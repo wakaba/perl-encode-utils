@@ -1,6 +1,8 @@
 2002-09-16  Wakaba <w@suika.fam.cx>
 
 	* EightBit.pm: New module.
+	* JIS.pm: New module.
+	* SevenBit.pm: Don't invoke G1 to GR when encoding.
 
 2002-09-15  Wakaba <w@suika.fam.cx>
 

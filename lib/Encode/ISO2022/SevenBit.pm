@@ -13,7 +13,7 @@ require 5.7.3;
 use strict;
 package Encode::ISO2022::SevenBit;
 use vars qw($VERSION);
-$VERSION=do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use base qw(Encode::Encoding);
 __PACKAGE__->Define (qw/iso-2022-7bit iso-2022-7 jis junet jis7/);
 require Encode::ISO2022;
@@ -47,6 +47,7 @@ sub __2022__common ($) {
 }
 sub __2022_encode ($) {
   my $C = shift->__2022__common;
+  $C->{GR} = undef;
   $C->{G1} = $Encode::ISO2022::CHARSET{G96}->{"\x7E"};	## empty set
   $C;
 }
@@ -90,6 +91,7 @@ sub __2022__common ($) {
 }
 sub __2022_encode ($) {
   my $C = shift->__2022__common;
+  $C->{GR} = undef;
   $C->{C1} = $Encode::ISO2022::CHARSET{C1}->{"\x7E"};	## empty set
   $C->{G1} = $Encode::ISO2022::CHARSET{G96}->{"\x7E"};	## empty set
   $C;
@@ -110,6 +112,7 @@ ISO/IEC 2022 based 7-bit encoding for Japanese.
 
 sub __2022_encode ($) {
   my $C = shift->__2022__common;
+  $C->{GR} = undef;
   $C->{option}->{designate_to}->{G94}->{"\x4A"} = -1;	## JIS X 0201 roman
   $C->{option}->{designate_to}->{G94n}->{"\x42"} = -1;	## JIS X 0208-1983
   $C->{option}->{designate_to}->{G94n}->{"\x42\x40"} = -1;	## JIS X 0208-1990
@@ -241,6 +244,7 @@ sub __2022__common ($) {
 }
 sub __2022_encode ($) {
   my $C = shift->__2022__common;
+  $C->{GR} = undef;
   $C->{C1} = $Encode::ISO2022::CHARSET{C1}->{"\x7E"};	## empty set
   $C->{G1} = $Encode::ISO2022::CHARSET{G96}->{"\x7E"};	## empty set
   $C;
@@ -286,6 +290,7 @@ sub __2022__common ($) {
 }
 sub __2022_encode ($) {
   my $C = shift->__2022__common;
+  $C->{GR} = undef;
   $C->{C1} = $Encode::ISO2022::CHARSET{C1}->{"\x7E"};	## empty set
   $C->{G1} = $Encode::ISO2022::CHARSET{G96}->{"\x7E"};	## empty set
   $C;
@@ -323,6 +328,7 @@ sub __2022__common ($) {
 }
 sub __2022_encode ($) {
   my $C = shift->__2022__common;
+  $C->{GR} = undef;
   $C->{C1} = $Encode::ISO2022::CHARSET{C1}->{"\x7E"};	## empty set
   $C->{G1} = $Encode::ISO2022::CHARSET{G96}->{"\x7E"};	## empty set
   $C;
@@ -366,6 +372,7 @@ sub __2022__common ($) {
 }
 sub __2022_encode ($) {
   my $C = shift->__2022__common;
+  $C->{GR} = undef;
   $C->{C1} = $Encode::ISO2022::CHARSET{C1}->{"\x7E"};	## empty set
   $C->{G1} = $Encode::ISO2022::CHARSET{G96}->{"\x7E"};	## empty set
   $C;
@@ -443,6 +450,7 @@ sub __2022__common ($) {
 }
 sub __2022_encode ($) {
   my $C = shift->__2022__common;
+  $C->{GR} = undef;
   $C->{C1} = $Encode::ISO2022::CHARSET{C1}->{"\x7E"};	## empty set
   $C->{G1} = $Encode::ISO2022::CHARSET{G96}->{"\x7E"};	## empty set
   $C;
@@ -499,5 +507,5 @@ and/or modify it under the same terms as Perl itself.
 
 =cut
 
-# $Date: 2002/09/16 02:17:48 $
+# $Date: 2002/09/16 06:34:35 $
 ### SevenBit.pm ends here
