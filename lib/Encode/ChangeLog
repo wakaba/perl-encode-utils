@@ -1,6 +1,11 @@
+2002-10-05  Nanashi-san
+
+	* Table.pm: New module.
+	(Commited by Wakaba <w@suika.fam.cx>.)
+
 2002-09-22  Wakaba <w@suika.fam.cx>
 
-	* ISO2022.pm (_internal_to_iso2022): Allow SP as a
+	* ISO2022.pm (_internal_to_iso2022): Allow SP as the
 	replacement character.
 
 2002-09-21  Wakaba <w@suika.fam.cx>

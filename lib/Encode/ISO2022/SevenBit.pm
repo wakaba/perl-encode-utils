@@ -13,7 +13,7 @@ require 5.7.3;
 use strict;
 package Encode::ISO2022::SevenBit;
 use vars qw($VERSION);
-$VERSION=do{my @r=(q$Revision: 1.7 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.8 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use base qw(Encode::Encoding);
 __PACKAGE__->Define (qw/iso-2022-7bit iso-2022-7 jis junet jis7
   7bit-jis/);
@@ -124,12 +124,12 @@ sub __2022_encode ($) {
 package Encode::ISO2022::SevenBit::JP1;
 use vars qw/@ISA/;
 push @ISA, 'Encode::ISO2022::SevenBit::JP';
-__PACKAGE__->Define (qw/iso-2022-jp-1/);
+__PACKAGE__->Define (qw/iso-2022-jp-1 iso2022jp-1/);
 
 =item iso-2022-jp-1
 
 ISO/IEC 2022 based 7-bit encoding for Japanese,
-defined by RFC 2237
+defined by RFC 2237.  (Alias: iso2022jp-1)
 
 =cut
 
@@ -143,14 +143,14 @@ sub __2022__common ($) {
 package Encode::ISO2022::SevenBit::JP3;
 use vars qw/@ISA/;
 push @ISA, 'Encode::ISO2022::SevenBit::JP';
-__PACKAGE__->Define (qw/iso-2022-jp-3 x-iso-2022-jp-3
+__PACKAGE__->Define (qw/iso-2022-jp-3 x-iso-2022-jp-3 iso2022jp-3
  jis0213   iso-2022-jp-3-compatible iso-2022-jp-3-strict/);
 
 =item iso-2022-jp-3
 
 ISO/IEC 2022 based 7-bit encoding for Japanese,
 defined by JIS X 0213:2000 Appendix 2.
-(Alias: x-iso-2022-jp-3, jis0213)
+(Alias: x-iso-2022-jp-3, iso2022jp-3, jis0213)
 
 =item iso-2022-jp-3-compatible
 
@@ -216,12 +216,13 @@ sub __2022__common ($) {
 package Encode::ISO2022::SevenBit::JP2;
 use vars qw/@ISA/;
 push @ISA, 'Encode::ISO2022::SevenBit::SS2';
-__PACKAGE__->Define (qw/iso-2022-jp-2 csiso2022jp2/);
+__PACKAGE__->Define (qw/iso-2022-jp-2 csiso2022jp2 iso2022jp-2/);
 
 =item iso-2022-jp-2
 
 ISO/IEC 2022 based 7-bit multilingual encoding, defined by
-RFC 1554.  A subset of iso-2022-7bit-ss2.  (Alias: csISO2022JP2 (IANA))
+RFC 1554.  A subset of iso-2022-7bit-ss2.  (Alias: iso2022jp-2,
+csISO2022JP2 (IANA))
 
 =cut
 
@@ -510,5 +511,5 @@ and/or modify it under the same terms as Perl itself.
 
 =cut
 
-# $Date: 2002/09/23 10:36:03 $
+# $Date: 2002/10/04 23:58:04 $
 ### SevenBit.pm ends here

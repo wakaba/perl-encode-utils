@@ -13,7 +13,7 @@ require 5.7.3;
 use strict;
 package Encode::ISO2022::EightBit;
 use vars qw($VERSION);
-$VERSION=do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use base qw(Encode::Encoding);
 require Encode::ISO2022;
 
@@ -82,7 +82,7 @@ package Encode::ISO2022::EightBit::EUCJapan;
 use vars qw/@ISA/;
 push @ISA, 'Encode::ISO2022::EightBit';
 __PACKAGE__->Define (qw/euc-japan euc-japan-1990 euc-jp euc-j eucjp euc_jp x-euc-jp
-  x-eucjp eucjis euc-jis Extended_UNIX_Code_Packed_Format_for_Japanese csEUCPkdFmtJapanese
+  x-eucjp eucjis euc-jis eucj Extended_UNIX_Code_Packed_Format_for_Japanese csEUCPkdFmtJapanese
   japanese-iso-8bit cp51932 japanese_euc
       ajec eucjp-open  ibm-eucjp cp33722 33722  sdeckanji/);
 
@@ -90,7 +90,7 @@ __PACKAGE__->Define (qw/euc-japan euc-japan-1990 euc-jp euc-j eucjp euc_jp x-euc
 
 EUC (ISO/IEC 2022 based 8-bit encoding) for Japanese.
 (Alias: euc-japan-1990 (emacsen), euc-jp (IANA),
-euc-j, eucjp (X), euc_jp, x-eucjp, x-euc-jp, eucjis, euc-jis,
+euc-j, eucjp (X), euc_jp, eucj, x-eucjp, x-euc-jp, eucjis, euc-jis,
 extended_unix_code_packed_format_for_japanese (IANA),
 cseucpkdfmtjapanese (IANA), japanese-iso-8bit (emacsen),
 cp51932 (M$), japanese_euc)
@@ -108,14 +108,14 @@ sub __2022__common ($) {
 package Encode::ISO2022::EightBit::EUCJISX0213;
 use vars qw/@ISA/;
 push @ISA, 'Encode::ISO2022::EightBit';
-__PACKAGE__->Define (qw/euc-jisx0213 x-euc-jisx0213 eucjp0213
+__PACKAGE__->Define (qw/euc-jisx0213 x-euc-jisx0213 euc_jisx0213 eucjp0213
  euc-jp-3     x-euc-jisx0213-packed  deckanji2000/);
 
 =item euc-jisx0213
 
 EUC (ISO/IEC 2022 based 8-bit encoding) for Japanese
 with JIS X 0213:2000, defined by JIS X 0213:2000.
-(Alias: x-euc-jisx0213, eucjp0213, euc-jp-3)
+(Alias: x-euc-jisx0213, euc_jisx0213, eucjp0213, euc-jp-3)
 
 =cut
 
@@ -382,5 +382,5 @@ and/or modify it under the same terms as Perl itself.
 
 =cut
 
-# $Date: 2002/09/22 11:08:23 $
+# $Date: 2002/10/04 23:58:04 $
 ### SevenBit.pm ends here
