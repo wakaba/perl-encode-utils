@@ -41,7 +41,7 @@ require v5.7.3;
 package Encode::ISO2022;
 use strict;
 use vars qw(%CHARSET %CODING_SYSTEM $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.12 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.13 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use base qw(Encode::Encoding);
 __PACKAGE__->Define (qw!iso-2022 iso/iec2022 iso2022 2022 cp2022!);
 require Encode::Charset;
@@ -471,7 +471,7 @@ sub internal_to_iso2022 ($;%) {
       }
       $t = _i2o ($c, $C, cs_F => $F) if $F;
     }
-    if (defined $t) {	## Output character itself
+    if (defined $t) {	## Output the character itself
       $r .= $t;
     } elsif ($C->{option}->{fallback_from_ucs} =~ /quiet/) {
       $r .= _back2ascii ($C) if $C->{option}->{fallback_from_ucs} =~ /back/;
@@ -795,4 +795,4 @@ and/or modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2002/12/14 11:02:25 $
+1; # $Date: 2002/12/16 10:25:01 $

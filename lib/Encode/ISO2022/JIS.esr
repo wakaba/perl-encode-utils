@@ -2,12 +2,12 @@
 Name:
 	ISO2022::JIS
 ShortDescription:
-	An Encode module of 7-bit ISO/IEC 2022
+	The Encode module for 7-bit ISO/IEC 2022
 	based coding systems defined by JISes
 Description:
 	This module defines convertion between perl internal
-	representation and coding systems defined in standards
-	of JIS (Japan Industrial Standards).
+	representation and 7-bit ISO/IEC 2022 based coding systems]
+	defined in standards of JIS (Japan Industrial Standards).
 	
 	Note that frequently used coding systems of JIS
 	are included in other modules.  For instance,

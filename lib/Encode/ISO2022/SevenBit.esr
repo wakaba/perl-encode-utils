@@ -20,9 +20,10 @@ Cversion:
 	C:designate:G96n:default=2
 	C:designate:coding_system:default=0
 	C:option:{Ginvoked_by_single_shift}->[2]=1
-Encode:
+Encode:Prepare:
 	C:GR=undef
 	C:G1=G96:~
+Encode:
 	->iso2022:C
 Decode:
 	<-iso2022:C
@@ -50,9 +51,10 @@ Cversion:
 	C:designate:G96:A=2	## ISO/IEC 8859-1 GR
 	C:designate:G96:F=2	## ISO/IEC 8859-7 GR
 	C:option:{Ginvoked_by_single_shift}->[2]=1
-Encode:
+Encode:Prepare:
 	C:GR=undef
 	C:G1=G96:~
+Encode:
 	=>ucs_to_ascii ucs_to_jisx0208_1983 ucs_to_jisx0212_1990 ucs_to_gb2312_1980 ucs_to_ksx1001_1992 ucs_to_jisx0208_1978 ucs_to_isoiec8859_1 ucs_to_isoiec8859_7 ucs_to_jisx0201_latin
 	->iso2022:C
 Decode:
@@ -79,10 +81,11 @@ Cversion:
 	C:designate:G94n:default=0
 	C:designate:G96n:default=1
 	C:designate:coding_system:default=0
-Encode:
+Encode:Prepare:
 	C:GR=undef
 	C:C1=C1:~
 	C:G1=G96:~
+Encode:
 	->iso2022:C
 Decode:
 	<-iso2022:C
@@ -104,10 +107,11 @@ Cversion:
 	C:designate:G94n:default=0
 	C:designate:G94n:C=1	## KS X 1001
 	C:designate:G96n:default=1
-Encode:
+Encode:Prepare:
 	C:GR=undef
 	C:C1=C1:~
 	C:G1=G96:~
+Encode:
 	->iso2022:C
 Decode:
 	<-iso2022:C
@@ -130,10 +134,11 @@ Cversion:
 	C:designate:*:default=-1
 	C:designate:G94:B=0	## ASCII
 	C:designate:G94n:C=1	## KS X 1001
-Encode:
+Encode:Prepare:
 	C:GR=undef
 	C:C1=C1:~
 	C:G1=G96:~
+Encode:
 	=>ucs_to_ascii ksx1001_1992_to_ucs
 	->iso2022:C
 Decode:
@@ -161,10 +166,11 @@ Cversion:
 	C:designate:G94n:D=0	## JIS X 0212-1990
 	C:designate:G96:A=1	## ISO/IEC 8859-1 GR
 	C:designate:G96:F=0	## ISO/IEC 8859-7 GR
-Encode:
+Encode:Prepare:
 	C:GR=undef
 	C:C1=C1:~
 	C:G1=G96:~
+Encode:
 	=>ucs_to_ascii ucs_to_jisx0208_1983 ucs_to_gb2312_1980 ucs_to_ksx1001_1992 ucs_to_isoiec8859_1 ucs_to_isoiec8859_7 ucs_to_jisx0212_1990 ucs_to_jisx0208_1978 ucs_to_jisx0201_latin
 	->iso2022:C
 Decode:
@@ -218,10 +224,11 @@ Cversion:
 	C:designate:G94n:CScns11643_14=3	## CNS 11643 plane 14
 	C:designate:G94n:CScns11643_15=3	## CNS 11643 plane 15
 	C:designate:coding_system:default=0
-Encode:
+Encode:Prepare:
 	C:GR=undef
 	C:C1=C1:~
 	C:G1=G96:~
+Encode:
 	->iso2022:C
 Decode:
 	C:G1=G94n:C
@@ -244,10 +251,11 @@ Cversion:
 	C:designate:G94n:A=1	## GB 2312-80
 	C:designate:G94n:G=1	## CNS 11643 plane 1
 	C:designate:G94n:H=2	## CNS 11643 plane 2
-Encode:
+Encode:Prepare:
 	C:GR=undef
 	C:C1=C1:~
 	C:G1=G96:~
+Encode:
 	=>ucs_to_ascii ucs_to_gb2312_1980 ucs_to_cns11643_1 ucs_to_cns11643_2
 	->iso2022:C
 Decode:
@@ -274,10 +282,11 @@ Cversion:
 	C:designate:G94n:A=1	## GB 2312-80
 	C:designate:G94n:G=1	## CNS 11643 plane 1
 	C:designate:G94n:H=2	## CNS 11643 plane 2
-Encode:
+Encode:Prepare:
 	C:GR=undef
 	C:C1=C1:~
 	C:G1=G96:~
+Encode:
 	=>ucs_to_ascii ucs_to_cns11643_1 ucs_to_cns11643_2 ucs_to_gb2312_1980
 	->iso2022:C
 Decode:
@@ -319,10 +328,11 @@ Cversion:
 	C:designate:G94n:CScns11643_13=3	## CNS 11643 plane 13
 	C:designate:G94n:CScns11643_14=3	## CNS 11643 plane 14
 	C:designate:G94n:CScns11643_15=3	## CNS 11643 plane 15
-Encode:
+Encode:Prepare:
 	C:GR=undef
 	C:C1=C1:~
 	C:G1=G96:~
+Encode:
 	=>ucs_to_ascii ucs_to_gb2312_1980 ucs_to_iso_ir_165 ucs_to_cns11643_1 ucs_to_cns11643_2 ucs_to_cns11643_3 ucs_to_cns11643_4 ucs_to_cns11643_5 ucs_to_cns11643_6 ucs_to_cns11643_7
 	->iso2022:C
 Decode:

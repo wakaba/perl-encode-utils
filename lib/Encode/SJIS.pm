@@ -5,8 +5,9 @@ Encode::SJIS --- Shift JIS coding systems encoder and decoder
 
 =head1 ENCODINGS
 
-This module defines only two basic version of shift JIS.
-Other variants are defined in Encode::SJIS::* modules.
+This module defines encoding engine for Shift JIS coding systems.
+This module only provides general en/decoding parts.  Actual profiles
+for Shift JISes are included in Encode::SJIS::*.
 
 =over 4
 
@@ -15,40 +16,14 @@ Other variants are defined in Encode::SJIS::* modules.
 package Encode::SJIS;
 use 5.7.3;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.5 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Encode::Charset;
 use base qw(Encode::Encoding);
 
-### --- Perl Encode module common functions
-
-sub encode ($$;$) {
-  my ($obj, $str, $chk) = @_;
-  $_[1] = '' if $chk;
-  if (!defined $obj->{_encode_mapping} || $obj->{_encode_mapping}) {
-    require Encode::Table;
-    $str = Encode::Table::convert ($str, $obj->__encode_map,
-      -autoload => defined $obj->{_encode_mapping_autoload} ?
-                   $obj->{_encode_mapping_autoload} : 1);
-  }
-  $str = &internal_to_sjis ($str, $obj->__2022_encode);
-  $str;
-}
-
-sub decode ($$;$) {
-  my ($obj, $str, $chk) = @_;
-  $_[1] = '' if $chk;
-  $str = &sjis_to_internal ($str, $obj->__2022_decode);
-  if (!defined $obj->{_decode_mapping} || $obj->{_decode_mapping}) {
-    require Encode::Table;
-    $str = Encode::Table::convert ($str, $obj->__decode_map,
-      -autoload => defined $obj->{_decode_mapping_autoload} ?
-                   $obj->{_decode_mapping_autoload} : 1);
-  }
-  $str;
-}
-
-### --- Encode::SJIS unique functions
 *new_object = \&Encode::Charset::new_object_sjis;
+
+## Code extention escape sequence defined by ISO/IEC 2022 is
+## not supported in this version of this module.
 
 sub sjis_to_internal ($$) {
   my ($s, $C) = @_;
@@ -103,24 +78,28 @@ sub internal_to_sjis ($\%) {
   $C ||= &new_object;
   
   my $r = '';
-  for my $c (split //, $s) {
-    my $cc = ord $c;
+  my @c = split //, $s;
+  for my $i (0..$#c) {
+    my $c = $c[$i]; my $cc = ord $c;  Encode::_utf8_off ($c);
     my $t;
+    ## CL = C0 control characters
     if ($cc <= 0x1F) {
       $t = $c if $C->{ $C->{CL} } eq $Encode::Charset::CHARSET{C0}->{"\x40"};
+    ## 0x20 == SP and 0x7E == DEL
     } elsif ($cc == 0x20 || $cc == 0x7F) {
-      Encode::_utf8_off ($c);
       $t = $c;
+    ## GL = G0 = ISO/IEC 646 graphic character set
     } elsif ($cc < 0x7F) {
-      Encode::_utf8_off ($c);
       $t = $c if $C->{ $C->{GL} } eq $Encode::Charset::CHARSET{G94}->{"\x42"};
+    ## 0x80
     } elsif ($C->{option}->{C1invoke_to_right} && $cc == 0x80) {
       $t = "\x80"
         if $C->{ $C->{CR} } eq $Encode::Charset::CHARSET{C1}->{'64291991C1'};
+    ## ESC Fe = C1 control characters
     } elsif ($cc <= 0x9F) {
       $t = "\x1B".pack 'C', ($cc - 0x40)
         if $C->{ $C->{ESC_Fe} } eq $Encode::Charset::CHARSET{C1}->{'64291991C1'};
-    
+    ## G1 or G3 = 94^2 graphic character set from ISO-IR
     } elsif (0xE9F6C0 <= $cc && $cc <= 0xF06F80) {
       my $c = $cc - 0xE9F6C0;  my $F = chr (($c / 8836)+0x30);
       if ($C->{G1} eq $Encode::Charset::CHARSET{G94n}->{ $F }) {
@@ -130,14 +109,15 @@ sub internal_to_sjis ($\%) {
       } elsif ($C->{G3} eq $Encode::Charset::CHARSET{G94n}->{ $F }) {
         my ($c1, $c2) = ((($c % 8836) / 94)+0x21, ($c % 94)+0x21);
         if ($C->{G3}->{Csjis_first}) {
-          $t = pack ('CC', $C->{G3}->{Csjis_first}->{ ($c % 8836) / 94 },
-                     $c2 + (($c1 & 1) ? ($c2 < 0x60 ? 0x1F : 0x20) : 0x7E));
+          my $fb = $C->{G3}->{Csjis_first}->{ ($c % 8836) / 94 };
+          $t = pack ('CC', $fb, $c2 + (($c1 & 1) ? ($c2 < 0x60 ? 0x1F : 0x20) : 0x7E)) if $fb;
         } else {
           $t = pack ('CC', ($c / 188) + 0xF0,
                      $c2 + (($c1 & 1) ? ($c2 < 0x60 ? 0x1F : 0x20) : 0x7E))
                if ($c / 188) + 0xF0 < 0xFD;
         }
       }
+    ## G1 = JIS X 0208-1990/:1997
     } elsif (0xF49D7C <= $cc && $cc <= 0xF4BFFF) {
       my $c = $cc - 0xF49D7C;
       if ($C->{G1} eq $Encode::Charset::CHARSET{G94n}->{'B@'}) {
@@ -145,7 +125,7 @@ sub internal_to_sjis ($\%) {
         $t = pack ('CC', (($c1 - 1) >> 1) + ($c1 < 0x5F ? 0x71 : 0xB1),
                $c2 + (($c1 & 1) ? ($c2 < 0x60 ? 0x1F : 0x20) : 0x7E));
       }
-    
+    ## GL = G0 = ISO/IEC 646 graphic character set / GR = G2 = JIS X 0201 Katakana set
     } elsif (0xE90940 <= $cc && $cc <= 0xE92641) {
       my $c = $cc - 0xE90940;  my $F = chr (($c / 94)+0x30);
       if ($C->{ $C->{GL} } eq $Encode::Charset::CHARSET{G94}->{ $F }) {
@@ -153,6 +133,7 @@ sub internal_to_sjis ($\%) {
       } elsif ($C->{ $C->{GR} } eq $Encode::Charset::CHARSET{G94}->{ $F }) {
         $t = pack 'C', (($c % 94) + 0xA1) if ($c % 94) < 0x3F;
       }
+    ## G1 / G3 = 94^2 graphic character set
     } elsif (0x70420000 <= $cc && $cc <= 0x7046F19B) {
       my $c = $cc % 0x10000;
       my $F0=$C->{option}->{private_set}->{G94n}->[($cc/0x10000)-0x7042]->[$c/8836];
@@ -161,129 +142,51 @@ sub internal_to_sjis ($\%) {
        || $C->{G3} eq $Encode::Charset::CHARSET{G94n}->{ $F1 }) {
         my ($c1, $c2) = ((($c % 8836) / 94)+0x21, ($c % 94)+0x21);
         if ($C->{G3}->{Csjis_first}) {
-          $t = pack ('CC', $C->{G3}->{Csjis_first}->{ ($c % 8836) / 94 },
-                     $c2 + (($c1 & 1) ? ($c2 < 0x60 ? 0x1F : 0x20) : 0x7E));
+          my $fb = $C->{G3}->{Csjis_first}->{ ($c % 8836) / 94 };
+          $t = pack ('CC', $fb, $c2 + (($c1 & 1) ? ($c2 < 0x60 ? 0x1F : 0x20) : 0x7E)) if $fb;
         } else {
           $t = pack ('CC', ($c / 188) + 0xF0,
                      $c2 + (($c1 & 1) ? ($c2 < 0x60 ? 0x1F : 0x20) : 0x7E))
                if ($c / 188) + 0xF0 < 0xFD;
         }
       }
+    ## Other character sets are not supported now (and there is no plan to implement them).
     }
     
+    ## Output the character itself
     if (defined $t) {
       $r .= $t;
+    ## Output the character itself with mapping table of special code positions
     } elsif ($C->{GsmapR}->{ $c }) {
       $r .= $C->{GsmapR}->{ $c };
+    } elsif ($C->{option}->{fallback_from_ucs} =~ /quiet/) {
+      return ($r, halfway => 1, converted_length => $i,
+              warn => $C->{option}->{fallback_from_ucs} =~ /warn/ ? 1 : 0,
+              reason => sprintf (q(U+%04X: There is no character mapped to), $cc));
+    } elsif ($C->{option}->{fallback_from_ucs} eq 'croak') {
+      return ($r, halfway => 1, die => 1,
+              reason => sprintf (q(U+%04X: There is no character mapped to), $cc));
+    ## 
     } else {
-      $r .= $C->{option}->{undef_char_sjis} || "\x3F";
+      ## Try to output with fallback escape sequence (if specified)
+      my $t = Encode::Charset::fallback_escape ($C, $c);
+      if (defined $t) {
+        my %D = (fallback => $C->{option}->{fallback_from_ucs}, reset => $C->{option}->{reset});
+        $C->{option}->{fallback_from_ucs} = 'croak';
+        $C->{option}->{reset} = {Gdesignation => 0, Ginvoke => 0};
+        eval q{$t = $C->{_encoder}->_encode_internal ($t, $C)} or undef $t;
+        $C->{option}->{fallback_from_ucs} = $D{fallback};
+        $C->{option}->{reset} = $D{reset};
+      }
+      if (defined $t) {
+        $r .= $t;
+      } else {	## Replacement character specified in charset definition
+        $r .= $C->{option}->{undef_char_sjis} || "\x3F";
+      }
     }
   }
   $r;
 }
-
-sub __clone ($) {
-  my $self = shift;
-  bless {%$self}, ref $self;
-};
-
-__PACKAGE__->Define (qw!shift_jisx0213 japanese-shift-jisx0213
-shift-jisx0213 x-shift_jisx0213 shift-jis-3 shift-jis-2000 sjisx0213
-sjis s-jis shift-jis x-sjis x_sjis x-sjis-jp shiftjis x-shiftjis
-x-shift-jis shift.jis!);
-
-=item sjis
-
-"Shift JIS" coding system.  (Alias: shift-jis, shiftjis,
-shift.jis, x-shiftjis, x-shift-jis, s-jis, x-sjis, x_sjis,
-x-sjis-jp)
-
-Since this name is ambiguous (it can now refer all or any
-of shift JIS coding system family), this name should not
-be used to address specific coding system.  In this module,
-this is considered as an alias name to the shift JIS with
-latest official definition, currently of JIS X 0213:2000
-Appendix 1 (with implemention level 4).
-
-Note that the name "Shift_JIS" is not associated with
-this name, because IANA registry [IANAREG] assignes
-it to a shift JIS defined by JIS X 0208:1997.
-
-=item shift_jisx0213
-
-Shift_JISX0213 coded representation, defined by
-JIS X 0213:2000 Appendix 1 (implemention level 4).
-(Alias: shift-jisx0213, x-shift_jisx0213, japanese-shift-jisx0213 (emacsen),
-shift-jis-3 (Yudit), shift-jis-2000, sjisx0213)
-
-=cut
-
-sub __2022__common ($) {
-  my $C = Encode::SJIS->new_object;
-  $C->{G0} = $Encode::Charset::CHARSET{G94}->{J};	## JIS X 0201:1997 Latin
-  $C->{G1} = $Encode::Charset::CHARSET{G94n}->{"\x4F"};	## JIS X 0213:2000 plane 1
-  $C->{G2} = $Encode::Charset::CHARSET{G94}->{I};	## JIS X 0201:1997 Katakana
-  $C->{G3} = $Encode::Charset::CHARSET{G94n}->{"\x50"};	## JIS X 0213:2000 plane 2
-  $C;
-}
-sub __2022_encode ($) {
-  my $C = shift->__2022__common;
-  $C;
-}
-sub __2022_decode ($) {
-  my $C = shift->__2022__common;
-  $C;
-}
-sub __encode_map ($) {
-  [qw/ucs_to_jisx0201_latin ucs_to_jisx0213_2000_1 ucs_to_jisx0213_2000_2 ucs_to_jisx0201_katakana/];
-}
-sub __decode_map ($) {
-  [qw/jisx0201_latin_to_ucs jisx0213_2000_1_to_ucs jisx0213_2000_2_to_ucs jisx0201_katakana_to_ucs/];
-}
-
-package Encode::SJIS::X0213ASCII;
-use vars qw/@ISA/;
-push @ISA, 'Encode::SJIS';
-__PACKAGE__->Define (qw/shift_jisx0213-ascii shift-jis-2000-ascii
-sjis-ascii shift-jis-ascii/);
-
-=item sjis-ascii
-
-Same as sjis but ASCII (ISO/IEC 646 IRV) instead of
-JIS X 0201 Roman (or Latin) set.  (Alias: shift-jis-ascii)
-
-In spite of the history of shift JIS, ASCII is sometimes
-used instead of JIS X 0201 Roman set, because of compatibility
-with ASCII world.
-
-Note that this name is now an alias of shift_jisx0213-ascii,
-as sjis is of shift_jisx0213.
-
-=item shift_jisx0213-ascii
-
-Same as Shift_JISX0213 but ASCII (ISO/IEC 646 IRV)
-instead of JIS X 0201:1997 Latin character set.
-(Alias: shift-jis-2000-ascii)
-
-Note that this coding system does NOT comform to
-JIS X 0213:2000 Appendix 1.
-
-=cut
-
-sub __2022__common ($) {
-  my $C = shift->SUPER::__2022__common;
-  $C->{G0} = $Encode::Charset::CHARSET{G94}->{B};	## ASCII
-  $C;
-}
-sub __encode_map ($) {
-  [qw/ucs_to_ascii ucs_to_jisx0213_2000_1 ucs_to_jisx0213_2000_2 ucs_to_jisx0201_katakana/];
-}
-sub __decode_map ($) {
-  [qw/jisx0213_2000_1_to_ucs jisx0213_2000_2_to_ucs jisx0201_katakana_to_ucs/];
-}
-
-1;
-__END__
 
 =back
 
@@ -297,23 +200,19 @@ JIS X 0213:2000, "7-bit and 8-bit double byte coded extended Kanji
 sets for information interchange", Japan Industrial Standards
 Committee (JISC) <http://www.jisc.go.jp/>, 2000.
 
-Encode, perlunicode
+L<Encode::SJIS::JIS>
 
-[IANAREG] "CHARACTER SETS", IANA <http://www.iana.org/>,
-<http://www.iana.org/assignments/character-sets>.
-The charset registry for IETF <http://www.ietf.org/> standards.
-(Note that in this registry two shift JISes are registered,
-"Shift_JIS" and "Windows-31j".  Former is JIS X 0208:1997's
-definition and later is the Windows standard character set.)
+L<Encode>, L<perlunicode>
+
+L<Encode::Charset>, L<Encode::ISO2022>
 
 =head1 LICENSE
 
-Copyright 2002 Nanashi-san
+Copyright 2002 Nanashi-san <nanashi-san@nanashi.invalid>
 
 This library is free software; you can redistribute it
 and/or modify it under the same terms as Perl itself.
 
 =cut
 
-# $Date: 2002/12/12 08:17:16 $
-### SJIS.pm ends here
+1; # $Date: 2002/12/16 10:25:01 $

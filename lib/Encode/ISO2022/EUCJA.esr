@@ -23,8 +23,9 @@ Cversion:
 	C:option:{reset}->{Gdesignation}=0
 	C:option:{reset}->{Ginvoke}=0
 	C:option:{undef_char}=["\x22\x2E", {type => 'G94n', charset => '@'}]
-Encode:
+Encode:Prepare:
 	C:G3=G94n:~
+Encode:
 	=>ucs_to_ascii ucs_to_jisx0208_1978 ucs_to_jisx0201_katakana
 	->iso2022:C
 Decode:
@@ -156,8 +157,9 @@ Cversion:
 	C:option:{reset}->{Gdesignation}=0
 	C:option:{reset}->{Ginvoke}=0
 	C:option:{undef_char}=["\x22\x2E", {type => 'G94n', charset => 'O'}]
-Encode:
+Encode:Prepare:
 	C:G3=G94n:~	## empty
+Encode:
 	=>ucs_to_ascii ucs_to_jisx0213_2000_1 ucs_to_jisx0201_katakana
 	->iso2022:C
 Decode:

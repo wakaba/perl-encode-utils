@@ -1,3 +1,12 @@
+2002-12-16  Wakaba  <w@suika.fam.cx>
+
+	* *.esr: Refined to new style of using Encode:Prepare: and
+	Decode:Prepare.
+
+2002-12-15  Wakaba  <w@suika.fam.cx>
+
+	* Makefile (%.pm): Do syntax check of outputed perl module.
+
 2002-12-14  Wakaba  <w@suika.fam.cx>
 
 	* JIS.esr: Update to new syntax and bug fix of C:option:{undef_char}

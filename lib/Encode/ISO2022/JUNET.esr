@@ -15,10 +15,12 @@ Cversion:
 	C:G0=G94:B
 	C:designate:*:default=0
 	C:designate:coding_system:default=0
-Encode:
+Encode:Prepare:
 	C:GR=undef
 	C:C1=C1:~
 	C:G1=G96:~
+Encode:
+	#=>ucs_to_ascii ucs_to_jisx0208_1983 ucs_to_jisx0213_2000_1 ucs_to_gb2312_1980 ucs_to_ksx1001_1992 ucs_to_cns11643_1 ucs_to_jisx0213_2000_2 ucs_to_iso_ir_165 ucs_to_jisx0212_1990 ucs_to_cns11643_2 ucs_to_jisx0208_1978 ucs_to_cns11643_3 ucs_to_jisx0201_latin ucs_to_jisx0201_katakana ucs_to_cns11643_4 ucs_to_cns11643_5 ucs_to_cns11643_6 ucs_to_cns11643_7 ucs_to_kps9566_1997
 	->iso2022:C
 Decode:
 	<-iso2022:C
@@ -42,10 +44,11 @@ Cversion:
 	C:designate:G94n:B@=0	## JIS X 0208-1990
 	C:option:{use_revision}=0
 	C:option:{undef_char}=["\x22\x2E", {type => 'G94n', charset => 'B'}]
-Encode:
+Encode:Prepare:
 	C:GR=undef
 	C:C1=C1:~
 	C:G1=G96:~
+Encode:
 	=>ucs_to_ascii ucs_to_jisx0208_1983 ucs_to_jisx0208_1978 ucs_to_jisx0201_latin
 	->iso2022:C
 Decode:
@@ -75,10 +78,11 @@ Cversion:
 	C:designate:G94n:B@=0	## JIS X 0208-1990
 	C:option:{use_revision}=0
 	C:option:{undef_char}=["\x22\x2E", {type => 'G94n', charset => '@'}]
-Encode:
+Encode:Prepare:
 	C:GR=undef
 	C:C1=C1:~
 	C:G1=G96:~
+Encode:
 	=>ucs_to_ascii ucs_to_jisx0208_1978 ucs_to_jisx0208_1983 ucs_to_jisx0201_latin
 	->iso2022:C
 Decode:
@@ -104,10 +108,11 @@ Cversion:
 	C:designate:G94:J=0	## JIS X 0201 Roman
 	C:designate:G94n:B=0	## JIS X 0208-1983
 	C:option:{undef_char}=["\x22\x2E", {type => 'G94n', charset => 'B'}]
-Encode:
+Encode:Prepare:
 	C:GR=undef
 	C:C1=C1:~
 	C:G1=G96:~
+Encode:
 	=>ucs_to_ascii ucs_to_jisx0208_1983 ucs_to_jisx0201_latin ucs_to_jisx0201_katakana
 	->iso2022:C
 Decode:
@@ -137,10 +142,11 @@ Cversion:
 	C:designate:G94n:D=0	## JIS X 0212-1990
 	C:option:{use_revision}=0
 	C:option:{undef_char}=["\x22\x2E", {type => 'G94n', charset => 'B'}]
-Encode:
+Encode:Prepare:
 	C:GR=undef
 	C:C1=C1:~
 	C:G1=G96:~
+Encode:
 	=>ucs_to_ascii ucs_to_jisx0208_1983 ucs_to_jisx0212_1990 ucs_to_jisx0208_1978 ucs_to_jisx0201_latin
 	->iso2022:C
 Decode:
@@ -170,10 +176,11 @@ Cversion:
 	C:designate:G94n:O=0	## JIS X 0213:2000 plane 1
 	C:designate:G94n:P=0	## JIS X 0213:2000 plane 2
 	C:option:{undef_char}=["\x22\x2E", {type => 'G94n', charset => 'O'}]
-Encode:
+Encode:Prepare:
 	C:GR=undef
 	C:C1=C1:~
 	C:G1=G96:~
+Encode:
 	=>ucs_to_ascii ucs_to_jisx0213_2000_1 ucs_to_jisx0213_2000_2
 	->iso2022:C
 Decode:
@@ -196,10 +203,11 @@ Cversion:
 	C:designate:G94n:O=0	## JIS X 0213:2000 plane 1
 	C:designate:G94n:P=0	## JIS X 0213:2000 plane 2
 	C:option:{undef_char}=["\x22\x2E", {type => 'G94n', charset => 'O'}]
-Encode:
+Encode:Prepare:
 	C:GR=undef
 	C:C1=C1:~
 	C:G1=G96:~
+Encode:
 	=>ucs_to_ascii ucs_to_jisx0213_2000_1_esc_24_42 ucs_to_jisx0213_2000_1 ucs_to_jisx0213_2000_2
 	->iso2022:C
 Decode:
@@ -225,10 +233,11 @@ Cversion:
 	C:designate:G94n:O=0	## JIS X 0213:2000 plane 1
 	C:designate:G94n:P=0	## JIS X 0213:2000 plane 2
 	C:option:{undef_char}=["\x22\x2E", {type => 'G94n', charset => 'O'}]
-Encode:
+Encode:Prepare:
 	C:GR=undef
 	C:C1=C1:~
 	C:G1=G96:~
+Encode:
 	=>ucs_to_ascii ucs_to_jisx0208_1983 ucs_to_jisx0213_2000_1 ucs_to_jisx0213_2000_2
 	->iso2022:C
 Decode:
@@ -252,10 +261,11 @@ Cversion:
 	C:designate:G94n:B=0	## subset of JIS X 0213:2000 plane 1
 	C:designate:G94n:O=0	## JIS X 0213:2000 plane 1
 	C:option:{undef_char}=["\x22\x2E", {type => 'G94n', charset => 'O'}]
-Encode:
+Encode:Prepare:
 	C:GR=undef
 	C:C1=C1:~
 	C:G1=G96:~
+Encode:
 	=>ucs_to_ascii ucs_to_jisx0213_2000_1
 	->iso2022:C
 Decode:

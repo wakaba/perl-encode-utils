@@ -12,6 +12,7 @@ all: $(PMS)
 
 %.pm: %.esr $(ESR2PM)
 	$(PERL) $(PERLOPTION) $(ESR2PM) $< > $@
+	$(PERL) -c $@
 
 clean:
 	rm -v $(PMS)

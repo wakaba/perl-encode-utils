@@ -18,13 +18,15 @@ Cversion:
 	C:option:{Ginvoke_to_left}=[1,0,0,0]
 	C:option:{Ginvoke_by_single_shift}=[0,0,1,1]
 	C:option:{C1invoke_to_right}=1
-Encode:
+Encode:Prepare:
 	C:G1=G96:~	## empty
 	C:G2=G96:~	## empty
+Encode:
 	->iso2022:C
-Decode:
+Decode:Prepare:
 	C:G1=G96:A	## ISO/IEC 8859-1
 	C:G2=G96:A	## ISO/IEC 8859-1
+Decode:
 	<-iso2022:C
 Description:
 	ISO/IEC 2022 based 8-bit encoding using SS2 for 96-charset.
@@ -55,14 +57,16 @@ Cversion:
 	C:option:{C1invoke_to_right}=1
 	C:option:{reset}->{Ginvoke}=0
 	C:option:{use_revision}=0
-Encode:
+Encode:Prepare:
 	C:G1=G96:~	## empty
 	C:G2=G96:~	## empty
+Encode:
 	=>ucs_to_ascii ucs_to_isoiec8859_1 ucs_to_isoiec8859_2 ucs_to_isoiec8859_3 ucs_to_isoiec8859_4 ucs_to_isoiec8859_5 ucs_to_isoiec8859_6 ucs_to_isoiec8859_7 ucs_to_isoiec8859_8 ucs_to_isoiec8859_9 ucs_to_gb2312_1980 ucs_to_jisx0208_1983 ucs_to_ksx1001_1992 ucs_to_jisx0212_1990 ucs_to_jisx0201_latin ucs_to_jisx0201_katakana
 	->iso2022:C
-Decode:
+Decode:Prepare:
 	C:G1=G96:A	## ISO/IEC 8859-1
 	C:G2=G96:A	## ISO/IEC 8859-1
+Decode:
 	<-iso2022:C
 	<=isoiec8859_2_to_ucs isoiec8859_3_to_ucs isoiec8859_4_to_ucs isoiec8859_5_to_ucs isoiec8859_6_to_ucs isoiec8859_7_to_ucs isoiec8859_8_to_ucs isoiec8859_9_to_ucs gb2312_1980_to_ucs jisx0208_1983_to_ucs ksx1001_1992_to_ucs jisx0212_1990_to_ucs
 Description:
@@ -95,14 +99,16 @@ Cversion:
 	C:option:{C1invoke_to_right}=1
 	C:option:{reset}->{Ginvoke}=0
 	C:option:{use_revision}=0
-Encode:
+Encode:Prepare:
 	C:G1=G96:~	## empty
 	C:G2=G96:~	## empty
+Encode:
 	=>ucs_to_ascii ucs_to_isoiec8859_1 ucs_to_isoiec8859_2 ucs_to_isoiec8859_3 ucs_to_isoiec8859_4 ucs_to_isoiec8859_5 ucs_to_isoiec8859_6 ucs_to_isoiec8859_7 ucs_to_isoiec8859_8 ucs_to_isoiec8859_9 ucs_to_gb2312_1980 ucs_to_jisx0208_1983 ucs_to_ksx1001_1992 ucs_to_jisx0212_1990 ucs_to_jisx0201_latin ucs_to_jisx0201_katakana
 	->iso2022:C
-Decode:
+Decode:Prepare:
 	C:G1=G96:A	## ISO/IEC 8859-1
 	C:G2=G96:A	## ISO/IEC 8859-1
+Decode:
 	<-iso2022:C
 	<=isoiec8859_2_to_ucs isoiec8859_3_to_ucs isoiec8859_4_to_ucs isoiec8859_5_to_ucs isoiec8859_6_to_ucs isoiec8859_7_to_ucs isoiec8859_8_to_ucs isoiec8859_9_to_ucs gb2312_1980_to_ucs jisx0208_1983_to_ucs ksx1001_1992_to_ucs jisx0212_1990_to_ucs
 Description:
@@ -131,14 +137,16 @@ Cversion:
 	C:option:{Ginvoke_to_left}=[1,0,0,0]
 	C:option:{C1invoke_to_right}=1
 	C:option:{reset}->{Ginvoke}=0
-Encode:
+Encode:Prepare:
 	C:G1=G96:~	## empty
 	C:G2=G96:~	## empty
+Encode:
 	=>ucs_to_ascii ucs_to_isoiec8859_1 ucs_to_isoiec8859_2 ucs_to_isoiec8859_3 ucs_to_isoiec8859_4 ucs_to_isoiec8859_5 ucs_to_isoiec8859_6 ucs_to_isoiec8859_7 ucs_to_isoiec8859_8 ucs_to_isoiec8859_9 ucs_to_gb2312_1980 ucs_to_jisx0208_1983 ucs_to_ksx1001_1992 ucs_to_jisx0212_1990 ucs_to_jisx0213_2000_1 ucs_to_jisx0213_2000_2 ucs_to_jisx0208_1990 ucs_to_jisx0208_1978 ucs_to_jisx0201_latin ucs_to_jisx0201_katakana
 	->iso2022:C
-Decode:
+Decode:Prepare:
 	C:G1=G96:A	## ISO/IEC 8859-1
 	C:G2=G96:A	## ISO/IEC 8859-1
+Decode:
 	<-iso2022:C
 	<=isoiec8859_2_to_ucs isoiec8859_3_to_ucs isoiec8859_4_to_ucs isoiec8859_5_to_ucs isoiec8859_6_to_ucs isoiec8859_7_to_ucs isoiec8859_8_to_ucs isoiec8859_9_to_ucs gb2312_1980_to_ucs jisx0208_1983_to_ucs ksx1001_1992_to_ucs jisx0212_1990_to_ucs jisx0208_1990_to_ucs jisx0213_2000_1_to_ucs jisx0213_2000_2_to_ucs jisx0208_1978_to_ucs
 Description:

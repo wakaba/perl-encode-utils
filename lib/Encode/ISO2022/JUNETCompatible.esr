@@ -38,10 +38,11 @@ Cversion:
 	C:designate:G94n:B@=0	## JIS X 0208-1990
 	C:option:{use_revision}=0
 	C:option:{undef_char}=["\x22\x2E", {type => 'G94n', charset => 'B'}]
-Encode:
+Encode:Prepare:
 	C:GR=undef
 	C:C1=C1:~
 	C:G1=G96:~
+Encode:
 	=>ucs_to_ascii ucs_to_jisx0208_1983_irv ucs_to_jisx0208_1978_irv ucs_to_jisx0201_latin
 	->iso2022:C
 Decode:
@@ -80,10 +81,11 @@ Cversion:
 	C:designate:G94n:O=0	## JIS X 0213:2000 plane 1
 	C:designate:G94n:P=0	## JIS X 0213:2000 plane 2
 	C:option:{undef_char}=["\x22\x2E", {type => 'G94n', charset => 'O'}]
-Encode:
+Encode:Prepare:
 	C:GR=undef
 	C:C1=C1:~
 	C:G1=G96:~
+Encode:
 	=>ucs_to_ascii ucs_to_jisx0213_2000_1_irv ucs_to_jisx0213_2000_2
 	->iso2022:C
 Decode:

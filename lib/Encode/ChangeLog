@@ -1,3 +1,13 @@
+2002-12-16  Wakaba  <w@suika.fam.cx>
+
+	* SJIS.pm (sjis, sjis-ascii, shift_jisx0213, shift_jisx0213-ascii): Removed.
+	(Moved to Encode::SJIS::JIS.)
+
+2002-12-15  Nanashi-san  <nanashi-san@nanashi.invalid>
+
+	* SJIS.pm (internal_to_shiftjis): Don't output invalid sequence
+	from unmappable plane 2 code positions.
+
 2002-12-14  Wakaba  <w@suika.fam.cx>
 
 	* Charset.pm (%FallbackFromUCS): New hash.
