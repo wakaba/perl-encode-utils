@@ -1,0 +1,7 @@
+2002-08-16  Wakaba <w@suika.fam.cx>
+
+	* ChangeLog: New file.
+
+2002-07-22  Wakaba <w@suika.fam.cx>
+
+	* CP932.pm: New module.
