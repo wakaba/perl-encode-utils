@@ -1,0 +1,64 @@
+#?PESRC/1.0
+Name:
+	ISO2022::EUCKR
+ShortDescription:
+	An Encode module of EUC (8-bit ISO/IEC 2022
+	based coding system) for Korean
+
+{
+Name:
+	euc-korea
+Alias:
+	euc-kr euckr cp970 cp51949 ibm-euckr x-euc-kr cseuckr korean-iso-8bit
+Cversion:
+	C:bit=8
+	C:G0=G94:B	## ASCII
+	C:G1=G94n:C	## KS C 5601 (KS X 1001)-1987
+	C:designate:*:default=-1
+	C:option:{Ginvoke_to_left}=[1,0,0,0]
+	C:option:{Ginvoke_by_single_shift}=[0,0,1,1]
+	C:option:{C1invoke_to_right}=1
+	C:option:{reset}->{Gdesignation}=0
+	C:option:{reset}->{Ginvoke}=0
+	C:option:{undef_char}=["\x21\x6B", {type => 'G94n', charset => 'C'}]
+Encode:
+	=>ucs_to_ascii ksx1001_1992
+	->iso2022:C
+Decode:
+	<-iso2022:C
+	<=ksx1001_1992_to_ucs
+Description:
+	EUC (ISO/IEC 2022 based 8-bit encoding) for Korean.
+}
+
+{
+Name:
+	euc-kps9566
+Cversion:
+	C:bit=8
+	C:G0=G94:B	## ASCII
+	C:G1=G94n:N	## KPS 9566-97
+	C:designate:*:default=-1
+	C:option:{Ginvoke_to_left}=[1,0,0,0]
+	C:option:{Ginvoke_by_single_shift}=[0,0,1,1]
+	C:option:{C1invoke_to_right}=1
+	C:option:{reset}->{Gdesignation}=0
+	C:option:{reset}->{Ginvoke}=0
+	C:option:{undef_char}=["\x3F", {type => 'G94', charset => 'B'}]
+Encode:
+	=>ucs_to_ascii ucs_to_kps9566_1997
+	->iso2022:C
+Decode:
+	<-iso2022:C
+	<=kps9566_1997_to_ucs
+Description:
+	EUC (ISO/IEC 2022 based 8-bit encoding) for Korean
+	with KPS 9566-97.
+}
+
+POD:SEE ALSO:
+	L<Encode::ISO2022>
+POD:LICENSE:
+	Copyright %%YEAR%% Nanashi-san <nanashi@san.invalid>
+	
+	%%PerlLicense%%

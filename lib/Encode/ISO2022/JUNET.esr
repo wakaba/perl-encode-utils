@@ -1,0 +1,283 @@
+#?PESRC/1.0
+Name:
+	ISO2022::JUNET
+ShortDescription:
+	An Encode module of 7-bit ISO/IEC 2022
+	based coding systems, developed in JUNET
+
+{
+Name:
+	junet
+Alias:
+	iso-2022-7bit iso-2022-7 jis jis7 7bit-jis
+Cversion:
+	C:bit=7
+	C:G0=G94:B
+	C:designate:*:default=0
+	C:designate:coding_system:default=0
+Encode:
+	C:GR=undef
+	C:C1=C1:~
+	C:G1=G96:~
+	->iso2022:C
+Decode:
+	<-iso2022:C
+Description:
+	ISO/IEC 2022 based 7-bit encoding using only G0
+}
+
+{
+Name:
+	iso-2022-jp
+Alias:
+	junet-code japanese-iso-7bit csiso2022jp iso2022jp rfc1468
+Cversion:
+	C:bit=7
+	C:G0=G94:B
+	C:designate:*:default=-1
+	C:designate:G94:B=0	## ASCII
+	C:designate:G94:J=0	## JIS X 0201 Roman
+	C:designate:G94n:@=0	## JIS X 0208-1978
+	C:designate:G94n:B=0	## JIS X 0208-1983
+	C:designate:G94n:B@=0	## JIS X 0208-1990
+	C:option:{use_revision}=0
+	C:option:{undef_char}=["\x22\x2E", {type => 'G94n', charset => 'B'}]
+Encode:
+	C:GR=undef
+	C:C1=C1:~
+	C:G1=G96:~
+	=>ucs_to_ascii ucs_to_jisx0208_1983 ucs_to_jisx0208_1978 ucs_to_jisx0201_latin
+	->iso2022:C
+Decode:
+	<-iso2022:C
+	<=jisx0208_1983_to_ucs jisx0208_1978_to_ucs jisx0201_latin_to_ucs
+Description:
+	ISO/IEC 2022 based 7-bit encoding for Japanese.
+	
+	This coding system is defined by Junet no tebiki,
+	RFC 1468, JIS X 0208:1997 Appendix 2 and bis1468
+	(an expired Internet Draft).
+}
+
+{
+Name:
+	iso-2022-jp-1978-irv
+Alias:
+	japanese-iso-7bit-1978-irv old-jis x-obsoleted-iso-2022-jp jis78
+Cversion:
+	C:bit=7
+	C:G0=G94:B
+	C:designate:*:default=-1
+	C:designate:G94:B=0	## ASCII
+	C:designate:G94:J=0	## JIS X 0201 Roman
+	C:designate:G94n:@=0	## JIS X 0208-1978
+	C:designate:G94n:B=0	## JIS X 0208-1983
+	C:designate:G94n:B@=0	## JIS X 0208-1990
+	C:option:{use_revision}=0
+	C:option:{undef_char}=["\x22\x2E", {type => 'G94n', charset => '@'}]
+Encode:
+	C:GR=undef
+	C:C1=C1:~
+	C:G1=G96:~
+	=>ucs_to_ascii ucs_to_jisx0208_1978 ucs_to_jisx0208_1983 ucs_to_jisx0201_latin
+	->iso2022:C
+Decode:
+	<-iso2022:C
+	<=jisx0208_1978_to_ucs jisx0208_1983_to_ucs jisx0201_latin_to_ucs
+Description:
+	ISO/IEC 2022 based 7-bit encoding for Japanese,
+	using JIS X 0208-1978.
+	
+	This coding system is same as C<iso-2022-jp>,
+	but this preferrs JIS X 0208-1978 to -1983.
+}
+
+{
+Name:
+	less-jis
+Cversion:
+	C:bit=7
+	C:G0=G94:B
+	C:designate:*:default=-1
+	C:designate:G94:B=0	## ASCII
+	C:designate:G94:I=0	## JIS X 0201 Katakana
+	C:designate:G94:J=0	## JIS X 0201 Roman
+	C:designate:G94n:B=0	## JIS X 0208-1983
+	C:option:{undef_char}=["\x22\x2E", {type => 'G94n', charset => 'B'}]
+Encode:
+	C:GR=undef
+	C:C1=C1:~
+	C:G1=G96:~
+	=>ucs_to_ascii ucs_to_jisx0208_1983 ucs_to_jisx0201_latin ucs_to_jisx0201_katakana
+	->iso2022:C
+Decode:
+	<-iso2022:C
+	<=jisx0208_1983_to_ucs jisx0208_1978_to_ucs jisx0213_2000_1_to_ucs jisx0212_0213_to_ucs jisx0208_1997_to_ucs jisx0201_latin_to_ucs jisx0201_katakana_to_ucs
+Description:
+	ISO/IEC 2022 based 7-bit encoding for Japanese.
+	
+	For more information, see
+	<http://www.io.com/~kazushi/less/README.iso.jp> (in Japanese)
+	or <http://www.io.com/~kazushi/less/README.iso> (In English).
+}
+
+{
+Name:
+	iso-2022-jp-1
+Alias:
+	iso2022jp-1 iso-2022-jp1
+Cversion:
+	C:bit=7
+	C:G0=G94:B
+	C:designate:*:default=-1
+	C:designate:G94:B=0	## ASCII
+	C:designate:G94:J=0	## JIS X 0201 Roman
+	C:designate:G94n:@=0	## JIS X 0208-1978
+	C:designate:G94n:B=0	## JIS X 0208-1983
+	C:designate:G94n:D=0	## JIS X 0212-1990
+	C:option:{use_revision}=0
+	C:option:{undef_char}=["\x22\x2E", {type => 'G94n', charset => 'B'}]
+Encode:
+	C:GR=undef
+	C:C1=C1:~
+	C:G1=G96:~
+	=>ucs_to_ascii ucs_to_jisx0208_1983 ucs_to_jisx0212_1990 ucs_to_jisx0208_1978 ucs_to_jisx0201_latin
+	->iso2022:C
+Decode:
+	<-iso2022:C
+	<=jisx0208_1983_to_ucs jisx0212_1990_to_ucs jisx0208_1978_to_ucs jisx0201_latin_to_ucs
+Description:
+	ISO/IEC 2022 based 7-bit encoding for Japanese,
+	defined by RFC 2237.
+	
+	You should note that this coding system is not so widely
+	supported.  C<iso-2022-jp-2>, a superset of this coding
+	system, is even more widely supported.
+}
+
+{
+Name:
+	iso-2022-jp-3
+Alias:
+	x-iso-2022-jp-3 iso2022jp-3 iso-2022-jp3
+	jisx0213 jis0213
+Cversion:
+	C:bit=7
+	C:G0=G94:B
+	C:designate:*:default=-1
+	C:designate:G94:B=0	## ASCII
+	C:designate:G94n:B=0	## subset of JIS X 0213:2000 plane 1
+	C:designate:G94n:O=0	## JIS X 0213:2000 plane 1
+	C:designate:G94n:P=0	## JIS X 0213:2000 plane 2
+	C:option:{undef_char}=["\x22\x2E", {type => 'G94n', charset => 'O'}]
+Encode:
+	C:GR=undef
+	C:C1=C1:~
+	C:G1=G96:~
+	=>ucs_to_ascii ucs_to_jisx0213_2000_1 ucs_to_jisx0213_2000_2
+	->iso2022:C
+Decode:
+	<-iso2022:C
+	<=jisx0213_2000_1_to_ucs jisx0212_0213_to_ucs jisx0208_1983_to_ucs jisx0208_1978_to_ucs jisx0201_latin_to_ucs
+Description:
+	ISO/IEC 2022 based 7-bit encoding for Japanese,
+	defined by JIS X 0213:2000 Appendix 2.
+}
+
+{
+Name:
+	iso-2022-jp-3-strict
+Cversion:
+	C:bit=7
+	C:G0=G94:B
+	C:designate:*:default=-1
+	C:designate:G94:B=0	## ASCII
+	C:designate:G94n:B=0	## subset of JIS X 0213:2000 plane 1
+	C:designate:G94n:O=0	## JIS X 0213:2000 plane 1
+	C:designate:G94n:P=0	## JIS X 0213:2000 plane 2
+	C:option:{undef_char}=["\x22\x2E", {type => 'G94n', charset => 'O'}]
+Encode:
+	C:GR=undef
+	C:C1=C1:~
+	C:G1=G96:~
+	=>ucs_to_ascii ucs_to_jisx0213_2000_1_esc_24_42 ucs_to_jisx0213_2000_1 ucs_to_jisx0213_2000_2
+	->iso2022:C
+Decode:
+	<-iso2022:C
+	<=jisx0213_2000_1_to_ucs jisx0212_0213_to_ucs jisx0208_1983_to_ucs jisx0208_1978_to_ucs jisx0201_latin_to_ucs
+Description:
+	ISO/IEC 2022 based 7-bit encoding for Japanese.
+	
+	This coding system is a subset of C<iso-2022-jp-3>.
+	See <http://www.m17n.org/m17n2000_all_but_registration/proceedings/kawabata/jisx0213.html>
+	for more information.
+}
+
+{
+Name:
+	iso-2022-jp-3-compatible
+Cversion:
+	C:bit=7
+	C:G0=G94:B
+	C:designate:*:default=-1
+	C:designate:G94:B=0	## ASCII
+	C:designate:G94n:B=0	## subset of JIS X 0213:2000 plane 1
+	C:designate:G94n:O=0	## JIS X 0213:2000 plane 1
+	C:designate:G94n:P=0	## JIS X 0213:2000 plane 2
+	C:option:{undef_char}=["\x22\x2E", {type => 'G94n', charset => 'O'}]
+Encode:
+	C:GR=undef
+	C:C1=C1:~
+	C:G1=G96:~
+	=>ucs_to_ascii ucs_to_jisx0208_1983 ucs_to_jisx0213_2000_1 ucs_to_jisx0213_2000_2
+	->iso2022:C
+Decode:
+	<-iso2022:C
+	<=jisx0213_2000_1_to_ucs jisx0212_0213_to_ucs jisx0208_1983_to_ucs jisx0208_1978_to_ucs jisx0201_latin_to_ucs
+Description:
+	ISO/IEC 2022 based 7-bit encoding for Japanese.
+	
+	See <http://www.m17n.org/m17n2000_all_but_registration/proceedings/kawabata/jisx0213.html>
+	for more information.
+}
+
+{
+Name:
+	iso-2022-jp-3-plane1
+Cversion:
+	C:bit=7
+	C:G0=G94:B
+	C:designate:*:default=-1
+	C:designate:G94:B=0	## ASCII
+	C:designate:G94n:B=0	## subset of JIS X 0213:2000 plane 1
+	C:designate:G94n:O=0	## JIS X 0213:2000 plane 1
+	C:option:{undef_char}=["\x22\x2E", {type => 'G94n', charset => 'O'}]
+Encode:
+	C:GR=undef
+	C:C1=C1:~
+	C:G1=G96:~
+	=>ucs_to_ascii ucs_to_jisx0213_2000_1
+	->iso2022:C
+Decode:
+	<-iso2022:C
+	<=jisx0213_2000_1_to_ucs jisx0212_0213_to_ucs jisx0208_1983_to_ucs jisx0208_1978_to_ucs jisx0201_latin_to_ucs
+Description:
+	ISO/IEC 2022 based 7-bit encoding for Japanese,
+	defined by JIS X 0213:2000 Appendix 2.
+}
+
+POD:SEE ALSO:
+	%%ReferenceJISX0208_1997%%
+	
+	%%ReferenceJISX0213_2000%%
+	
+	%%ReferenceRFC1468%%
+	
+	L<Encode::ISO2022::SevenBit>
+	(C<iso-2022-jp-2> and C<iso-2022-int> are defined in
+	this module.)
+
+POD:LICENSE:
+	Copyright %%YEAR%% Wakaba <w@suika.fam.cx>
+	
+	%%PerlLicense%%

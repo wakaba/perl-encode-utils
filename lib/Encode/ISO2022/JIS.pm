@@ -15,7 +15,7 @@ require 5.7.3;
 use strict;
 package Encode::ISO2022::JIS;
 use vars qw($VERSION);
-$VERSION=do{my @r=(q$Revision: 1.5 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.6 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use base qw(Encode::Encoding);
 require Encode::ISO2022;
 
@@ -145,7 +145,7 @@ sub __2022_encode ($) {
 package Encode::ISO2022::JIS::JISX0201LatinKatakana8;
 use vars qw/@ISA/;
 push @ISA, 'Encode::ISO2022::JIS';
-__PACKAGE__->Define (qw/jisx0201-1997-latin-latin-8bit/);
+__PACKAGE__->Define (qw/jisx0201-1997-latin-latin-8bit kana8/);
 
 =item jisx0201-1997-latin-katakana-8bit
 
@@ -516,5 +516,5 @@ and/or modify it under the same terms as Perl itself.
 
 =cut
 
-# $Date: 2002/10/12 07:27:01 $
+# $Date: 2002/11/06 09:29:16 $
 ### JIS.pm ends here

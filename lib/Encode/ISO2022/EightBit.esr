@@ -1,0 +1,160 @@
+#?PESRC/1.0
+Name:
+	ISO2022::EightBit
+ShortDescription:
+	Encode and decode of 8-bit ISO/IEC 2022 based encodings
+	(except EUCs)
+
+{
+Name:
+	iso-2022-8bit-ss2
+Cversion:
+	use:private:mule
+	C:bit=8
+	C:G0=G94:B	## ASCII
+	C:designate:G96:default=2
+	C:designate:G96n:default=2
+	C:option:{G94n_designate_long}=1
+	C:option:{Ginvoke_to_left}=[1,0,0,0]
+	C:option:{Ginvoke_by_single_shift}=[0,0,1,1]
+	C:option:{C1invoke_to_right}=1
+Encode:
+	C:G1=G96:~	## empty
+	C:G2=G96:~	## empty
+	->iso2022:C
+Decode:
+	C:G1=G96:A	## ISO/IEC 8859-1
+	C:G2=G96:A	## ISO/IEC 8859-1
+	<-iso2022:C
+Description:
+	ISO/IEC 2022 based 8-bit encoding using SS2 for 96-charset.
+}
+
+{
+Name:
+	compound-text
+Alias:
+	compound_text x-compound-text ctext x-ctext ct iso8
+Cversion:
+	C:bit=8
+	C:G0=G94:B	## ASCII
+	C:designate:C0:default=-1
+	C:designate:C1:default=-1
+	C:designate:*drcs:default=-1
+	C:designate:*private:default=-1
+	C:designate:G94:I=1	## JIS X 0201 Katakana
+	C:designate:G94n:B@=-1	## JIS X 0208-1990
+	C:designate:G96:default=1
+	C:designate:G96n:default=-1
+	C:designate:coding_system:0=0
+	C:designate:coding_system:1=0
+	C:designate:coding_system:2=0
+	C:designate:coding_system:3=0
+	C:option:{G94n_designate_long}=1
+	C:option:{Ginvoke_to_left}=[1,0,0,0]
+	C:option:{C1invoke_to_right}=1
+	C:option:{reset}->{Ginvoke}=0
+	C:option:{use_revision}=0
+Encode:
+	C:G1=G96:~	## empty
+	C:G2=G96:~	## empty
+	=>ucs_to_ascii ucs_to_isoiec8859_1 ucs_to_isoiec8859_2 ucs_to_isoiec8859_3 ucs_to_isoiec8859_4 ucs_to_isoiec8859_5 ucs_to_isoiec8859_6 ucs_to_isoiec8859_7 ucs_to_isoiec8859_8 ucs_to_isoiec8859_9 ucs_to_gb2312_1980 ucs_to_jisx0208_1983 ucs_to_ksx1001_1992 ucs_to_jisx0212_1990 ucs_to_jisx0201_latin ucs_to_jisx0201_katakana
+	->iso2022:C
+Decode:
+	C:G1=G96:A	## ISO/IEC 8859-1
+	C:G2=G96:A	## ISO/IEC 8859-1
+	<-iso2022:C
+	<=isoiec8859_2_to_ucs isoiec8859_3_to_ucs isoiec8859_4_to_ucs isoiec8859_5_to_ucs isoiec8859_6_to_ucs isoiec8859_7_to_ucs isoiec8859_8_to_ucs isoiec8859_9_to_ucs gb2312_1980_to_ucs jisx0208_1983_to_ucs ksx1001_1992_to_ucs jisx0212_1990_to_ucs
+Description:
+	ISO/IEC 2022 based 8-bit encoding used in inter-client
+	communication of X Window System.
+}
+
+{
+Name:
+	compound-text-xfree86
+Cversion:
+	C:bit=8
+	C:G0=G94:B	## ASCII
+	C:designate:C0:default=-1
+	C:designate:C1:default=-1
+	C:designate:*drcs:default=-1
+	C:designate:*private:default=-1
+	C:designate:G94:I=1	## JIS X 0201 Katakana
+	C:designate:G94n:B@=0	## JIS X 0208-1990
+	C:designate:G96:default=1
+	C:designate:G96n:default=-1
+	C:designate:coding_system:0=0
+	C:designate:coding_system:1=0
+	C:designate:coding_system:2=0
+	C:designate:coding_system:3=0
+	C:designate:coding_system:@=0	## ISO/IEC 2022
+	C:designate:coding_system:G=0	## UTF-8
+	C:option:{G94n_designate_long}=1
+	C:option:{Ginvoke_to_left}=[1,0,0,0]
+	C:option:{C1invoke_to_right}=1
+	C:option:{reset}->{Ginvoke}=0
+	C:option:{use_revision}=0
+Encode:
+	C:G1=G96:~	## empty
+	C:G2=G96:~	## empty
+	=>ucs_to_ascii ucs_to_isoiec8859_1 ucs_to_isoiec8859_2 ucs_to_isoiec8859_3 ucs_to_isoiec8859_4 ucs_to_isoiec8859_5 ucs_to_isoiec8859_6 ucs_to_isoiec8859_7 ucs_to_isoiec8859_8 ucs_to_isoiec8859_9 ucs_to_gb2312_1980 ucs_to_jisx0208_1983 ucs_to_ksx1001_1992 ucs_to_jisx0212_1990 ucs_to_jisx0201_latin ucs_to_jisx0201_katakana
+	->iso2022:C
+Decode:
+	C:G1=G96:A	## ISO/IEC 8859-1
+	C:G2=G96:A	## ISO/IEC 8859-1
+	<-iso2022:C
+	<=isoiec8859_2_to_ucs isoiec8859_3_to_ucs isoiec8859_4_to_ucs isoiec8859_5_to_ucs isoiec8859_6_to_ucs isoiec8859_7_to_ucs isoiec8859_8_to_ucs isoiec8859_9_to_ucs gb2312_1980_to_ucs jisx0208_1983_to_ucs ksx1001_1992_to_ucs jisx0212_1990_to_ucs
+Description:
+	ISO/IEC 2022 based 8-bit encoding used in inter-client
+	communication of XFree86.
+	
+	This coding system is upper-compatible version of X
+	Window System (original)'s Compound Text.  It allows
+	UTF-8 embeding.  See
+	<http://cvsweb.xfree86.org/cvsweb/xc/doc/specs/CTEXT/ctext.tbl.ms>.
+}
+
+{
+Name:
+	x-ctext
+Cversion:
+	C:bit=8
+	C:G0=G94:B	## ASCII
+	C:designate:C0:default=-1
+	C:designate:C1:default=-1
+	C:designate:*drcs:default=-1
+	C:designate:G94:I=1	## JIS X 0201 Katakana
+	C:designate:G96:default=1
+	C:designate:G96n:default=-1
+	C:option:{G94n_designate_long}=1
+	C:option:{Ginvoke_to_left}=[1,0,0,0]
+	C:option:{C1invoke_to_right}=1
+	C:option:{reset}->{Ginvoke}=0
+Encode:
+	C:G1=G96:~	## empty
+	C:G2=G96:~	## empty
+	=>ucs_to_ascii ucs_to_isoiec8859_1 ucs_to_isoiec8859_2 ucs_to_isoiec8859_3 ucs_to_isoiec8859_4 ucs_to_isoiec8859_5 ucs_to_isoiec8859_6 ucs_to_isoiec8859_7 ucs_to_isoiec8859_8 ucs_to_isoiec8859_9 ucs_to_gb2312_1980 ucs_to_jisx0208_1983 ucs_to_ksx1001_1992 ucs_to_jisx0212_1990 ucs_to_jisx0213_2000_1 ucs_to_jisx0213_2000_2 ucs_to_jisx0208_1990 ucs_to_jisx0208_1978 ucs_to_jisx0201_latin ucs_to_jisx0201_katakana
+	->iso2022:C
+Decode:
+	C:G1=G96:A	## ISO/IEC 8859-1
+	C:G2=G96:A	## ISO/IEC 8859-1
+	<-iso2022:C
+	<=isoiec8859_2_to_ucs isoiec8859_3_to_ucs isoiec8859_4_to_ucs isoiec8859_5_to_ucs isoiec8859_6_to_ucs isoiec8859_7_to_ucs isoiec8859_8_to_ucs isoiec8859_9_to_ucs gb2312_1980_to_ucs jisx0208_1983_to_ucs ksx1001_1992_to_ucs jisx0212_1990_to_ucs jisx0208_1990_to_ucs jisx0213_2000_1_to_ucs jisx0213_2000_2_to_ucs jisx0208_1978_to_ucs
+Description:
+	ISO/IEC 2022 based 8-bit encoding used in emacsen community.
+	This coding system is almost compatible with X Window System's
+	Compound Text but it allows private coded character sets
+	and 96^n coded character sets.
+	
+	See [mule-jp:7455] <mid:rsqsoa5s2hr.fsf@crane.jaist.ac.jp> and
+	[mule-jp:7457] <mid:rsq4smlky85.fsf@crane.jaist.ac.jp>.
+}
+
+POD:SEE ALSO:
+	L<Encode::ISO2022>, L<Encode::ISO2022::EUCJA>,
+	L<Encode::ISO2022::EUCKR>, L<Encode::ISO2022::EUCZH>.
+POD:LICENSE:
+	Copyright %%YEAR%% Wakaba <w@suika.fam.cx>.
+	
+	%%PerlLicense%%

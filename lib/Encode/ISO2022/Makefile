@@ -1,9 +1,16 @@
 PERL = perl
-PERLINS = ../../
-PERLOPTION = -I$(PERLINS)
+PERLINC = ../../
+PERLOPTION = -I$(PERLINC)
 ESR2PM = ../Table/tool/esr2pm.pl
 
-all: JISCompatible.pm
+PMS = SevenBit.pm JUNET.pm JUNETCompatible.pm \
+  EightBit.pm \
+  EUCJA.pm EUCJACompatible.pm EUCKR.pm EUCZH.pm
+
+all: $(PMS)
 
 %.pm: %.esr $(ESR2PM)
 	$(PERL) $(PERLOPTION) $(ESR2PM) $< > $@
+
+clean:
+	rm -v $(PMS)

@@ -1,0 +1,116 @@
+#?PESRC/1.0
+Name:
+	ISO2022::JUNETCompatible
+ShortDescription:
+	An Encode module of 7-bit ISO/IEC 2022
+	based compatible coding systems for Japanese
+POD:DESCRIPTION:
+	Due to the historical reason, some of current
+	implementions of JIS coded character sets support
+	pairs of same characters dupplicately, with
+	halfwidth/fullwidth property.
+	
+	Although this situation is undesirable, we can't ignore
+	such historical implementions and latest JIS coded
+	character set standards admire such dupulicate
+	encoding to and only to "keep compatibility with
+	current practice."
+	
+	This module provides encoder and decoder for such
+	coding systems that comform to JIS and that based
+	on 7-bit ISO/IEC 2022 structure.
+	
+	Those coding systems SHOULD not be used for new
+	implemention or new data.  They may not comform
+	to future version of JIS or other standards.
+
+{
+Name:
+	iso-2022-jp-fullwidth
+Cversion:
+	C:bit=7
+	C:G0=G94:B
+	C:designate:*:default=-1
+	C:designate:G94:B=0	## ASCII
+	C:designate:G94:J=0	## JIS X 0201 Roman
+	C:designate:G94n:@=0	## JIS X 0208-1978
+	C:designate:G94n:B=0	## JIS X 0208-1983
+	C:designate:G94n:B@=0	## JIS X 0208-1990
+	C:option:{use_revision}=0
+	C:option:{undef_char}=["\x22\x2E", {type => 'G94n', charset => 'B'}]
+Encode:
+	C:GR=undef
+	C:C1=C1:~
+	C:G1=G96:~
+	=>ucs_to_ascii ucs_to_jisx0208_1983_irv ucs_to_jisx0208_1978_irv ucs_to_jisx0201_latin
+	->iso2022:C
+Decode:
+	<-iso2022:C
+	<=jisx0208_1983_irv_to_ucs jisx0208_1978_irv_to_ucs jisx0201_latin_to_ucs jisx0201_katakana_to_ucs jisx0212_1990_irv_to_ucs jisx0208_1997_irv_to_ucs
+Description:
+	ISO/IEC 2022 based 7-bit encoding for Japanese,
+	ASCII + JIS X 0201 + JIS X 0208-1978 + JIS X 0208-1983.
+	Some characters defined in JIS X 0208 are mapped to FULLWIDTH
+	area of UCS as specified in JIS X 0208:1997.
+	
+	This encoding is a "compatible" version of
+	C<iso-2022-jp> defined in Encode::ISO2022::JUNET.
+	
+	When decoding, mapping tables from coded character
+	sets listed below to UCS are also loaded to restore
+	incorrectly labeled data.
+	
+		JIS X 0201 Katakana coded character set,
+		JIS X 0212-1990, JIS X 0213:2000
+	
+	Note that for Windows user, Encode::ISO2022::CP932
+	may be useful to try to restore broken "ISO-2022-JP"
+	data.
+}
+
+{
+Name:
+	iso-2022-jp-3-fullwidth
+Cversion:
+	C:bit=7
+	C:G0=G94:B
+	C:designate:*:default=-1
+	C:designate:G94:B=0	## ASCII
+	#C:designate:G94n:B=0	## JIS X 0213:2000 plane 1
+	C:designate:G94n:O=0	## JIS X 0213:2000 plane 1
+	C:designate:G94n:P=0	## JIS X 0213:2000 plane 2
+	C:option:{undef_char}=["\x22\x2E", {type => 'G94n', charset => 'O'}]
+Encode:
+	C:GR=undef
+	C:C1=C1:~
+	C:G1=G96:~
+	=>ucs_to_ascii ucs_to_jisx0213_2000_1_irv ucs_to_jisx0213_2000_2
+	->iso2022:C
+Decode:
+	<-iso2022:C
+	<=jisx0213_2000_1_irv_to_ucs jisx0213_2000_2_to_ucs jisx0208_1997_irv_to_ucs
+Description:
+	ISO/IEC 2022 based 7-bit encoding for Japanese,
+	ISO/IEC 646 IRV + JIS X 0213:2000.  Some characters
+	defined in JIS X 0213 are mapped to FULLWIDTH
+	area of UCS as specified in JIS X 0213:2000.
+	
+	This encoding is a "compatible" version of
+	C<iso-2022-jp-3> defined in Encode::ISO2022::JUNET.
+}
+
+POD:SEE ALSO:
+	%%ReferenceJISX0212_1995%%
+	
+	%%ReferenceJISX0208_1997%%
+	
+	%%ReferenceJISX0213_2000%%
+	
+	%%ReferenceRFC1468%%
+	
+	L<Encode::ISO2022::EightBit>
+
+POD:LICENSE:
+	Copyright %%YEAR%% Wakaba <w@suika.fam.cx>
+	
+	%%PerlLicense%%

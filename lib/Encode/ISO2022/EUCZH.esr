@@ -1,0 +1,191 @@
+#?PESRC/1.0
+Name:
+	ISO2022::EUCZH
+ShortDescription:
+	An Encode module of EUC (8-bit ISO/IEC 2022
+	based coding system) for Chinese
+
+{
+Name:
+	euc-china
+Alias:
+	euc-china euc-cn euccn euc-gb cn-gb chinese-iso-8bit ugb gb x-euc-cn cp51936
+	cn-gb-2312 gb2312 csgb2312
+	
+	ibm-euccn CP1383 1383
+Cversion:
+	C:bit=8
+	C:G0=G94:B	## ASCII
+	C:G1=G94n:A	## GB 2312-80
+	C:designate:*:default=-1
+	C:option:{Ginvoke_to_left}=[1,0,0,0]
+	C:option:{Ginvoke_by_single_shift}=[0,0,1,1]
+	C:option:{C1invoke_to_right}=1
+	C:option:{reset}->{Gdesignation}=0
+	C:option:{reset}->{Ginvoke}=0
+	C:option:{undef_char}=["\x21\x7E", {type => 'G94n', charset => 'A'}]
+Encode:
+	=>ucs_to_ascii ucs_to_gb2312_1980
+	->iso2022:C
+Decode:
+	<-iso2022:C
+	<=gb2312_1980_to_ucs
+Description:
+	EUC (ISO/IEC 2022 based 8-bit encoding) for Chinese.
+}
+
+{
+Name:
+	cn-gb-isoir165
+Alias:
+	iso-ir-165
+Cversion:
+	C:bit=8
+	C:G0=G94:B	## ASCII
+	C:G1=G94n:E	## ISO-IR 165
+	C:designate:*:default=-1
+	C:option:{Ginvoke_to_left}=[1,0,0,0]
+	C:option:{Ginvoke_by_single_shift}=[0,0,1,1]
+	C:option:{C1invoke_to_right}=1
+	C:option:{reset}->{Gdesignation}=0
+	C:option:{reset}->{Ginvoke}=0
+	C:option:{undef_char}=["\x21\x7E", {type => 'G94n', charset => 'E'}]
+Encode:
+	=>ucs_to_ascii ucs_to_iso_ir_165
+	->iso2022:C
+Decode:
+	<-iso2022:C
+	<=iso_ir_165_to_ucs
+Description:
+	EUC (ISO/IEC 2022 based 8-bit encoding) for Chinese
+	with ISO-IR 165.
+}
+
+{
+Name:
+	euc-gb12345
+Alias:
+	cn-gb-12345 gb12345
+Cversion:
+	require:private:gb
+	C:bit=8
+	C:G0=G94:B	## ASCII
+	C:G1=G94n:CSgb12345	## GB 12345-90
+	C:designate:*:default=-1
+	C:option:{Ginvoke_to_left}=[1,0,0,0]
+	C:option:{Ginvoke_by_single_shift}=[0,0,1,1]
+	C:option:{C1invoke_to_right}=1
+	C:option:{reset}->{Gdesignation}=0
+	C:option:{reset}->{Ginvoke}=0
+	C:option:{undef_char}=["\x21\x7E", {type => 'G94n', charset => 'CSgb12345'}]
+Encode:
+	=>ucs_to_ascii ucs_to_gb12345_1990
+	->iso2022:C
+Decode:
+	<-iso2022:C
+	<=gb12345_1990_to_ucs
+Description:
+	EUC (ISO/IEC 2022 based 8-bit encoding) for Chinese
+	with GB 12345-90.
+}
+
+{
+Name:
+	euc-cwnn
+Alias:
+	cwnn-iso-8bit
+Cversion:
+	require:private:mule
+	C:bit=8
+	C:G0=G94:B	## ASCII
+	C:G1=G94n:A	## GB 2312-80
+	C:G2=G94:CSomron_sisheng	## omron_udc_zh (sisheng)
+	C:designate:*:default=-1
+	C:option:{Ginvoke_to_left}=[1,0,0,0]
+	C:option:{Ginvoke_by_single_shift}=[0,0,1,1]
+	C:option:{C1invoke_to_right}=1
+	C:option:{reset}->{Gdesignation}=0
+	C:option:{reset}->{Ginvoke}=0
+	C:option:{undef_char}=["\x21\x7E", {type => 'G94n', charset => 'A'}]
+Encode:
+	=>ucs_to_ascii ucs_to_gb2312_1980 ucs_to_omron_udc_zh
+	->iso2022:C
+Decode:
+	<-iso2022:C
+	<=gb2312_1980_to_ucs omron_udc_zh_to_ucs
+Description:
+	EUC (ISO/IEC 2022 based 8-bit encoding) for Chinese
+	with GB 2312, used by cwnn input system.
+	
+	See <http://www.tomo.gr.jp/users/wnn/9912ml/msg00088.html>.
+}
+
+{
+Name:
+	euc-taiwan
+Alias:
+	euc-tw euctw x-euc-tw cns11643 cseuctw
+	
+	ibm-euctw cp964
+Cversion:
+	#require:private:cns
+	C:bit=8
+	C:G0=G94:B	## ASCII
+	C:G1=G94n:G	## CNS 11643 plane 1
+	## BUG: does not support plane 2-16 yet
+	C:G2=G94: `	## 3byte DRCS (temporary)
+	C:designate:*:default=-1
+	C:option:{Ginvoke_to_left}=[1,0,0,0]
+	C:option:{Ginvoke_by_single_shift}=[0,0,1,1]
+	C:option:{C1invoke_to_right}=1
+	C:option:{reset}->{Gdesignation}=0
+	C:option:{reset}->{Ginvoke}=0
+	C:option:{undef_char}=["\x3F", {type => 'G94', charset => 'B'}]
+Encode:
+	=>ucs_to_ascii ucs_to_cns11643_1 ucs_to_cns11643_2 ucs_to_cns11643_3 ucs_to_cns11643_4 ucs_to_cns11643_5 ucs_to_cns11643_6 ucs_to_cns11643_7 ucs_to_cns11643_8 ucs_to_cns11643_9 ucs_to_cns11643_10 ucs_to_cns11643_11 ucs_to_cns11643_12 ucs_to_cns11643_13 ucs_to_cns11643_14 ucs_to_cns11643_15 ucs_to_cns11643_16
+	->iso2022:C
+Decode:
+	<-iso2022:C
+	<=cns11643_1_to_ucs cns11643_2_to_ucs cns11643_3_to_ucs cns11643_4_to_ucs cns11643_5_to_ucs cns11643_6_to_ucs cns11643_7_to_ucs cns11643_8_to_ucs cns11643_9_to_ucs cns11643_10_to_ucs cns11643_11_to_ucs cns11643_12_to_ucs cns11643_13_to_ucs cns11643_14_to_ucs cns11643_15_to_ucs cns11643_16_to_ucs
+Description:
+	EUC (ISO/IEC 2022 based 8-bit encoding) for Chinese
+	with CNS 11643.
+}
+
+{
+Name:
+	euc-twnn
+Alias:
+	twnn-iso-8bit
+Cversion:
+	require:private:mule
+	C:bit=8
+	C:G0=G94:B	## ASCII
+	C:G1=G94n:G	## CNS 11643 plane 1
+	C:G2=G94:CSomron_sisheng	## omron_udc_zh (sisheng)
+	C:G3=G94n:H	## CNS 11643 plane 2
+	C:designate:*:default=-1
+	C:option:{Ginvoke_to_left}=[1,0,0,0]
+	C:option:{Ginvoke_by_single_shift}=[0,0,1,1]
+	C:option:{C1invoke_to_right}=1
+	C:option:{reset}->{Gdesignation}=0
+	C:option:{reset}->{Ginvoke}=0
+	C:option:{undef_char}=["\x3F", {type => 'G94', charset => 'B'}]
+Encode:
+	=>ucs_to_ascii ucs_to_cns11643_1 ucs_to_cns11643_2 ucs_to_omron_udc_zh
+	->iso2022:C
+Decode:
+	<-iso2022:C
+	<=cns11643_1_to_ucs cns11643_2_to_ucs omron_udc_zh_to_ucs
+Description:
+	EUC (ISO/IEC 2022 based 8-bit encoding) for Chinese
+	with CNS 11643, used by twnn input system.
+	See <http://www.tomo.gr.jp/users/wnn/9912ml/msg00088.html>.
+}
+
+POD:SEE ALSO:
+	L<Encode::ISO2022>
+POD:LICENSE:
+	Copyright %%YEAR%% Nanashi-san <nanashi@san.invalid>
+	
+	%%PerlLicense%%

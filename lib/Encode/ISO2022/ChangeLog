@@ -1,3 +1,11 @@
+2002-11-06  Wakaba <w@suika.fam.cx>
+
+	* SevenBit.esr, EightBit.esr, JUNET.esr,
+	JUNETCompatible.esr, EUCJA.esr, EUCJACompatible.esr,
+	EUCKR.esr, EUCZH.esr: New files.
+	* SevenBit.pm, EightBit.pm: Removed.
+	(Now these modules are auto-generated from *.esr files.)
+
 2002-10-13  Wakaba <w@suika.fam.cx>
 
 	* JISCompatible.esr: New file.

@@ -1,0 +1,342 @@
+#?PESRC/1.0
+Name:
+	ISO2022::SevenBit
+ShortDescription:
+	Encode and decode of 7-bit ISO/IEC 2022 based encodings
+
+{
+Name:
+	iso-2022-7bit-ss2
+Alias:
+	x-iso-2022-jp-2 iso-2022-ss2-7 jis_encoding csjisencoding
+Cversion:
+	C:bit=7
+	C:G0=G94:B
+	C:designate:C0:default=0
+	C:designate:C1:default=1
+	C:designate:G94:default=0
+	C:designate:G96:default=2
+	C:designate:G94n:default=0
+	C:designate:G96n:default=2
+	C:designate:coding_system:default=0
+	C:option:{Ginvoked_by_single_shift}->[2]=1
+Encode:
+	C:GR=undef
+	C:G1=G96:~
+	->iso2022:C
+Decode:
+	<-iso2022:C
+Description:
+	ISO/IEC 2022 based 7-bit encoding using SS2 for 96-charset.
+}
+
+{
+Name:
+	iso-2022-jp-2
+Alias:
+	csiso2022jp2 iso2022jp-2
+Cversion:
+	C:bit=7
+	C:G0=G94:B
+	C:C1=C1:G	## Minimum C1
+	C:designate:*:default=-1
+	C:designate:G94:B=0	## ASCII
+	C:designate:G94:J=0	## JIS X 0201 Latin
+	C:designate:G94n:@=0	## JIS X 0208-1978
+	C:designate:G94n:A=0	## GB 2312-80
+	C:designate:G94n:B=0	## JIS X 0208-1983
+	C:designate:G94n:C=0	## KS X 1001
+	C:designate:G94n:D=0	## JIS X 0212-1990
+	C:designate:G96:A=2	## ISO/IEC 8859-1 GR
+	C:designate:G96:F=2	## ISO/IEC 8859-7 GR
+	C:option:{Ginvoked_by_single_shift}->[2]=1
+Encode:
+	C:GR=undef
+	C:G1=G96:~
+	=>ucs_to_ascii ucs_to_jisx0208_1983 ucs_to_jisx0212_1990 ucs_to_gb2312_1980 ucs_to_ksx1001_1992 ucs_to_jisx0208_1978 ucs_to_isoiec8859_1 ucs_to_isoiec8859_7 ucs_to_jisx0201_latin
+	->iso2022:C
+Decode:
+	<-iso2022:C
+	<=jisx0208_1983_to_ucs jisx0208_1978_to_ucs jisx0201_latin_to_ucs gb2312_1980_to_ucs ksx1001_1992_to_ucs isoiec8859_7_to_ucs
+Description:
+	ISO/IEC 2022 based 7-bit multilingual encoding, defined by
+	RFC 1554.  A profiled subset of iso-2022-7bit-ss2.
+}
+
+
+{
+Name:
+	iso-2022-7bit-lock
+Alias:
+	iso7
+Cversion:
+	C:bit=7
+	C:G0=G94:B
+	C:designate:C0:default=0
+	C:designate:C1:default=1
+	C:designate:G94:default=0
+	C:designate:G96:default=1
+	C:designate:G94n:default=0
+	C:designate:G96n:default=1
+	C:designate:coding_system:default=0
+Encode:
+	C:GR=undef
+	C:C1=C1:~
+	C:G1=G96:~
+	->iso2022:C
+Decode:
+	<-iso2022:C
+Description:
+	ISO/IEC 2022 based 7-bit encoding using G1 and
+	locking-shift for 96-charset
+}
+
+{
+Name:
+	iso-2022-int
+Alias:
+	iso-2022-int-* iso-2022-int-2
+Cversion:
+	C:bit=7
+	C:G0=G94:B
+	C:designate:G94:default=0
+	C:designate:G96:default=1
+	C:designate:G94n:default=0
+	C:designate:G94n:C=1	## KS X 1001
+	C:designate:G96n:default=1
+Encode:
+	C:GR=undef
+	C:C1=C1:~
+	C:G1=G96:~
+	->iso2022:C
+Decode:
+	<-iso2022:C
+Description:
+	ISO/IEC 2022 based 7-bit encoding using G1 and locking-shift for
+	KS X 1001 and 96-charset.
+	
+	See draft-ohta-text-encoding (expired Internet Drafts)
+	for more information.
+}
+
+{
+Name:
+	iso-2022-kr
+Alias:
+	korean-iso-7bit csiso2022kr cp50225 kr2022 korean-mail
+Cversion:
+	C:bit=7
+	C:G0=G94:B
+	C:designate:*:default=-1
+	C:designate:G94:B=0	## ASCII
+	C:designate:G94n:C=1	## KS X 1001
+Encode:
+	C:GR=undef
+	C:C1=C1:~
+	C:G1=G96:~
+	=>ucs_to_ascii ksx1001_1992_to_ucs
+	->iso2022:C
+Decode:
+	C:G1=G94n:C	## KS X 1001
+	<-iso2022:C
+	<=ksx1001_1992_to_ucs
+Description:
+	An ISO/IEC 2022 based 7-bit encoding for Korean,
+	defined by RFC 1557.
+}
+
+{
+Name:
+	iso-2022-int-1
+Cversion:
+	C:bit=7
+	C:G0=G94:B
+	C:designate:*:default=-1
+	C:designate:G94:B=0	## ASCII
+	C:designate:G94:J=0	## JIS X 0201 Latin
+	C:designate:G94n:@=0	## JIS X 0208-1978
+	C:designate:G94n:A=0	## GB 2312-80
+	C:designate:G94n:B=0	## JIS X 0208-1983
+	C:designate:G94n:C=1	## KS X 1001
+	C:designate:G94n:D=0	## JIS X 0212-1990
+	C:designate:G96:A=1	## ISO/IEC 8859-1 GR
+	C:designate:G96:F=0	## ISO/IEC 8859-7 GR
+Encode:
+	C:GR=undef
+	C:C1=C1:~
+	C:G1=G96:~
+	=>ucs_to_ascii ucs_to_jisx0208_1983 ucs_to_gb2312_1980 ucs_to_ksx1001_1992 ucs_to_isoiec8859_1 ucs_to_isoiec8859_7 ucs_to_jisx0212_1990 ucs_to_jisx0208_1978 ucs_to_jisx0201_latin
+	->iso2022:C
+Decode:
+	C:G1=G94n:C	## KS X 1001
+	<-iso2022:C
+	<=jisx0208_1983_to_ucs jisx0208_1978_to_ucs jisx0201_latin_to_ucs gb2312_1980_to_ucs ksx1001_1992_to_ucs isoiec8859_7_to_ucs
+Description:
+	An ISO/IEC 2022 based 7-bit multilingual encoding,
+	defined by draft-ohta-text-encoding.
+}
+
+
+{
+Name:
+	iso-2022-7bit-lock-ss2
+Alias:
+	iso-2022-cjk
+Cversion:
+	require:private:gb
+	require:private:cns
+	require:private:mule
+	C:bit=7
+	C:G0=G94:B
+	C:designate:C0:default=0
+	C:designate:C1:default=1
+	C:designate:G94:default=0
+	C:designate:G94n:default=0
+	C:designate:G94n:A=1	## GB 2312-80
+	C:designate:G94n:C=1	## KS X 1001
+	C:designate:G94n:E=1	## ISO-IR 165
+	C:designate:G94n:G=1	## CNS 11643 plane 1
+	C:designate:G94n:CSgb12345=1	## GB 12345-90
+	C:designate:G96:default=2
+	C:designate:G96n:default=2
+	C:designate:G94n:CSgb7589=2	## GB 7589-87
+	C:designate:G94n:CSgb13131=2	## GB 13131-91
+	C:designate:G94n:H=2	## CNS 11643 plane 2
+	C:designate:G94n:CSgb7590=3	## GB 7590-87
+	C:designate:G94n:CSgb13132=3	## GB 13131-91
+	C:designate:G94n:I=3	## CNS 11643 plane 3
+	C:designate:G94n:J=3	## CNS 11643 plane 4
+	C:designate:G94n:K=3	## CNS 11643 plane 5
+	C:designate:G94n:L=3	## CNS 11643 plane 6
+	C:designate:G94n:M=3	## CNS 11643 plane 7
+	C:designate:G94n:CScns11643_8=3	## CNS 11643 plane 8
+	C:designate:G94n:CScns11643_9=3	## CNS 11643 plane 9
+	C:designate:G94n:CScns11643_10=3	## CNS 11643 plane 10
+	C:designate:G94n:CScns11643_11=3	## CNS 11643 plane 11
+	C:designate:G94n:CScns11643_12=3	## CNS 11643 plane 12
+	C:designate:G94n:CScns11643_13=3	## CNS 11643 plane 13
+	C:designate:G94n:CScns11643_14=3	## CNS 11643 plane 14
+	C:designate:G94n:CScns11643_15=3	## CNS 11643 plane 15
+	C:designate:coding_system:default=0
+Encode:
+	C:GR=undef
+	C:C1=C1:~
+	C:G1=G96:~
+	->iso2022:C
+Decode:
+	C:G1=G94n:C
+	<-iso2022:C
+Description:
+	An ISO/IEC 2022 based 7-bit encoding.  Mixture of ISO-2022-JP,
+	ISO-2022-KR, ISO-2022-CN.
+}
+
+{
+Name:
+	iso-2022-cn
+Alias:
+	chinese-iso-7bit  iso2022cn-gb
+Cversion:
+	C:bit=7
+	C:G0=G94:B
+	C:designate:*:default=-1
+	C:designate:G94:B=0	## ASCII
+	C:designate:G94n:A=1	## GB 2312-80
+	C:designate:G94n:G=1	## CNS 11643 plane 1
+	C:designate:G94n:H=2	## CNS 11643 plane 2
+Encode:
+	C:GR=undef
+	C:C1=C1:~
+	C:G1=G96:~
+	=>ucs_to_ascii ucs_to_gb2312_1980 ucs_to_cns11643_1 ucs_to_cns11643_2
+	->iso2022:C
+Decode:
+	<-iso2022:C
+	<=gb2312_1980_to_ucs cns11643_1_to_ucs cns11643_2_to_ucs
+Description:
+	An ISO/IEC 2022 based 7-bit encoding for Chinese,
+	defined by RFC 1922.
+	
+	This coding system prefers GB 2312-80 (Some people
+	names this as C<iso2022cn-gb>.) when encoding, because
+	Taiwan people mainly use C<Big5>, not CNS 11643.
+	CNS 11643-preferred version is named as C<iso2022cn-cns>.
+}
+
+{
+Name:
+	iso2022cn-cns
+Cversion:
+	C:bit=7
+	C:G0=G94:B
+	C:designate:*:default=-1
+	C:designate:G94:B=0	## ASCII
+	C:designate:G94n:A=1	## GB 2312-80
+	C:designate:G94n:G=1	## CNS 11643 plane 1
+	C:designate:G94n:H=2	## CNS 11643 plane 2
+Encode:
+	C:GR=undef
+	C:C1=C1:~
+	C:G1=G96:~
+	=>ucs_to_ascii ucs_to_cns11643_1 ucs_to_cns11643_2 ucs_to_gb2312_1980
+	->iso2022:C
+Decode:
+	<-iso2022:C
+	<=cns11643_1_to_ucs cns11643_2_to_ucs gb2312_1980_to_ucs
+Description:
+	An ISO/IEC 2022 based 7-bit encoding for Chinese,
+	defined by RFC 1922.
+}
+
+{
+Name:
+	iso-2022-cn-ext
+Cversion:
+	require:private:gb
+	require:private:cns
+	C:bit=7
+	C:G0=G94:B
+	C:designate:*:default=-1
+	C:designate:G94n:A=1	## GB 2312-80
+	C:designate:G94n:E=1	## ISO-IR 165
+	C:designate:G94n:G=1	## CNS 11643 plane 1
+	C:designate:G94n:CSgb12345=1	## GB 12345-90
+	C:designate:G94n:CSgb7589=2	## GB 7589-87
+	C:designate:G94n:CSgb13131=2	## GB 13131-91
+	C:designate:G94n:H=2	## CNS 11643 plane 2
+	C:designate:G94n:CSgb7590=3	## GB 7590-87
+	C:designate:G94n:CSgb13132=3	## GB 13131-91
+	C:designate:G94n:I=3	## CNS 11643 plane 3
+	C:designate:G94n:J=3	## CNS 11643 plane 4
+	C:designate:G94n:K=3	## CNS 11643 plane 5
+	C:designate:G94n:L=3	## CNS 11643 plane 6
+	C:designate:G94n:M=3	## CNS 11643 plane 7
+	C:designate:G94n:CScns11643_8=3	## CNS 11643 plane 8
+	C:designate:G94n:CScns11643_9=3	## CNS 11643 plane 9
+	C:designate:G94n:CScns11643_10=3	## CNS 11643 plane 10
+	C:designate:G94n:CScns11643_11=3	## CNS 11643 plane 11
+	C:designate:G94n:CScns11643_12=3	## CNS 11643 plane 12
+	C:designate:G94n:CScns11643_13=3	## CNS 11643 plane 13
+	C:designate:G94n:CScns11643_14=3	## CNS 11643 plane 14
+	C:designate:G94n:CScns11643_15=3	## CNS 11643 plane 15
+Encode:
+	C:GR=undef
+	C:C1=C1:~
+	C:G1=G96:~
+	=>ucs_to_ascii ucs_to_gb2312_1980 ucs_to_iso_ir_165 ucs_to_cns11643_1 ucs_to_cns11643_2 ucs_to_cns11643_3 ucs_to_cns11643_4 ucs_to_cns11643_5 ucs_to_cns11643_6 ucs_to_cns11643_7
+	->iso2022:C
+Decode:
+	<-iso2022:C
+	<=gb2312_1980_to_ucs iso_ir_165_to_ucs cns11643_1_to_ucs cns11643_2_to_ucs cns11643_3_to_ucs cns11643_4_to_ucs cns11643_5_to_ucs cns11643_6_to_ucs cns11643_7_to_ucs
+Description:
+	An ISO/IEC 2022 based 7-bit encoding for Chinese,
+	defined by RFC 1922.
+}
+
+POD:SEE ALSO:
+	L<Encode::ISO2022::JUNET>, L<Encode::ISO2022::JUNETCompatible>
+
+POD:LICENSE:
+	Copyright %%YEAR%% Wakaba <w@suika.fam.cx>
+	
+	%%PerlLicense%%
