@@ -13,7 +13,7 @@ require 5.7.3;
 use strict;
 package Encode::ISO2022::SevenBit;
 use vars qw($VERSION);
-$VERSION=do{my @r=(q$Revision: 1.9 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.10 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use base qw(Encode::Encoding);
 __PACKAGE__->Define (qw/iso-2022-7bit iso-2022-7 jis junet jis7
   7bit-jis/);
@@ -44,6 +44,11 @@ sub decode ($$;$) {
   }
   $str;
 }
+
+sub __clone ($) {
+  my $self = shift;
+  bless {%$self}, ref $self;
+};
 
 =item iso-2022-7bit
 
@@ -146,7 +151,7 @@ sub __2022_encode ($) {
   $C;
 }
 sub __encode_map ($) {
-  [qw/ucs_to_ascii ucs_to_jisx0208_1978 ucs_to_jisx0208_1983 ucs_to_jisx0208_1990 ucs_to_jisx0201_latin/];
+  [qw/ucs_to_ascii ucs_to_jisx0208_1978 ucs_to_jisx0201_latin/];
 }
 sub __decode_map ($) {
   [qw/jisx0208_1983_to_ucs jisx0208_1990_to_ucs jisx0208_1978_to_ucs jisx0201_latin_to_ucs/];
@@ -387,13 +392,13 @@ sub __2022_decode ($) {
 package Encode::ISO2022::SevenBit::KR;
 use vars qw/@ISA/;
 push @ISA, 'Encode::ISO2022::SevenBit';
-__PACKAGE__->Define (qw/iso-2022-kr korean-iso-7bit csiso2022kr cp50225 kr2022/);
+__PACKAGE__->Define (qw/iso-2022-kr korean-iso-7bit csiso2022kr cp50225 kr2022 korean-mail/);
 
 =item iso-2022-kr
 
 An ISO/IEC 2022 based 7-bit encoding for Korean,
 defined by RFC 1557 (Alias: korean-iso-7bit (emacsen),
-csISO2022KR (IANA), CP50225 (M$), KR2022)
+csISO2022KR (IANA), CP50225 (M$), KR2022, korean-mail (emacsen))
 
 =cut
 
@@ -472,7 +477,7 @@ sub __2022_decode ($) {
   $C;
 }
 sub __encode_map ($) {
-  [qw/ucs_to_ascii ucs_to_isoiec8859_1 ucs_to_jisx0208_1983 ucs_to_jisx0212_1990 ucs_to_gb2312_1980 ucs_to_ksx1001_1992 ucs_to_isoiec8859_7 ucs_to_jisx0208_1978 ucs_to_jisx0201_latin/];
+  [qw/ucs_to_ascii ucs_to_jisx0208_1983 ucs_to_gb2312_1980 ucs_to_ksx1001_1992 ucs_to_isoiec8859_1 ucs_to_isoiec8859_7 ucs_to_jisx0212_1990 ucs_to_jisx0208_1978 ucs_to_jisx0201_latin/];
 }
 sub __decode_map ($) {
   [qw/jisx0208_1983_to_ucs jisx0208_1978_to_ucs jisx0201_latin_to_ucs gb2312_1980_to_ucs ksx1001_1992_to_ucs isoiec8859_7_to_ucs/];
@@ -550,6 +555,12 @@ sub __2022_encode ($) {
   $C->{G1} = $Encode::ISO2022::CHARSET{G96}->{"\x7E"};	## empty set
   $C;
 }
+sub __encode_map ($) {
+  [qw/ucs_to_ascii ucs_to_gb2312_1980 ucs_to_cns11643_1 ucs_to_cns11643_2/];
+}
+sub __decode_map ($) {
+  [qw/gb2312_1980_to_ucs cns11643_1_to_ucs cns11643_2_to_ucs/];
+}
 
 package Encode::ISO2022::SevenBit::CNExt;
 use vars qw/@ISA/;
@@ -587,6 +598,12 @@ sub __2022__common ($) {
   $C->{option}->{designate_to}->{G94n}->{P2_1} = 3;	## CNS 11643 plane 16
   $C;
 }
+sub __encode_map ($) {
+  [qw/ucs_to_ascii ucs_to_gb2312_1980 ucs_to_iso_ir_165 ucs_to_cns11643_1 ucs_to_cns11643_2 ucs_to_cns11643_3 ucs_to_cns11643_4 ucs_to_cns11643_5 ucs_to_cns11643_6 ucs_to_cns11643_7/];
+}
+sub __decode_map ($) {
+  [qw/gb2312_1980_to_ucs iso_ir_165_to_ucs cns11643_1_to_ucs cns11643_2_to_ucs cns11643_3_to_ucs cns11643_4_to_ucs cns11643_5_to_ucs cns11643_6_to_ucs cns11643_7_to_ucs/];
+}
 
 1;
 __END__
@@ -608,5 +625,5 @@ and/or modify it under the same terms as Perl itself.
 
 =cut
 
-# $Date: 2002/10/05 05:01:24 $
+# $Date: 2002/10/12 07:27:01 $
 ### SevenBit.pm ends here

@@ -9,7 +9,7 @@ used by Encode::ISO2022, Encode::SJIS, and other modules.
 package Encode::Charset;
 use strict;
 use vars qw(%CHARSET %CODING_SYSTEM $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 ## --- Make initial charset definitions
 &_make_initial_charsets;
@@ -106,7 +106,23 @@ $CHARSET{G96}->{A}->{ucs} = 0xA0;	## ISO 8859-1
 $CHARSET{G94n}->{'B@'}->{dimension} = 2;	## JIS X 0208-1990
 $CHARSET{G94n}->{'B@'}->{chars} = 94;
 $CHARSET{G94n}->{'B@'}->{ucs} = 0xE9F6C0 + 94*94*79;
-
+  
+  ## SJIS G3 mapping (JIS X 0213:2000 plane 2)
+  $CHARSET{G94n}->{"\x50"}->{Csjis_kuE} = { # ku - 1
+    0xF0 => 7,  0xF1 => 3,  0xF2 => 11, 0xF3 => 13, 0xF4 => 77,
+    0xF5 => 79, 0xF6 => 81, 0xF7 => 83, 0xF8 => 85, 0xF9 => 87,
+    0xFA => 89, 0xFB => 91, 0xFC => 93,
+  };
+  $CHARSET{G94n}->{"\x50"}->{Csjis_kuO} = { # ku - 1
+    0xF0  => 0,  0xF1 => 2,  0xF2 => 4,  0xF3 => 12, 0xF4 => 14,
+    0xF5  => 78, 0xF6 => 80, 0xF7 => 82, 0xF8 => 84, 0xF9 => 86,
+    0xFA  => 88, 0xFB => 90, 0xFC => 92,
+  };
+  $CHARSET{G94n}->{"\x50"}->{Csjis_first} = { reverse (
+    %{ $CHARSET{G94n}->{"\x50"}->{Csjis_kuE} },
+    %{ $CHARSET{G94n}->{"\x50"}->{Csjis_kuO} },
+  )};
+  
   ## -- Control character sets
   $CHARSET{C0}->{'@'}->{ucs} = 0x00;	## ISO/IEC 6429 C0
   for ("\x40", "\x43", "\x44", "\x45", "\x46", "\x49", "\x4A", "\x4B", "\x4C") {
@@ -184,6 +200,7 @@ sub make_charset (%) {
 sub new_object {
   my %C;
   $C{bit} = 8;
+  $C{coding_system} = $CODING_SYSTEM{"\x40"};	## ISO/IEC 2022
   $C{CL} = 'C0'; $C{CR} = 'C1'; $C{ESC_Fe} = 'C1';
   $C{C0} = $CHARSET{C0}->{"\x40"};	## ISO/IEC 6429:1991 C0
   $C{C1} = $CHARSET{C1}->{'64291991C1'};	## ISO/IEC 6429:1991 C1
@@ -193,7 +210,6 @@ sub new_object {
   $C{G1} = $CHARSET{G94}->{"\x7E"};	## empty set
   $C{G2} = $CHARSET{G94}->{"\x7E"};	## empty set
   $C{G3} = $CHARSET{G94}->{"\x7E"};	## empty set
-  $C{coding_system} = $CODING_SYSTEM{"\x40"};	## ISO/IEC 2022
   $C{option} = {
   	C1invoke_to_right	=> 0,	## C1 invoked to: (0: ESC Fe, 1: CR)
   	G94n_designate_long	=> 0,	## (1: ESC 02/04 02/08 04/00..02)
@@ -242,7 +258,22 @@ sub new_object {
   	undef_char	=> ["\x3F", {type => 'G94', charset => 'B'}],
   	use_revision	=> 1,	## Output IRR
   };
+  ## Special code area (such as 0xFD-0xFF of sjis'es)
+  $C{Gsmap} = {"\xA0" => "\x{F8F0}", "\xFD" => "\x{F8F1}", "\xFE" => "\x{F8F2}", "\xFF" => "\x{F8F3}"};
+  $C{GsmapR} = {};	## Reversed table
   \%C;
+}
+
+sub new_object_sjis {
+  my $C = new_object;
+  $C->{coding_system} = $CODING_SYSTEM{Csjis};
+  $C->{CR} = undef;
+  $C->{GR} = 'G2';	## 0xA1-0xDF
+  #$C->{G0} = $CHARSET{G94}->{J};	## JIS X 0201:1997 Latin
+  $C->{G1} = $CHARSET{G94n}->{'B@'};	## JIS X 0208:1997
+  $C->{G2} = $CHARSET{G94}->{I};	## JIS X 0201:1997 Katakana
+  $C->{G3} = $CHARSET{G94n}->{"\x50"};	## JIS X 0213:2000 plane 2
+  $C;
 }
 
 1;
@@ -263,5 +294,5 @@ and/or modify it under the same terms as Perl itself.
 
 =cut
 
-# $Date: 2002/09/21 01:34:08 $
+# $Date: 2002/10/12 07:27:01 $
 ### Charset.pm ends here

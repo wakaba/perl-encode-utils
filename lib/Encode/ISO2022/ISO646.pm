@@ -13,7 +13,7 @@ require 5.7.3;
 use strict;
 package Encode::ISO2022::ISO646;
 use vars qw($VERSION);
-$VERSION=do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use base qw(Encode::Encoding);
 require Encode::ISO2022;
 
@@ -53,6 +53,11 @@ sub __2022_decode ($) {
   my $C = shift->__2022__common;
   $C;
 }
+
+sub __clone ($) {
+  my $self = shift;
+  bless {%$self}, ref $self;
+};
 
 package Encode::ISO2022::ISO646::ISO646basic1993;
 use vars qw/@ISA/;
@@ -599,5 +604,5 @@ and/or modify it under the same terms as Perl itself.
 
 =cut
 
-# $Date: 2002/09/23 10:36:03 $
+# $Date: 2002/10/12 07:27:01 $
 ### ISO646.pm ends here
