@@ -9,9 +9,9 @@ require v5.7.3;
 package Encode::ISO2022;
 use strict;
 use vars qw(%CHARSET $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.1 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use base qw(Encode::Encoding);
-__PACKAGE__->Define (qw/iso-2022 iso2022/);
+__PACKAGE__->Define (qw/iso-2022 iso2022 2022 cp2022/);
 
 ### --- Intialization
 
@@ -555,7 +555,7 @@ sub internal_to_iso2022 ($\%) {
       my $c = $cc % 0x10000;
       $t = _i2g (chr((($c % 8836) / 94)+0x21).chr(($c % 94)+0x21), $C,
           type => 'G94n',
-          charset_id => 'P'.int(($cc / 0x10000) - 0x7042).int($c / 8836),
+          charset_id => 'P'.int(($cc / 0x10000) - 0x7042).'_'.int($c / 8836),
           charset => $C->{private_set}->{G94n}->[ ($cc / 0x10000) - 0x7042 ]
                        ->[ $c / 8836 ]);
     }
@@ -755,5 +755,5 @@ and/or modify it under the same terms as Perl itself.
 
 =cut
 
-# $Date: 2002/09/15 04:15:51 $
+# $Date: 2002/09/15 05:08:13 $
 ### ISO2022.pm ends here

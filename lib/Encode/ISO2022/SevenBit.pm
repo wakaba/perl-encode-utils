@@ -13,9 +13,9 @@ require 5.7.3;
 use strict;
 package Encode::ISO2022::SevenBit;
 use vars qw($VERSION);
-$VERSION=do{my @r=(q$Revision: 1.1 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use base qw(Encode::Encoding);
-__PACKAGE__->Define (qw/iso-2022-7bit jis junet/);
+__PACKAGE__->Define (qw/iso-2022-7bit jis junet jis7/);
 require Encode::ISO2022;
 
 sub encode ($$;$) {
@@ -34,7 +34,7 @@ sub decode ($$;$) {
 =item iso-2022-7bit
 
 ISO/IEC 2022 based 7-bit encoding using only G0
-(Alias: junet, jis)
+(Alias: junet, jis, jis7)
 
 =cut
 
@@ -59,13 +59,15 @@ sub __2022_decode ($) {
 package Encode::ISO2022::SevenBit::JP;
 use vars qw/@ISA/;
 push @ISA, 'Encode::ISO2022::SevenBit';
-__PACKAGE__->Define (qw/iso-2022-jp junet-code japanese-iso-7bit/);
+__PACKAGE__->Define (qw/iso-2022-jp junet-code japanese-iso-7bit csiso2022jp
+ cp50220 iso2022jp/);
 
 =item iso-2022-jp
 
 ISO/IEC 2022 based 7-bit encoding for Japanese.
 Defined by Junet no tebiki, RFC 1468 and JIS X 0208:1997 Appendix 2.
-(Alias: junet-code, japanese-iso-7bit (emacsen))
+(Alias: junet-code, japanese-iso-7bit (emacsen), csISO2022JP (IANA),
+CP50220 (M$))
 
 =cut
 
@@ -96,7 +98,8 @@ sub __2022_encode ($) {
 package Encode::ISO2022::SevenBit::JP1978IRV;
 use vars qw/@ISA/;
 push @ISA, 'Encode::ISO2022::SevenBit::JP';
-__PACKAGE__->Define (qw/iso-2022-jp-1978-irv japanese-iso-7bit-1978-irv old-jis/);
+__PACKAGE__->Define (qw/iso-2022-jp-1978-irv japanese-iso-7bit-1978-irv old-jis
+  x-obsoleted-iso-2022-jp/);
 
 =item iso-2022-jp-1978-irv
 
@@ -186,7 +189,7 @@ sub __2022__common ($) {
 package Encode::ISO2022::SevenBit::SS2;
 use vars qw/@ISA/;
 push @ISA, 'Encode::ISO2022::SevenBit';
-__PACKAGE__->Define (qw/iso-2022-7bit-ss2 x-iso-2022-jp-2/);
+__PACKAGE__->Define (qw/iso-2022-7bit-ss2 x-iso-2022-jp-2  jis_encoding csjisencoding/);
 
 =item iso-2022-7bit-ss2
 
@@ -206,12 +209,12 @@ sub __2022__common ($) {
 package Encode::ISO2022::SevenBit::JP2;
 use vars qw/@ISA/;
 push @ISA, 'Encode::ISO2022::SevenBit::SS2';
-__PACKAGE__->Define (qw/iso-2022-jp-2/);
+__PACKAGE__->Define (qw/iso-2022-jp-2 csiso2022jp2/);
 
 =item iso-2022-jp-2
 
 ISO/IEC 2022 based 7-bit multilingual encoding, defined by
-RFC 1554.  A subset of iso-2022-7bit-ss2.
+RFC 1554.  A subset of iso-2022-7bit-ss2.  (Alias: csISO2022JP2 (IANA))
 
 =cut
 
@@ -263,12 +266,13 @@ sub __2022__common ($) {
 package Encode::ISO2022::SevenBit::KR;
 use vars qw/@ISA/;
 push @ISA, 'Encode::ISO2022::SevenBit';
-__PACKAGE__->Define (qw/iso-2022-kr korean-iso-7bit/);
+__PACKAGE__->Define (qw/iso-2022-kr korean-iso-7bit csiso2022kr cp50225 kr2022/);
 
 =item iso-2022-kr
 
 An ISO/IEC 2022 based 7-bit encoding for Korean,
-defined by RFC 1557 (Alias: korean-iso-7bit (emacsen))
+defined by RFC 1557 (Alias: korean-iso-7bit (emacsen),
+csISO2022KR (IANA), CP50225 (M$), KR2022)
 
 =cut
 
@@ -365,6 +369,11 @@ sub __2022__common ($) {
   $C->{option}->{designate_to}->{G94n}->{"\x4B"} = 3;	## CNS 11643 plane 5
   $C->{option}->{designate_to}->{G94n}->{"\x4C"} = 3;	## CNS 11643 plane 6
   $C->{option}->{designate_to}->{G94n}->{"\x4D"} = 3;	## CNS 11643 plane 7
+  $C->{option}->{designate_to}->{G94n}->{P0_0} = 1;	## GB 12345
+  $C->{option}->{designate_to}->{G94n}->{P0_1} = 2;	## GB 7589
+  $C->{option}->{designate_to}->{G94n}->{P0_2} = 2;	## GB 13131
+  $C->{option}->{designate_to}->{G94n}->{P0_3} = 3;	## GB 7590
+  $C->{option}->{designate_to}->{G94n}->{P0_4} = 3;	## GB 13132
   $C;
 }
 sub __2022_decode ($) {
@@ -376,7 +385,7 @@ sub __2022_decode ($) {
 package Encode::ISO2022::SevenBit::CN;
 use vars qw/@ISA/;
 push @ISA, 'Encode::ISO2022::SevenBit';
-__PACKAGE__->Define (qw/iso-2022-cn chinese-iso-7bit/);
+__PACKAGE__->Define (qw/iso-2022-cn chinese-iso-7bit  iso2022cn-cns iso2022cn-gb/);
 
 =item iso-2022-cn
 
@@ -426,6 +435,20 @@ sub __2022__common ($) {
   $C->{option}->{designate_to}->{G94n}->{"\x4B"} = 3;	## CNS 11643 plane 5
   $C->{option}->{designate_to}->{G94n}->{"\x4C"} = 3;	## CNS 11643 plane 6
   $C->{option}->{designate_to}->{G94n}->{"\x4D"} = 3;	## CNS 11643 plane 7
+  $C->{option}->{designate_to}->{G94n}->{P0_0} = 1;	## GB 12345
+  $C->{option}->{designate_to}->{G94n}->{P0_1} = 2;	## GB 7589
+  $C->{option}->{designate_to}->{G94n}->{P0_2} = 2;	## GB 13131
+  $C->{option}->{designate_to}->{G94n}->{P0_3} = 3;	## GB 7590
+  $C->{option}->{designate_to}->{G94n}->{P0_4} = 3;	## GB 13132
+  $C->{option}->{designate_to}->{G94n}->{P1_0} = 3;	## CNS 11643 plane 8
+  $C->{option}->{designate_to}->{G94n}->{P1_1} = 3;	## CNS 11643 plane 9
+  $C->{option}->{designate_to}->{G94n}->{P1_2} = 3;	## CNS 11643 plane 10
+  $C->{option}->{designate_to}->{G94n}->{P1_3} = 3;	## CNS 11643 plane 11
+  $C->{option}->{designate_to}->{G94n}->{P1_4} = 3;	## CNS 11643 plane 12
+  $C->{option}->{designate_to}->{G94n}->{P1_5} = 3;	## CNS 11643 plane 13
+  $C->{option}->{designate_to}->{G94n}->{P1_6} = 3;	## CNS 11643 plane 14
+  $C->{option}->{designate_to}->{G94n}->{P2_0} = 3;	## CNS 11643 plane 15
+  $C->{option}->{designate_to}->{G94n}->{P2_1} = 3;	## CNS 11643 plane 16
   $C;
 }
 
@@ -443,5 +466,5 @@ and/or modify it under the same terms as Perl itself.
 
 =cut
 
-# $Date: 2002/09/15 04:15:11 $
+# $Date: 2002/09/15 05:08:13 $
 ### SevenBit.pm ends here
