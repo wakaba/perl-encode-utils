@@ -15,7 +15,7 @@ require 5.7.3;
 use strict;
 package Encode::ISO2022::JIS;
 use vars qw($VERSION);
-$VERSION=do{my @r=(q$Revision: 1.1 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use base qw(Encode::Encoding);
 require Encode::ISO2022;
 
@@ -57,7 +57,7 @@ sub __2022_decode ($) {
   $C;
 }
 
-package Encode::ISO2022::EightBit::JISX0201Latin7;
+package Encode::ISO2022::JIS::JISX0201Latin7;
 use vars qw/@ISA/;
 push @ISA, 'Encode::ISO2022::JIS';
 __PACKAGE__->Define (qw/jisx0201-1997-latin-7bit JIS_C6220-1969-ro
@@ -79,7 +79,7 @@ sub __2022__common ($) {
   $C;
 }
 
-package Encode::ISO2022::EightBit::JISX0201Katakana7;
+package Encode::ISO2022::JIS::JISX0201Katakana7;
 use vars qw/@ISA/;
 push @ISA, 'Encode::ISO2022::JIS';
 __PACKAGE__->Define (qw/jisx0201-1997-katakana-7bit JIS_C6220-1969-jp JIS_C6220-1969
@@ -102,7 +102,7 @@ sub __2022__common ($) {
   $C;
 }
 
-package Encode::ISO2022::EightBit::JISX0201LatinKatakana7;
+package Encode::ISO2022::JIS::JISX0201LatinKatakana7;
 use vars qw/@ISA/;
 push @ISA, 'Encode::ISO2022::JIS';
 __PACKAGE__->Define (qw/jisx0201-1997-latin-katakana-7bit
@@ -132,7 +132,7 @@ sub __2022_encode ($) {
   $C;
 }
 
-package Encode::ISO2022::EightBit::JISX0201LatinKatakana8;
+package Encode::ISO2022::JIS::JISX0201LatinKatakana8;
 use vars qw/@ISA/;
 push @ISA, 'Encode::ISO2022::JIS';
 __PACKAGE__->Define (qw/jisx0201-1997-latin-latin-8bit/);
@@ -149,10 +149,11 @@ sub __2022__common ($) {
   $C->{G0} = $Encode::ISO2022::CHARSET{G94}->{J};	## JIS X 0201:1997 Latin set
   $C->{G1} = $Encode::ISO2022::CHARSET{G94}->{I};	## JIS X 0201:1997 Katakana set
   $C->{option}->{undef_char} = ["\x3F", {type => 'G94', charset => 'J'}];
+  $C->{option}->{C1invoke_to_right} = 1;
   $C;
 }
 
-package Encode::ISO2022::EightBit::JISX0208Kanji7;
+package Encode::ISO2022::JIS::JISX0208Kanji7;
 use vars qw/@ISA/;
 push @ISA, 'Encode::ISO2022::JIS';
 __PACKAGE__->Define (qw/jisx0208-1997-kanji-7bit/);
@@ -170,7 +171,7 @@ sub __2022__common ($) {
   $C;
 }
 
-package Encode::ISO2022::EightBit::JISX0208Kanji8;
+package Encode::ISO2022::JIS::JISX0208Kanji8;
 use vars qw/@ISA/;
 push @ISA, 'Encode::ISO2022::JIS';
 __PACKAGE__->Define (qw/jisx0208-1997-kanji-8bit/);
@@ -190,7 +191,7 @@ sub __2022__common ($) {
   $C;
 }
 
-package Encode::ISO2022::EightBit::JISX0208IRVKanji7;
+package Encode::ISO2022::JIS::JISX0208IRVKanji7;
 use vars qw/@ISA/;
 push @ISA, 'Encode::ISO2022::JIS';
 __PACKAGE__->Define (qw/jisx0208-1997-irv-kanji-7bit/);
@@ -217,7 +218,7 @@ sub __2022_encode ($) {
   $C;
 }
 
-package Encode::ISO2022::EightBit::JISX0208IRVKanji8;
+package Encode::ISO2022::JIS::JISX0208IRVKanji8;
 use vars qw/@ISA/;
 push @ISA, 'Encode::ISO2022::JIS';
 __PACKAGE__->Define (qw/jisx0208-1997-irv-kanji-8bit/);
@@ -234,10 +235,11 @@ sub __2022__common ($) {
   $C->{bit} = 8;
   $C->{G0} = $Encode::ISO2022::CHARSET{G94}->{B};	## ISO/IEC 646 IRV
   $C->{G1} = $Encode::ISO2022::CHARSET{G94n}->{'B@'};	## JIS X 0208:1997
+  $C->{option}->{C1invoke_to_right} = 1;
   $C;
 }
 
-package Encode::ISO2022::EightBit::JISX0208LatinKanji7;
+package Encode::ISO2022::JIS::JISX0208LatinKanji7;
 use vars qw/@ISA/;
 push @ISA, 'Encode::ISO2022::JIS';
 __PACKAGE__->Define (qw/jisx0208-1997-latin-kanji-7bit/);
@@ -264,7 +266,7 @@ sub __2022_encode ($) {
   $C;
 }
 
-package Encode::ISO2022::EightBit::JISX0208LatinKanji8;
+package Encode::ISO2022::JIS::JISX0208LatinKanji8;
 use vars qw/@ISA/;
 push @ISA, 'Encode::ISO2022::JIS';
 __PACKAGE__->Define (qw/jisx0208-1997-latin-kanji-8bit/);
@@ -280,10 +282,11 @@ sub __2022__common ($) {
   $C->{bit} = 8;
   $C->{G0} = $Encode::ISO2022::CHARSET{G94}->{J};	## JIS X 0201:1997 Latin set
   $C->{G1} = $Encode::ISO2022::CHARSET{G94n}->{'B@'};	## JIS X 0208:1997
+  $C->{option}->{C1invoke_to_right} = 1;
   $C;
 }
 
-package Encode::ISO2022::EightBit::JISX0213Kanji7;
+package Encode::ISO2022::JIS::JISX0213Kanji7;
 use vars qw/@ISA/;
 push @ISA, 'Encode::ISO2022::JIS';
 __PACKAGE__->Define (qw/jisx0213-2000-kanji-7bit/);
@@ -311,7 +314,7 @@ sub __2022_encode ($) {
   $C;
 }
 
-package Encode::ISO2022::EightBit::JISX0213Kanji8;
+package Encode::ISO2022::JIS::JISX0213Kanji8;
 use vars qw/@ISA/;
 push @ISA, 'Encode::ISO2022::JIS';
 __PACKAGE__->Define (qw/jisx0213-2000-kanji-8bit/);
@@ -328,10 +331,11 @@ sub __2022__common ($) {
   $C->{G0} = $Encode::ISO2022::CHARSET{G94n}->{O};	## plane 1
   $C->{G1} = $Encode::ISO2022::CHARSET{G94n}->{P};	## plane 2
   $C->{option}->{undef_char} = ["\x22\x2E", {type => 'G94n', charset => 'O'}];
+  $C->{option}->{C1invoke_to_right} = 1;
   $C;
 }
 
-package Encode::ISO2022::EightBit::JISX0213IRVKanji7;
+package Encode::ISO2022::JIS::JISX0213IRVKanji7;
 use vars qw/@ISA/;
 push @ISA, 'Encode::ISO2022::JIS';
 __PACKAGE__->Define (qw/jisx0213-2000-irv-kanji-7bit/);
@@ -361,7 +365,7 @@ sub __2022_encode ($) {
   $C;
 }
 
-package Encode::ISO2022::EightBit::JISX0213IRVKanji8;
+package Encode::ISO2022::JIS::JISX0213IRVKanji8;
 use vars qw/@ISA/;
 push @ISA, 'Encode::ISO2022::JIS';
 __PACKAGE__->Define (qw/jisx0213-2000-irv-kanji-8bit/);
@@ -382,10 +386,11 @@ sub __2022__common ($) {
   $C->{option}->{Ginvoke_by_single_shift}->[3] = 1;
   $C->{option}->{Ginvoke_to_left} = [1,0,0,0];
   $C->{option}->{undef_char} = ["\x22\x2E", {type => 'G94n', charset => 'O'}];
+  $C->{option}->{C1invoke_to_right} = 1;
   $C;
 }
 
-package Encode::ISO2022::EightBit::JISX0213LatinKanji7;
+package Encode::ISO2022::JIS::JISX0213LatinKanji7;
 use vars qw/@ISA/;
 push @ISA, 'Encode::ISO2022::JIS';
 __PACKAGE__->Define (qw/jisx0213-2000-latin-kanji-7bit/);
@@ -415,7 +420,7 @@ sub __2022_encode ($) {
   $C;
 }
 
-package Encode::ISO2022::EightBit::JISX0213LatinKanji8;
+package Encode::ISO2022::JIS::JISX0213LatinKanji8;
 use vars qw/@ISA/;
 push @ISA, 'Encode::ISO2022::JIS';
 __PACKAGE__->Define (qw/jisx0213-2000-latin-kanji-8bit/);
@@ -435,6 +440,45 @@ sub __2022__common ($) {
   $C->{option}->{Ginvoke_by_single_shift}->[3] = 1;
   $C->{option}->{Ginvoke_to_left} = [1,0,0,0];
   $C->{option}->{undef_char} = ["\x22\x2E", {type => 'G94n', charset => 'O'}];
+  $C->{option}->{C1invoke_to_right} = 1;
+  $C;
+}
+
+package Encode::ISO2022::JIS::JISX4001Text7;
+use vars qw/@ISA/;
+push @ISA, 'Encode::ISO2022::JIS';
+__PACKAGE__->Define (qw/jisx4001-text-7bit/);
+
+=item jisx4001-text-7bit
+
+JIS X 4001-1989 text (7-bit code)
+
+=cut
+
+sub __2022__common ($) {
+  my $C = shift->SUPER::__2022__common;
+  $C->{bit} = 7;
+  $C->{G0} = $Encode::ISO2022::CHARSET{G94n}->{B};	## JIS X 0208-1983
+  $C->{option}->{designate_to}->{G94}->{J} = 0;	## JIS X 0201 Roman
+  $C->{option}->{designate_to}->{G94n}->{B} = 0;	## JIS X 0208-1983
+  $C;
+}
+
+package Encode::ISO2022::JIS::JISX4001Text8;
+use vars qw/@ISA/;
+push @ISA, 'Encode::ISO2022::JIS::JISX4001Text7';
+__PACKAGE__->Define (qw/jisx4001-text-8bit/);
+
+=item jisx4001-text-8bit
+
+JIS X 4001-1989 text (8-bit code)
+
+=cut
+
+sub __2022__common ($) {
+  my $C = shift->SUPER::__2022__common;
+  $C->{bit} = 7;
+  $C->{option}->{C1invoke_to_right} = 1;
   $C;
 }
 
@@ -462,5 +506,5 @@ and/or modify it under the same terms as Perl itself.
 
 =cut
 
-# $Date: 2002/09/16 06:34:35 $
+# $Date: 2002/09/16 11:00:41 $
 ### JIS.pm ends here
