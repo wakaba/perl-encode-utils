@@ -9,7 +9,7 @@ used by Encode::ISO2022, Encode::SJIS, and other modules.
 package Encode::Charset;
 use strict;
 use vars qw(%CHARSET %CODING_SYSTEM $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.7 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.8 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 ## --- Make initial charset definitions
 &_make_initial_charsets;
@@ -266,6 +266,7 @@ sub new_object {
   		Gdesignation	=> "\x42",	## F of designation or 0
   		Ginvoke	=> 1,
   	},
+  	reset_at_end => {},	## Default: same as 'reset''s value
   	undef_char	=> ["\x3F", {type => 'G94', charset => 'B'}],
   	use_revision	=> 1,	## Output IRR
   };
@@ -326,4 +327,4 @@ and/or modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2002/12/18 10:21:09 $
+1; # $Date: 2002/12/18 12:57:40 $

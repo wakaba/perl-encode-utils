@@ -98,7 +98,7 @@ Cversion:
 	C:option:{C1invoke_to_right}=1
 	C:option:{reset}->{Gdesignation}=0
 	C:option:{reset}->{Ginvoke}=0
-	C:option:{undef_char}=["\x22\x2E", {type => 'G94n', charset => 'B@'}]
+	C:option:{undef_char}=["\x22\x2E", {type => 'G94n', charset => 'B', revision => '@'}]
 Encode:
 	=>ucs_to_ascii ucs_to_jisx0208_1990 ucs_to_jisx0212_1990 ucs_to_jisx0201_katakana
 	->iso2022:C

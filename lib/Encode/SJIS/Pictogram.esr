@@ -81,11 +81,11 @@ Description:
 Name:
 	sjis-jphone
 Alias:
-	x-sjis-jphone
+	x-sjis-jphone sjis-jsky x-sjis-jsky
 Cversion:
 	use:charset:Pictogram
 	C:bit=8
-	C:G0=G94:J	## JIS X 0201:1997 Graphic character set for Latin letters
+	C:G0=G94:B	## ASCII + YEN SIGN
 	C:G1=G94n:B@	## JIS X 0208:1997
 	C:G2=G94:I	## JIS X 0201:1997 Graphic character set for Katakana
 	C:G3=G94n:~	## undef
@@ -93,12 +93,12 @@ Cversion:
 Encode:Prepare:
 	C:option:{fallback_from_ucs}=\&Encode::SJIS::_internal_to_page
 Encode:
-	=>ucs_to_jisx0201_latin ucs_to_jisx0208_1997_latin ucs_to_jisx0201_katakana_hw ucs_to_jphone
+	=>ucs_to_ascii_yen ucs_to_jisx0208_1997_yen ucs_to_jisx0201_katakana_hw ucs_to_jphone
 	->sjis:C
 Decode:
 	!& Encode::SJIS::page_to_internal
 	<-sjis:C
-	<=jisx0201_latin_to_ucs jisx0208_1997_latin_to_ucs jisx0201_katakana_hw_to_ucs jphone_to_ucs
+	<=ascii_yen_to_ucs jisx0208_1997_yen_to_ucs jisx0201_katakana_hw_to_ucs jphone_to_ucs
 Description:
 	Shift JIS with JPHONE extended pictographs
 	

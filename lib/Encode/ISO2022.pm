@@ -41,7 +41,7 @@ require v5.7.3;
 package Encode::ISO2022;
 use strict;
 use vars qw(%CHARSET %CODING_SYSTEM $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.14 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.15 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use base qw(Encode::Encoding);
 __PACKAGE__->Define (qw!iso-2022 iso/iec2022 iso2022 2022 cp2022!);
 require Encode::Charset;
@@ -487,10 +487,10 @@ sub internal_to_iso2022 ($;%) {
       if (defined $t) {
         my %D = (fallback => $C->{option}->{fallback_from_ucs}, reset => $C->{option}->{reset});
         $C->{option}->{fallback_from_ucs} = 'croak';
-        $C->{option}->{reset} = {Gdesignation => 0, Ginvoke => 0};
+        $C->{option}->{reset_at_end} = {Gdesignation => 0, Ginvoke => 0};
         eval q{$t = $C->{_encoder}->_encode_internal ($t, $C)} or undef $t;
         $C->{option}->{fallback_from_ucs} = $D{fallback};
-        $C->{option}->{reset} = $D{reset};
+        $C->{option}->{reset_at_end} = $D{reset_at_end};
       }
       if (defined $t) {
         $r .= $t;
@@ -506,7 +506,7 @@ sub internal_to_iso2022 ($;%) {
       }
     }
   }
-  ($r . _back2ascii ($C));	## Back to ASCII at the end of document if specified
+  ($r . _back2ascii ($C, at => 'reset_at_end'));
 }
 
 ## $O{charset} eq undef means that charset is same as the current designated one.
@@ -623,11 +623,13 @@ sub _i2g ($%%) {
   $s =~ tr/\x00-\x7F/\x80-\xFF/ unless $left;
   $r . $s;
 }
-sub _back2ascii (%) {
+sub _back2ascii ($;%) {
   my ($C, %O) = @_;
   my $r = '';
-  if ($C->{option}->{reset}->{Gdesignation}) {
-    my $F = $C->{option}->{reset}->{Gdesignation};	# \x42
+  $O{at} ||= 'reset';
+  if ($C->{option}->{$O{at}}->{Gdesignation}||$C->{option}->{reset}->{Gdesignation}) {
+    my $F = $C->{option}->{$O{at}}->{Gdesignation}
+         || $C->{option}->{reset}->{Gdesignation};	# \x42
     $r .= "\x1B\x28".$F unless $C->{G0} eq $CHARSET{G94}->{$F};
     $C->{G0} = $CHARSET{G94}->{$F};
     if ($O{reset_all}) {
@@ -636,7 +638,7 @@ sub _back2ascii (%) {
       $C->{G3} = $CHARSET{G94}->{"\x7E"};
     }
   }
-  if ($C->{option}->{reset}->{Ginvoke}) {
+  if ($C->{option}->{$O{at}}->{Ginvoke}||$C->{option}->{reset}->{Ginvoke}) {
     if ($C->{GL} ne 'G0') {
       $r .= $C->{C0}->{C_LS0} || ($C->{C0} = $CHARSET{C0}->{'@'},"\x1B\x21\x40\x0F");
       $C->{GL} = 'G0';
@@ -795,4 +797,4 @@ and/or modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2002/12/18 10:21:09 $
+1; # $Date: 2002/12/18 12:57:40 $
