@@ -14,7 +14,7 @@ require 5.7.3;
 use strict;
 package Encode::ISO2022::RFC1345;
 use vars qw($VERSION);
-$VERSION=do{my @r=(q$Revision: 1.1 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use base qw(Encode::Encoding);
 require Encode::ISO2022;
 
@@ -339,6 +339,604 @@ sub __2022__common ($) {
   $C;
 }
 
+package Encode::ISO2022::RFC1345::greek7;
+use vars qw/@ISA/;
+push @ISA, 'Encode::ISO2022::RFC1345';
+__PACKAGE__->Define (qw/greek7 iso-ir-88 csISO88Greek7/);
+
+=item greek7
+
+greek7 (Alias: iso-ir-88, csISO88Greek7 (IANA))
+
+=cut
+
+sub __2022__common ($) {
+  my $C = shift->SUPER::__2022__common;
+  $C->{bit} = 7;
+  $C->{G0} = $Encode::ISO2022::CHARSET{G94}->{"\x6A"};
+  $C->{G1} = $C->{G0}; $C->{G2} = $C->{G1}; $C->{G3} = $C->{G1};
+  $C->{option}->{undef_char} = ["\x3F", {type => 'G94', charset => "\x6A"}];
+  $C;
+}
+
+package Encode::ISO2022::RFC1345::ASMO_449;
+use vars qw/@ISA/;
+push @ISA, 'Encode::ISO2022::RFC1345';
+__PACKAGE__->Define (qw/ASMO_449 ISO_9036 arabic7 iso-ir-89 csISO89ASMO449/);
+
+=item ASMO_449
+
+ASMO_449 (Alias: ISO_9036, arabic7, iso-ir-89, csISO89ASMO449 (IANA))
+
+=cut
+
+sub __2022__common ($) {
+  my $C = shift->SUPER::__2022__common;
+  $C->{bit} = 7;
+  $C->{G0} = $Encode::ISO2022::CHARSET{G94}->{"\x6B"};
+  $C->{G1} = $C->{G0}; $C->{G2} = $C->{G1}; $C->{G3} = $C->{G1};
+  $C->{option}->{undef_char} = ["\x3F", {type => 'G94', charset => "\x6B"}];
+  $C;
+}
+
+package Encode::ISO2022::RFC1345::csISO91JISC62291984a;
+use vars qw/@ISA/;
+push @ISA, 'Encode::ISO2022::RFC1345';
+__PACKAGE__->Define (qw/JIS_C6229-1984-a iso-ir-91 jp-ocr-a csISO91JISC62291984a/);
+
+=item JIS_C6229-1984-a
+
+JIS_C6229-1984-a (Alias: iso-ir-91, jp-ocr-a, csISO91JISC62291984a (IANA))
+
+=cut
+
+sub __2022__common ($) {
+  my $C = shift->SUPER::__2022__common;
+  $C->{bit} = 7;
+  $C->{G0} = $Encode::ISO2022::CHARSET{G94}->{"\x6D"};
+  $C->{G1} = $C->{G0}; $C->{G2} = $C->{G1}; $C->{G3} = $C->{G1};
+  $C->{option}->{undef_char} = ["\x3F", {type => 'G94', charset => "\x6D"}];
+  $C;
+}
+
+package Encode::ISO2022::RFC1345::csISO92JISC62991984b;
+use vars qw/@ISA/;
+push @ISA, 'Encode::ISO2022::RFC1345';
+__PACKAGE__->Define (qw/JIS_C6229-1984-b iso-ir-92 ISO646-JP-OCR-B jp-ocr-b
+ csISO92JISC62991984b/);
+
+=item JIS_C6229-1984-b
+
+JIS_C6229-1984-b (Alias: iso-ir-92, ISO646-JP-OCR-B, jp-ocr-b,
+csISO92JISC62991984b (IANA))
+
+=cut
+
+sub __2022__common ($) {
+  my $C = shift->SUPER::__2022__common;
+  $C->{bit} = 7;
+  $C->{G0} = $Encode::ISO2022::CHARSET{G94}->{"\x6E"};
+  $C->{G1} = $C->{G0}; $C->{G2} = $C->{G1}; $C->{G3} = $C->{G1};
+  $C->{option}->{undef_char} = ["\x3F", {type => 'G94', charset => "\x6E"}];
+  $C;
+}
+
+package Encode::ISO2022::RFC1345::csISO93JIS62291984badd;
+use vars qw/@ISA/;
+push @ISA, 'Encode::ISO2022::RFC1345';
+__PACKAGE__->Define (qw/JIS_C6229-1984-b-add iso-ir-93 jp-ocr-b-add
+ csISO93JIS62291984badd/);
+
+=item JIS_C6229-1984-b-add
+
+JIS_C6229-1984-b-add (Alias: iso-ir-93, jp-ocr-b-add,
+csISO93JIS62291984badd (IANA))
+
+=cut
+
+sub __2022__common ($) {
+  my $C = shift->SUPER::__2022__common;
+  $C->{bit} = 7;
+  $C->{G0} = $Encode::ISO2022::CHARSET{G94}->{"\x6F"};
+  $C->{G1} = $C->{G0}; $C->{G2} = $C->{G1}; $C->{G3} = $C->{G1};
+  $C->{option}->{undef_char} = ["\x20"];
+  $C;
+}
+
+package Encode::ISO2022::RFC1345::csISO94JIS62291984hand;
+use vars qw/@ISA/;
+push @ISA, 'Encode::ISO2022::RFC1345';
+__PACKAGE__->Define (qw/JIS_C6229-1984-hand iso-ir-94 jp-ocr-hand
+ csISO94JIS62291984hand/);
+
+=item JIS_C6229-1984-hand
+
+JIS_C6229-1984-hand (Alias: iso-ir-94, jp-ocr-hand,
+csISO94JIS62291984hand (IANA))
+
+=cut
+
+sub __2022__common ($) {
+  my $C = shift->SUPER::__2022__common;
+  $C->{bit} = 7;
+  $C->{G0} = $Encode::ISO2022::CHARSET{G94}->{"\x70"};
+  $C->{G1} = $C->{G0}; $C->{G2} = $C->{G1}; $C->{G3} = $C->{G1};
+  $C->{option}->{undef_char} = ["\x3F", {type => 'G94', charset => "\x70"}];
+  $C;
+}
+
+package Encode::ISO2022::RFC1345::csISO93JIS62291984badd;
+use vars qw/@ISA/;
+push @ISA, 'Encode::ISO2022::RFC1345';
+__PACKAGE__->Define (qw/JIS_C6229-1984-hand-add iso-ir-95 jp-ocr-hand-add
+ csISO93JIS62291984badd/);
+
+=item JIS_C6229-1984-hand-add
+
+JIS_C6229-1984-hand-add (Alias: iso-ir-95, jp-ocr-hand-add,
+csISO93JIS62291984badd (IANA))
+
+=cut
+
+sub __2022__common ($) {
+  my $C = shift->SUPER::__2022__common;
+  $C->{bit} = 7;
+  $C->{G0} = $Encode::ISO2022::CHARSET{G94}->{"\x71"};
+  $C->{G1} = $C->{G0}; $C->{G2} = $C->{G1}; $C->{G3} = $C->{G1};
+  $C->{option}->{undef_char} = ["\x20"];
+  $C;
+}
+
+package Encode::ISO2022::RFC1345::csISO96JISC62291984kana;
+use vars qw/@ISA/;
+push @ISA, 'Encode::ISO2022::RFC1345';
+__PACKAGE__->Define (qw/JIS_C6229-1984-kana iso-ir-96
+ csISO96JISC62291984kana/);
+
+=item JIS_C6229-1984-kana
+
+JIS_C6229-1984-kana (Alias: iso-ir-96,
+csISO96JISC62291984kana (IANA))
+
+=cut
+
+sub __2022__common ($) {
+  my $C = shift->SUPER::__2022__common;
+  $C->{bit} = 7;
+  $C->{G0} = $Encode::ISO2022::CHARSET{G94}->{"\x72"};
+  $C->{G1} = $C->{G0}; $C->{G2} = $C->{G1}; $C->{G3} = $C->{G1};
+  $C->{option}->{undef_char} = ["\x20"];
+  $C;
+}
+
+package Encode::ISO2022::RFC1345::csISO2033;
+use vars qw/@ISA/;
+push @ISA, 'Encode::ISO2022::RFC1345';
+__PACKAGE__->Define (qw/ISO_2033-1983 iso-ir-98 e13b
+ csISO2033/);
+
+=item ISO_2033-1983
+
+ISO_2033-1983 (Alias: iso-ir-98, e13b,
+csISO2033 (IANA))
+
+=cut
+
+sub __2022__common ($) {
+  my $C = shift->SUPER::__2022__common;
+  $C->{bit} = 7;
+  $C->{G0} = $Encode::ISO2022::CHARSET{G94}->{"\x73"};
+  $C->{G1} = $C->{G0}; $C->{G2} = $C->{G1}; $C->{G3} = $C->{G1};
+  $C->{option}->{undef_char} = ["\x20"];
+  $C;
+}
+
+package Encode::ISO2022::RFC1345::csISO102T617bit;
+use vars qw/@ISA/;
+push @ISA, 'Encode::ISO2022::RFC1345';
+__PACKAGE__->Define (qw/T.61-7bit iso-ir-102 csISO102T617bit/);
+
+=item T.61-7bit
+
+T.61-7bit (Alias: iso-ir-102, csISO102T617bit (IANA))
+
+=cut
+
+sub __2022__common ($) {
+  my $C = shift->SUPER::__2022__common;
+  $C->{bit} = 7;
+  $C->{G0} = $Encode::ISO2022::CHARSET{G94}->{"\x75"};
+  $C->{G1} = $C->{G0}; $C->{G2} = $C->{G1}; $C->{G3} = $C->{G1};
+  $C->{option}->{undef_char} = ["\x3F", {type => 'G94', charset => "\x75"}];
+  $C;
+}
+
+
+package Encode::ISO2022::RFC1345::csISO146Serbian;
+use vars qw/@ISA/;
+push @ISA, 'Encode::ISO2022::RFC1345';
+__PACKAGE__->Define (qw/JUS_I.B1.003-serb iso-ir-146 serbian csISO146Serbian/);
+
+=item JUS_I.B1.003-serb
+
+JUS_I.B1.003-serb (Alias: iso-ir-146, serbian, csISO146Serbian (IANA))
+
+=cut
+
+sub __2022__common ($) {
+  my $C = shift->SUPER::__2022__common;
+  $C->{bit} = 7;
+  $C->{G0} = $Encode::ISO2022::CHARSET{G94}->{"\x7B"};
+  $C->{G1} = $C->{G0}; $C->{G2} = $C->{G1}; $C->{G3} = $C->{G1};
+  $C->{option}->{undef_char} = ["\x3F", {type => 'G94', charset => "\x7B"}];
+  $C;
+}
+
+package Encode::ISO2022::RFC1345::csISO147Macedonian;
+use vars qw/@ISA/;
+push @ISA, 'Encode::ISO2022::RFC1345';
+__PACKAGE__->Define (qw/JUS_I.B1.003-mac macedonian iso-ir-147
+ csISO147Macedonian/);
+
+=item JUS_I.B1.003-mac
+
+JUS_I.B1.003-mac (Alias: macedonian, iso-ir-147, csISO147Macedonian (IANA))
+
+=cut
+
+sub __2022__common ($) {
+  my $C = shift->SUPER::__2022__common;
+  $C->{bit} = 7;
+  $C->{G0} = $Encode::ISO2022::CHARSET{G94}->{"\x7D"};
+  $C->{G1} = $C->{G0}; $C->{G2} = $C->{G1}; $C->{G3} = $C->{G1};
+  $C->{option}->{undef_char} = ["\x3F", {type => 'G94', charset => "\x7D"}];
+  $C;
+}
+
+package Encode::ISO2022::RFC1345::csISO150GreekCCITT;
+use vars qw/@ISA/;
+push @ISA, 'Encode::ISO2022::RFC1345';
+__PACKAGE__->Define (qw/greek-ccitt iso-ir-150 csISO150
+ csISO150GreekCCITT/);
+
+=item greek-ccitt
+
+greek-ccitt (Alias: iso-ir-150, csISO150 (IANA), csISO150GreekCCITT (IANA))
+
+=cut
+
+sub __2022__common ($) {
+  my $C = shift->SUPER::__2022__common;
+  $C->{bit} = 7;
+  $C->{G0} = $Encode::ISO2022::CHARSET{G94}->{"\x21\x40"};
+  $C->{G1} = $C->{G0}; $C->{G2} = $C->{G1}; $C->{G3} = $C->{G1};
+  $C->{option}->{undef_char} = ["\x3F", {type => 'G94', charset => "\x21\x40"}];
+  $C;
+}
+
+
+
+
+package Encode::ISO2022::RFC1345::csISO70VideotexSupp1;
+use vars qw/@ISA/;
+push @ISA, 'Encode::ISO2022::RFC1345';
+__PACKAGE__->Define (qw/videotex-suppl iso-ir-70 csISO70VideotexSupp1/);
+
+=item videotex-suppl
+
+videotex-suppl (Alias: iso-ir-70, csISO70VideotexSupp1 (IANA))
+
+=cut
+
+sub __2022__common ($) {
+  my $C = shift->SUPER::__2022__common;
+  $C->{bit} = 8;
+  $C->{G0} = $Encode::ISO2022::CHARSET{G94}->{"\x74"};
+  $C->{G1} = $Encode::ISO2022::CHARSET{G94}->{"\x62"};
+  $C->{G2} = $C->{G1}; $C->{G3} = $C->{G1};
+  $C->{option}->{undef_char} = ["\x3F", {type => 'G94', charset => "\x74"}];
+  $C;
+}
+
+package Encode::ISO2022::RFC1345::csISO90;
+use vars qw/@ISA/;
+push @ISA, 'Encode::ISO2022::RFC1345';
+__PACKAGE__->Define (qw/iso-ir-90 csISO90/);
+
+=item iso-ir-90
+
+iso-ir-90 (Alias: csISO90 (IANA))
+
+=cut
+
+sub __2022__common ($) {
+  my $C = shift->SUPER::__2022__common;
+  $C->{bit} = 8;
+  $C->{G0} = $Encode::ISO2022::CHARSET{G94}->{"\x42"};
+  $C->{G1} = $Encode::ISO2022::CHARSET{G94}->{"\x6C"};
+  $C->{G2} = $C->{G1}; $C->{G3} = $C->{G1};
+  $C->{option}->{undef_char} = ["\x3F", {type => 'G94', charset => "\x6C"}];
+  $C;
+}
+
+package Encode::ISO2022::RFC1345::csISO2033;
+use vars qw/@ISA/;
+push @ISA, 'Encode::ISO2022::RFC1345';
+__PACKAGE__->Define (qw/ANSI_X3.110-1983 iso-ir-99 CSA_T500-1983 NAPLPS
+ csISO99NAPLPS
+ T.101-G2 iso-ir-128 csISO128T101G2/);
+
+=item ANSI_X3.110-1983
+
+ANSI_X3.110-1983 (Alias: iso-ir-99, CSA_T500-1983, NAPLPS,
+csISO99NAPLPS (IANA), T.101-G2, iso-ir-128, csISO128T101G2 (IANA))
+
+Note that C<ANSI_X3.110-1983> and C<T.101-G2> is defined as
+different charset in RFC 1345 and IANAREG although they have
+same definition.
+
+=cut
+
+sub __2022__common ($) {
+  my $C = shift->SUPER::__2022__common;
+  $C->{bit} = 8;
+  $C->{G0} = $Encode::ISO2022::CHARSET{G94}->{"\x74"};
+  $C->{G1} = $Encode::ISO2022::CHARSET{G94}->{"\x7C"};
+  $C->{G2} = $C->{G1}; $C->{G3} = $C->{G1};
+  $C->{option}->{undef_char} = ["\x3F", {type => 'G94', charset => "\x74"}];
+  $C;
+}
+
+## ISO_8859-1:1987 iso-ir-100 ISO_8859-1 ISO-8859-1 latin1 l1 IBM819 CP819
+## 	csISOLatin1 (IANA)
+## ISO_8859-2:1987 iso-ir-101 ISO_8859-2 ISO-8859-2 latin2 l2 csISOLatin2 (IANA)
+
+package Encode::ISO2022::RFC1345::csISO103T618bit;
+use vars qw/@ISA/;
+push @ISA, 'Encode::ISO2022::RFC1345';
+__PACKAGE__->Define (qw/T.61-8bit T.61 iso-ir-103 csISO103T618bit/);
+
+=item T.61-8bit
+
+T.61-8bit (Alias: T.61, iso-ir-103, csISO103T618bit (IANA))
+
+=cut
+
+sub __2022__common ($) {
+  my $C = shift->SUPER::__2022__common;
+  $C->{bit} = 8;
+  $C->{G0} = $Encode::ISO2022::CHARSET{G94}->{"\x7E"};
+  	## TODO: GL is subset of ISO-IR 102
+  $C->{G1} = $Encode::ISO2022::CHARSET{G96}->{"\x76"};
+  $C->{G2} = $C->{G1}; $C->{G3} = $C->{G1};
+  $C->{option}->{undef_char} = ["\x3F", {type => 'G94', charset => "\x7E"}];
+  $C;
+}
+
+# ISO_8859-3:1988 iso-ir-109 ISO_8859-3 ISO-8859-3 latin3 l3 csISOLatin3 (IANA)
+# ISO_8859-4:1988 iso-ir-110 ISO_8859-4 ISO-8859-4 latin4 l4 csISOLatin4 (IANA)
+
+package Encode::ISO2022::RFC1345::csISO111ECMACyrillic;
+use vars qw/@ISA/;
+push @ISA, 'Encode::ISO2022::RFC1345';
+__PACKAGE__->Define (qw/ECMA-cyrillic iso-ir-111 csISO111ECMACyrillic/);
+
+=item ECMA-cyrillic
+
+ECMA-cyrillic (Alias: iso-ir-111, csISO111ECMACyrillic (IANA))
+
+=cut
+
+sub __2022__common ($) {
+  my $C = shift->SUPER::__2022__common;
+  $C->{bit} = 8;
+  $C->{G0} = $Encode::ISO2022::CHARSET{G94}->{"\x42"};
+  $C->{G1} = $Encode::ISO2022::CHARSET{G96}->{"\x40"};
+  $C->{G2} = $C->{G1}; $C->{G3} = $C->{G1};
+  $C->{option}->{undef_char} = ["\x3F", {type => 'G94', charset => "\x42"}];
+  $C;
+}
+
+package Encode::ISO2022::RFC1345::csISO123CSAZ24341985gr;
+use vars qw/@ISA/;
+push @ISA, 'Encode::ISO2022::RFC1345';
+__PACKAGE__->Define (qw/CSA_Z243.4-1985-gr iso-ir-123 csISO123CSAZ24341985gr/);
+
+=item CSA_Z243.4-1985-gr
+
+CSA_Z243.4-1985-gr (Alias: iso-ir-123, csISO123CSAZ24341985gr (IANA))
+
+=cut
+
+sub __2022__common ($) {
+  my $C = shift->SUPER::__2022__common;
+  $C->{bit} = 8;
+  $C->{G0} = $Encode::ISO2022::CHARSET{G94}->{"\x42"};
+  $C->{G1} = $Encode::ISO2022::CHARSET{G96}->{"\x45"};
+  $C->{G2} = $C->{G1}; $C->{G3} = $C->{G1};
+  $C->{option}->{undef_char} = ["\x3F", {type => 'G94', charset => "\x42"}];
+  $C;
+}
+
+# ISO_8859-7:1987 iso-ir-126 ISO_8859-7 ISO-8859-7 ELOT_928 ECMA-118
+#	greek greek8 csISOLatinGreek (IANA)
+# ISO_8859-6:1987 iso-ir-127 ISO_8859-6 ISO-8859-6 ECMA-114 ASMO-708
+#	arabic csISOLatinArabic (IANA)
+# ISO_8859-8:1988 iso-ir-138 ISO_8859-8 ISO-8859-8 hebrew csISOLatinHebrew (IANA)
+
+package Encode::ISO2022::RFC1345::CSN_369103;
+use vars qw/@ISA/;
+push @ISA, 'Encode::ISO2022::RFC1345';
+__PACKAGE__->Define (qw/CSN_369103 iso-ir-139 csISO139CSN369103/);
+
+=item CSN_369103
+
+CSN_369103 (Alias: iso-ir-139, csISO139CSN369103 (IANA))
+
+=cut
+
+sub __2022__common ($) {
+  my $C = shift->SUPER::__2022__common;
+  $C->{bit} = 8;
+  $C->{G0} = $Encode::ISO2022::CHARSET{G94}->{"\x42"};
+  $C->{G1} = $Encode::ISO2022::CHARSET{G96}->{"\x49"};
+  $C->{G2} = $C->{G1}; $C->{G3} = $C->{G1};
+  $C->{option}->{undef_char} = ["\x3F", {type => 'G94', charset => "\x42"}];
+  $C;
+}
+
+package Encode::ISO2022::RFC1345::csISOTextComm;
+use vars qw/@ISA/;
+push @ISA, 'Encode::ISO2022::RFC1345';
+__PACKAGE__->Define (qw/ISO_6937-2-add iso-ir-142 csISOTextComm/);
+
+=item ISO_6937-2-add
+
+ISO_6937-2-add (Alias: iso-ir-142, csISOTextComm (IANA))
+
+=cut
+
+sub __2022__common ($) {
+  my $C = shift->SUPER::__2022__common;
+  $C->{bit} = 8;
+  $C->{G0} = $Encode::ISO2022::CHARSET{G94}->{"\x42"};
+  $C->{G1} = $Encode::ISO2022::CHARSET{G96}->{"\x4A"};
+  $C->{G2} = $C->{G1}; $C->{G3} = $C->{G1};
+  $C->{option}->{undef_char} = ["\x3F", {type => 'G94', charset => "\x42"}];
+  $C;
+}
+
+package Encode::ISO2022::RFC1345::csISO143IECP271;
+use vars qw/@ISA/;
+push @ISA, 'Encode::ISO2022::RFC1345';
+__PACKAGE__->Define (qw/IEC_P27-1 iso-ir-143 csISO143IECP271/);
+
+=item IEC_P27-1
+
+IEC_P27-1 (Alias: iso-ir-143, csISO143IECP271 (IANA))
+
+=cut
+
+sub __2022__common ($) {
+  my $C = shift->SUPER::__2022__common;
+  $C->{bit} = 8;
+  $C->{G0} = $Encode::ISO2022::CHARSET{G94}->{"\x42"};
+  $C->{G1} = $Encode::ISO2022::CHARSET{G96}->{"\x4B"};
+  $C->{G2} = $C->{G1}; $C->{G3} = $C->{G1};
+  $C->{option}->{undef_char} = ["\x3F", {type => 'G94', charset => "\x42"}];
+  $C;
+}
+
+# ISO_8859-5:1988 iso-ir-144 ISO_8859-5 ISO-8859-5 cyrillic csISOLatinCyrillic (IANA)
+# ISO_8859-9:1989 iso-ir-148 ISO_8859-9 ISO-8859-9 latin5 l5 csISOLatin5 (IANA)
+
+package Encode::ISO2022::RFC1345::csISO6937Add;
+use vars qw/@ISA/;
+push @ISA, 'Encode::ISO2022::RFC1345';
+__PACKAGE__->Define (qw/ISO_6937-2-25 iso-ir-152 csISO6937Add/);
+
+=item ISO_6937-2-25
+
+ISO_6937-2-25 (Alias: iso-ir-152, csISO6937Add (IANA))
+
+=cut
+
+sub __2022__common ($) {
+  my $C = shift->SUPER::__2022__common;
+  $C->{bit} = 8;
+  $C->{G0} = $Encode::ISO2022::CHARSET{G94}->{"\x42"};
+  $C->{G1} = $Encode::ISO2022::CHARSET{G96}->{"\x4E"};
+  $C->{G2} = $C->{G1}; $C->{G3} = $C->{G1};
+  $C->{option}->{undef_char} = ["\x3F", {type => 'G94', charset => "\x42"}];
+  $C;
+}
+
+package Encode::ISO2022::RFC1345::csISO153GOST1976874;
+use vars qw/@ISA/;
+push @ISA, 'Encode::ISO2022::RFC1345';
+__PACKAGE__->Define (qw/GOST_19768-74 ST_SEV_358-88 iso-ir-153 csISO153GOST1976874/);
+
+=item GOST_19768-74
+
+GOST_19768-74 (Alias: ST_SEV_358-88, iso-ir-153, csISO153GOST1976874 (IANA))
+
+=cut
+
+sub __2022__common ($) {
+  my $C = shift->SUPER::__2022__common;
+  $C->{bit} = 8;
+  $C->{G0} = $Encode::ISO2022::CHARSET{G94}->{"\x42"};
+  $C->{G1} = $Encode::ISO2022::CHARSET{G96}->{"\x4F"};
+  $C->{G2} = $C->{G1}; $C->{G3} = $C->{G1};
+  $C->{option}->{undef_char} = ["\x3F", {type => 'G94', charset => "\x42"}];
+  $C;
+}
+
+package Encode::ISO2022::RFC1345::csISO8859Supp;
+use vars qw/@ISA/;
+push @ISA, 'Encode::ISO2022::RFC1345';
+__PACKAGE__->Define (qw/ISO_8859-supp iso-ir-154 latin1-2-5 csISO8859Supp/);
+
+=item ISO_8859-supp
+
+ISO_8859-supp (Alias: iso-ir-154, latin1-2-5, csISO8859Supp (IANA))
+
+=cut
+
+sub __2022__common ($) {
+  my $C = shift->SUPER::__2022__common;
+  $C->{bit} = 8;
+  $C->{G0} = $Encode::ISO2022::CHARSET{G94}->{"\x42"};
+  $C->{G1} = $Encode::ISO2022::CHARSET{G96}->{"\x50"};
+  $C->{G2} = $C->{G1}; $C->{G3} = $C->{G1};
+  $C->{option}->{undef_char} = ["\x3F", {type => 'G94', charset => "\x42"}];
+  $C;
+}
+
+package Encode::ISO2022::RFC1345::csISO10367Box;
+use vars qw/@ISA/;
+push @ISA, 'Encode::ISO2022::RFC1345';
+__PACKAGE__->Define (qw/ISO_10367-box iso-ir-155 csISO10367Box/);
+
+=item ISO_10367-box
+
+ISO_10367-box (Alias: iso-ir-155, csISO10367Box (IANA))
+
+=cut
+
+sub __2022__common ($) {
+  my $C = shift->SUPER::__2022__common;
+  $C->{bit} = 8;
+  $C->{G0} = $Encode::ISO2022::CHARSET{G94}->{"\x42"};
+  $C->{G1} = $Encode::ISO2022::CHARSET{G96}->{"\x51"};
+  $C->{G2} = $C->{G1}; $C->{G3} = $C->{G1};
+  $C->{option}->{undef_char} = ["\x3F", {type => 'G94', charset => "\x42"}];
+  $C;
+}
+
+# latin6 iso-ir-157 l6 ISO-8859-10 (IANA) ISO_8859-10:1992 (IANA) csISOLatin6 (IANA)
+
+package Encode::ISO2022::RFC1345::csISO158Lap;
+use vars qw/@ISA/;
+push @ISA, 'Encode::ISO2022::RFC1345';
+__PACKAGE__->Define (qw/latin-lap lap iso-ir-158 csISO158Lap/);
+
+=item latin-lap
+
+latin-lap (Alias: lap, iso-ir-158, csISO158Lap (IANA))
+
+=cut
+
+sub __2022__common ($) {
+  my $C = shift->SUPER::__2022__common;
+  $C->{bit} = 8;
+  $C->{G0} = $Encode::ISO2022::CHARSET{G94}->{"\x42"};
+  $C->{G1} = $Encode::ISO2022::CHARSET{G96}->{"\x58"};
+  $C->{G2} = $C->{G1}; $C->{G3} = $C->{G1};
+  $C->{option}->{undef_char} = ["\x3F", {type => 'G94', charset => "\x42"}];
+  $C;
+}
+
 
 package Encode::ISO2022::RFC1345::csISO42JISC62261978;
 use vars qw/@ISA/;
@@ -384,20 +982,86 @@ sub __2022__common ($) {
   $C;
 }
 
+package Encode::ISO2022::RFC1345::csISO87JISX0208;
+use vars qw/@ISA/;
+push @ISA, 'Encode::ISO2022::RFC1345';
+__PACKAGE__->Define (qw/JIS_C6226-1983 iso-ir-87 x0208
+ JIS_X0208-1983 csISO87JISX0208 JIS0208/);
+
+=item JIS_C6226-1983
+
+JIS_C6226-1978 (Alias: iso-ir-87, x0208, JIS_X0208-1983, csISO87JISX0208 (IANA),
+JIS0208 (Not in RFC 1345))
+
+=cut
+
+sub __2022__common ($) {
+  my $C = shift->SUPER::__2022__common;
+  $C->{bit} = 7;
+  # 0x20, 0x7F = undef
+  $C->{C0} = $Encode::ISO2022::CHARSET{C0}->{"\x7E"};
+  $C->{G0} = $Encode::ISO2022::CHARSET{G94n}->{"\x42"};
+  $C->{G1} = $C->{G0}; $C->{G2} = $C->{G1}; $C->{G3} = $C->{G1};
+  $C->{option}->{undef_char} = ["\x22\x2E", {type => 'G94n', charset => "\x42"}];
+  $C;
+}
+
+package Encode::ISO2022::RFC1345::csKSC56011987;
+use vars qw/@ISA/;
+push @ISA, 'Encode::ISO2022::RFC1345';
+__PACKAGE__->Define (qw/KS_C_5601-1987 iso-ir-149 KS_C_5601-1989 KSC_5601
+ korean csKSC56011987 KSC5601 KS_C_5601 KSC5601_1992 KSX1001 KS_X_1001:1992/);
+
+=item KS_C_5601-1987
+
+KS_C_5601-1987 (Alias: iso-ir-149, KS_C_5601-1989, KSC_5601, korean,
+csKSC56011987 (IANA), KSC5601 (Not in RFC 1345), KS_C_5601 (Not in RFC 1345),
+KSC5601_1992 (Not in RFC 1345), KSX1001 (Not in RFC 1345),
+KS_X_1001:1992 (Not in RFC 1345))
+
+Some implementions use this name to label UHC (Unified Hangul
+Code).  It is a serious bug.
+
+=cut
+
+sub __2022__common ($) {
+  my $C = shift->SUPER::__2022__common;
+  $C->{bit} = 7;
+  # 0x20, 0x7F = undef
+  $C->{C0} = $Encode::ISO2022::CHARSET{C0}->{"\x7E"};
+  $C->{G0} = $Encode::ISO2022::CHARSET{G94n}->{"\x4C"};
+  $C->{G1} = $C->{G0}; $C->{G2} = $C->{G1}; $C->{G3} = $C->{G1};
+  $C->{option}->{undef_char} = ["\x21\x6B", {type => 'G94n', charset => "\x4C"}];
+  $C;
+}
+
+package Encode::ISO2022::RFC1345::csISO159JISX02121990;
+use vars qw/@ISA/;
+push @ISA, 'Encode::ISO2022::RFC1345';
+__PACKAGE__->Define (qw/JIS_X0212-1990 x0212 iso-ir-159 csISO159JISX02121990/);
+
+=item JIS_X0212-1990
+
+JIS_X0212-1990 (Alias: x0212, iso-ir-159, csISO159JISX02121990 (IANA))
+
+=cut
+
+sub __2022__common ($) {
+  my $C = shift->SUPER::__2022__common;
+  $C->{bit} = 7;
+  # 0x20, 0x7F = undef
+  $C->{C0} = $Encode::ISO2022::CHARSET{C0}->{"\x7E"};
+  $C->{G0} = $Encode::ISO2022::CHARSET{G94n}->{"\x44"};
+  $C->{G1} = $C->{G0}; $C->{G2} = $C->{G1}; $C->{G3} = $C->{G1};
+  $C->{option}->{undef_char} = ["\x22\x44", {type => 'G94n', charset => "\x44"}];
+  	## INVERTED QUESTION MARK
+  $C;
+}
+
 1;
 __END__
 
 =back
-
-Note that although other JISes such as JIS X 0212 and JIS X 9010
-define ISO/IEC 2022-comfprming coded character sets,
-these standards do not define complete coding system (but define
-as used on ISO/IEC 2022 environment), so this module
-does not include those coded character sets.  (IETF RFC 1345
-and IANAREG give charset name to coded character sets
-consist of such standards.  But those are defined by RFC 1345,
-not by JIS.  Such coded character sets should be implemented
-in Encode::ISO2022::RFC1345.)
 
 =head1 LICENSE
 
@@ -408,5 +1072,5 @@ and/or modify it under the same terms as Perl itself.
 
 =cut
 
-# $Date: 2002/09/22 11:08:23 $
-### JIS.pm ends here
+# $Date: 2002/09/23 02:35:37 $
+### RFC1345.pm ends here

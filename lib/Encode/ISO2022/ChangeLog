@@ -1,3 +1,9 @@
+2002-09-23  Wakaba <w@suika.fam.cx>
+
+	* ISO646.pm, RFC1345.pm: Updated.  They now
+	cover akmost all ISO/IEC 2022-based charsets
+	described in IETF RFC 1345.
+
 2002-09-22  Wakaba <w@suika.fam.cx>
 
 	* ISO646.pm, RFC1345.pm: New modules.
