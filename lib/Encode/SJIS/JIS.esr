@@ -9,6 +9,40 @@ Description:
 	in standards of JIS (Japan Industrial Standards).
 
 {
+AliasOf:
+	shift_jisx0213
+Alias:
+	sjis s-jis x-sjis x_sjis x-sjis-jp shift-jis shiftjis shift.jis x-shiftjis x-shift-jis x-shift_jis
+Description:
+	"Shift JIS" coding system.
+	
+	Since this name is ambiguous (it can now refer all or any
+	of shift JIS coding system family), this name should not
+	be used to address specific coding system.  In this module,
+	this is considered as an alias name to the shift JIS with
+	latest official definition, currently of JIS X 0213:2000
+	Appendix 1 (with implemention level 4).
+	
+	Note that the name "Shift_JIS" is not associated with
+	this name, because IANA registry [IANAREG] assignes
+	it to a shift JIS defined by JIS X 0208:1997.
+}
+
+{
+AliasOf:
+	shift_jisx0213-ascii
+Alias:
+	sjis-ascii shift-jis-ascii
+Description:
+	Same as sjis but ASCII (ISO/IEC 646 IRV) instead of
+	JIS X 0201 Roman (or Latin) set.
+	
+	In spite of the history of shift JIS, ASCII is sometimes
+	used instead of JIS X 0201 Roman set, because of compatibility
+	with ASCII world.
+}
+
+{
 Name:
 	shift-jis-1997
 Alias:
