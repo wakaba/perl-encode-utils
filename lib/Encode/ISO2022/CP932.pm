@@ -1,8 +1,8 @@
-require 5.8.0;
+require 5.7.3;
 package Encode::ISO2022::CP932;
 use strict;
 use vars qw(%DEFAULT $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.1 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use base qw(Encode::Encoding);
 __PACKAGE__->Define (qw/x-iso2022jp-cp932/);
 
@@ -86,6 +86,6 @@ and/or modify it under the same terms as Perl itself.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/08/16 09:19:18 $
+$Date: 2002/09/15 04:15:11 $
 
 =cut
