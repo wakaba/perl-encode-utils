@@ -413,6 +413,8 @@ M17N::Code::JA --- Japanese string coding system convertion
 
 wakaba <wakaba@suika.fam.cx>
 
+$Id: JA.pm,v 1.2 2001/12/24 08:13:56 wakaba Exp $
+
 =cut
 
 1;
