@@ -1,0 +1,130 @@
+#?PESRC/1.0
+Name:
+	ISO2022::JISCompatible
+ShortDescription:
+	An Encode module of ISO/IEC 2022
+	based compatible coding systems for Japanese
+POD:DESCRIPTION:
+	Due to the historical reason, some of current
+	implementions of JIS coded character sets support
+	pairs of same characters dupplicately, with
+	halfwidth/fullwidth property.
+	
+	Even this situation is undesirable, we can't ignore
+	such historical implementions and latest JIS coded
+	character set standards admire such dupulicate
+	encoding to and only to "keep compatibility with
+	current practice."
+	
+	This module provides encoder and decoder for such
+	coding systems that comform to JIS and that based
+	on ISO/IEC 2022 structure.
+	
+	Those coding systems SHOULD not be used for new
+	implemention or new data.  They may not comform
+	to future version of JIS or other standards.
+
+{
+Name:
+	iso-2022-jp-3-fullwidth
+Encode:
+	use:Encode::ISO2022::SevenBit
+	=>ucs_to_ascii ucs_to_jisx0213_2000_1_irv ucs_to_jisx0213_2000_2
+	->iso-2022-jp-3
+Decode:
+	use:Encode::ISO2022::SevenBit
+	<-iso-2022-jp-3
+	<=jisx0213_2000_1_irv_to_ucs jisx0213_2000_2_to_ucs jisx0208_1997_irv_to_ucs
+Description:
+	ISO/IEC 2022 based 7-bit encoding for Japanese,
+	ISO/IEC 646 IRV + JIS X 0213:2000.  Some characters
+	defined in JIS X 0213 are mapped to FULLWIDTH or
+	HALFWIDTH area of UCS as specified in JIS X 0213:2000.
+	
+	This encoding is a "compatible" version of
+	C<iso-2022-jp-3> defined in Encode::ISO2022::SevenBit.
+}
+
+{
+Name:
+	euc-jp-1997-fullwidth
+Alias:
+	euc-japan-1997-fullwidth euc-jp-1990-fullwidth euc-japan-1990-fullwidth
+Encode:
+	=>ucs_to_ascii ucs_to_jisx0208_1997_irv ucs_to_jisx0212_1990_irv ucs_to_jisx0201_katakana_hw
+	->euc-jp-1997
+Decode:
+	<-euc-jp-1997
+	<=jisx0208_1997_irv_to_ucs jisx0212_1990_irv_to_ucs jisx0201_katakana_hw_to_ucs
+Description:
+	EUC (ISO/IEC 2022 based 8-bit encoding) for Japanese,
+	ISO/IEC 646 IRV + JIS X 0208:1997 + JIS X 0212-1990
+	+ JIS X 0201:1997 Katakana.  Some characters defined
+	in JIS X 0208 and all characters defined in JIS X 0201
+	are mapped to FULLWIDTH or HALFWIDTH characters of UCS
+	as specified by JIS X 0221-1995 and JIS X 0208:1997.
+	
+	This encoding is a "compatible" version of
+	C<euc-jp-1997> defined in Encode::ISO2022::EightBit.
+}
+
+{
+Name:
+	euc-jisx0213-fullwidth
+Alias:
+	euc-japan-2000-fullwidth euc-jp-2000-fullwidth
+Encode:
+	use:Encode::ISO2022::EightBit
+	=>ucs_to_ascii ucs_to_jisx0213_2000_1_irv ucs_to_jisx0213_2000_2 ucs_to_jisx0201_katakana_hw
+	->euc-jisx0213
+Decode:
+	use:Encode::ISO2022::EightBit
+	<-euc-jisx0213
+	<=jisx0213_2000_1_irv_to_ucs jisx0213_2000_2_to_ucs jisx0201_katakana_hw_to_ucs
+Description:
+	EUC (ISO/IEC 2022 based 8-bit encoding) for Japanese,
+	ISO/IEC 646 IRV + JIS X 0213:2000 + JIS X 0201:1997
+	Katakana.  Some characters defined in JIS X 0213 and
+	all characters defined in JIS X 0201 are mapped to
+	FULLWIDTH or HALFWIDTH characters of UCS as specified
+	by JIS X 0213:2000.
+	
+	This encoding is a "compatible" version of
+	C<euc-jisx0213> defined in Encode::ISO2022::EightBit.
+}
+
+POD:EXAMPLE:
+	  use %%MYSELF%%;
+	  while (<>) {
+	    print "FW->  : ". Encode::encode ('euc-jp-1997', Encode::decode ('euc-jp-1997-fullwidth', $_));
+	    print "FW->FW: ". Encode::encode ('euc-jp-1997-fullwidth', Encode::decode ('euc-jp-1997-fullwidth', $_));
+	    print "  ->FW: ". Encode::encode ('euc-jp-1997-fullwidth', Encode::decode ('euc-jp-1997', $_));
+	    print "  ->  : ". Encode::encode ('euc-jp-1997', Encode::decode ('euc-jp-1997', $_));
+	  }
+}
+
+POD:SEE ALSO:
+	JIS X 0221-1995, "Universal multi-octet coded character
+	set (UCS)", Japan Industrial Standards Committee
+	<http://www.jisc.go.jp/>, 1995.  IDT with ISO/IEC 10646-1:1993
+	but three additional appendixes.
+	
+	JIS X 0208:1997, "7-bit and 8-bit double byte coded
+	Kanji set for information interchange", Japan
+	Industrial Standards Committee <http://www.jisc.go.jp/>,
+	1997.
+	
+	JIS X 0213:2000, "7-bit and 8-bit double byte extended
+	coded Kanji set for information interchange", Japan
+	Industrial Standards Committee <http://www.jisc.go.jp/>,
+	2000.
+	
+	L<Encode::ISO2022::EightBit>
+
+POD:TO DO:
+	Support of C<iso-2022-jp-fullwidth>
+
+POD:LICENSE:
+	Copyright %%YEAR%% Wakaba <w@suika.fam.cx>
+	
+	%%PerlLicense%%
