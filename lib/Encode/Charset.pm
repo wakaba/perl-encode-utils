@@ -9,7 +9,7 @@ used by Encode::ISO2022, Encode::SJIS, and other modules.
 package Encode::Charset;
 use strict;
 use vars qw(%CHARSET %CODING_SYSTEM $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.1 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 ## --- Make initial charset definitions
 &_make_initial_charsets;
@@ -169,6 +169,7 @@ sub make_initial_coding_system {
     $CODING_SYSTEM{$F} = {};
     $CODING_SYSTEM{"\x2F".$F} = {reset_state => 1};
   }
+  $CODING_SYSTEM{Csjis} = {perl_name => 'shiftjis'};
 }
 
 sub make_charset (%) {
@@ -177,6 +178,71 @@ sub make_charset (%) {
   my $settype = $set{type} || 'G94';
   delete $set{type}, $set{I}, $set{F}, $set{revision};
   $CHARSET{ $settype }->{ $setid } = \%set;
+}
+
+## Make a new ISO/IEC 2022-buffers object with default status
+sub new_object {
+  my %C;
+  $C{bit} = 8;
+  $C{CL} = 'C0'; $C{CR} = 'C1'; $C{ESC_Fe} = 'C1';
+  $C{C0} = $CHARSET{C0}->{"\x40"};	## ISO/IEC 6429:1991 C0
+  $C{C1} = $CHARSET{C1}->{'64291991C1'};	## ISO/IEC 6429:1991 C1
+  $C{GL} = 'G0'; $C{GR} = 'G1';
+  $C{G0} = $CHARSET{G94}->{"\x42"};	## ISO/IEC 646:1991 IRV
+  #$C{G1} = $CHARSET{G96}->{"\x41"};	## ISO/IEC 8859-1 GR
+  $C{G1} = $CHARSET{G94}->{"\x7E"};	## empty set
+  $C{G2} = $CHARSET{G94}->{"\x7E"};	## empty set
+  $C{G3} = $CHARSET{G94}->{"\x7E"};	## empty set
+  $C{coding_system} = $CODING_SYSTEM{"\x40"};	## ISO/IEC 2022
+  $C{option} = {
+  	C1invoke_to_right	=> 0,	## C1 invoked to: (0: ESC Fe, 1: CR)
+  	G94n_designate_long	=> 0,	## (1: ESC 02/04 02/08 04/00..02)
+  	designate_to	=> {	## Designated G buffer (-1: not be outputed)
+  		C0	=> {
+  			default	=> 0,
+  		},
+  		C1	=> {
+  			default	=> 1,
+  		},
+  		G94	=> {
+  			"\x42"	=> 0,
+  			default	=> 0,
+  		},
+  		G96	=> {
+  			default	=> 1,
+  		},
+  		G94n	=> {
+  			default	=> 0,
+  		},
+  		G96n	=> {
+  			default	=> 1,
+  		},
+  		coding_system => {
+  			default => -1,
+  		},
+  	},
+  	Ginvoke_by_single_shift	=> [0,0,0,0],	## Invoked by SS
+  	Ginvoke_to_left	=> [1,1,1,1],	## Which invoked to? (1: L, 0: R)
+  	private_set	=> {	## Private set vs Final byte
+  		C0	=> [],
+  		C1	=> [],
+  		G94	=> [],
+  		G94n	=> [[],[],[],[],[]],
+  		G96	=> [],
+  		#G96n	=> [],	## (not implemented)
+  		U96n	=> [],	## mule-unicode sets
+  		XC1	=> {
+  			'64291991C1'	=> undef,	## ISO/IEC 6429:1991 C1
+  		},
+  	},
+  	reset => {	## Reset status at top of line
+  		Gdesignation	=> "\x42",	## F of designation or 0
+  		Ginvoke	=> 1,
+  	},
+  	undef_char	=> ["\x3F", {type => 'G94', charset => 'B'}],
+  	use_revision	=> 1,	## Output IRR
+  };
+  \%C;
 }
 
 1;
@@ -197,5 +263,5 @@ and/or modify it under the same terms as Perl itself.
 
 =cut
 
-# $Date: 2002/09/20 14:01:45 $
+# $Date: 2002/09/21 01:34:08 $
 ### Charset.pm ends here

@@ -3,15 +3,47 @@
 
 Encode::ISO2022 --- ISO/IEC 2022 encoder and decoder
 
+=head1 ENCODINGS
+
+=over 4
+
+=item iso2022
+
+ISO/IEC 2022:1994.  Default status is:
+
+=over 2
+
+=item CL = C0 = ISO/IEC 6429:1991 C0 set
+
+=item CR = C1 = ISO/IEC 6429:1991 C1 set
+
+=item GL = G0 = ISO/IEC 646:1991 IRV GL(G0) set
+
+=item GR = G1 = empty set
+
+=item G2 = empty set
+
+=item G3 = empty set
+
+=back
+
+(Alias: iso/iec2022, iso-2022, 2022, cp2022)
+
+=back
+
+Note that ISO/IEC 2022 based encodings are found in
+Encode::ISO2022::* modules.  This module, Encode::ISO2022
+only provides a general ISO/IEC 2022 encoder/decoder.
+
 =cut
 
 require v5.7.3;
 package Encode::ISO2022;
 use strict;
 use vars qw(%CHARSET %CODING_SYSTEM $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.5 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.6 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use base qw(Encode::Encoding);
-__PACKAGE__->Define (qw/iso-2022 iso2022 2022 cp2022/);
+__PACKAGE__->Define (qw!iso-2022 iso/iec2022 iso2022 2022 cp2022!);
 require Encode::Charset;
 	*CHARSET = \%Encode::Charset::CHARSET;
 	*CODING_SYSTEM = \%Encode::Charset::CODING_SYSTEM;
@@ -49,74 +81,11 @@ sub decode ($$;$) {
 }
 
 ### --- Encode::ISO2022 unique functions
-
-## Make a new ISO/IEC 2022-buffers object with default status
-sub new_object {
-  my %C;
-  $C{bit} = 8;
-  $C{CL} = 'C0'; $C{CR} = 'C1'; $C{ESC_Fe} = 'C1';
-  $C{C0} = $CHARSET{C0}->{"\x40"};	## ISO/IEC 6429:1991 C0
-  $C{C1} = $CHARSET{C1}->{'64291991C1'};	## ISO/IEC 6429:1991 C1
-  $C{GL} = 'G0'; $C{GR} = 'G1';
-  $C{G0} = $CHARSET{G94}->{"\x42"};	## ISO/IEC 646:1991 IRV
-  #$C{G1} = $CHARSET{G96}->{"\x41"};	## ISO/IEC 8859-1 GR
-  $C{G1} = $CHARSET{G94}->{"\x7E"};	## empty set
-  $C{G2} = $CHARSET{G94}->{"\x7E"};	## empty set
-  $C{G3} = $CHARSET{G94}->{"\x7E"};	## empty set
-  $C{coding_system} = $CODING_SYSTEM{"\x40"};	## ISO/IEC 2022
-  $C{option} = {
-  	C1invoke_to_right	=> 0,	## C1 invoked to: (0: ESC Fe, 1: CR)
-  	G94n_designate_long	=> 0,	## (1: ESC 02/04 02/08 04/00..02)
-  	designate_to	=> {	## Designated G buffer (-1: not be outputed)
-  		C0	=> {
-  			default	=> 0,
-  		},
-  		C1	=> {
-  			default	=> 1,
-  		},
-  		G94	=> {
-  			"\x42"	=> 0,
-  			default	=> 0,
-  		},
-  		G96	=> {
-  			default	=> 1,
-  		},
-  		G94n	=> {
-  			default	=> 0,
-  		},
-  		G96n	=> {
-  			default	=> 1,
-  		},
-  		coding_system => {
-  			default => -1,
-  		},
-  	},
-  	Ginvoke_by_single_shift	=> [0,0,0,0],	## Invoked by SS
-  	Ginvoke_to_left	=> [1,1,1,1],	## Which invoked to? (1: L, 0: R)
-  	private_set	=> {	## Private set vs Final byte
-  		C0	=> [],
-  		C1	=> [],
-  		G94	=> [],
-  		G94n	=> [[],[],[],[],[]],
-  		G96	=> [],
-  		#G96n	=> [],	## (not implemented)
-  		U96n	=> [],	## mule-unicode sets
-  		XC1	=> {
-  			'64291991C1'	=> undef,	## ISO/IEC 6429:1991 C1
-  		},
-  	},
-  	reset => {	## Reset status at top of line
-  		Gdesignation	=> "\x42",	## F of designation or 0
-  		Ginvoke	=> 1,
-  	},
-  	undef_char	=> ["\x3F", {type => 'G94', charset => 'B'}],
-  	use_revision	=> 1,	## Output IRR
-  };
-  \%C;
-}
+*new_object = \&Encode::Charset::new_object;
 
 sub iso2022_to_internal ($;\%) {
   my ($s, $C) = @_;
+  $C ||= &new_object;
   my $t = '';
   $s =~ s{
     ^((?:(?!\x1B\x25\x2F?[\x30-\x7E]).)*)
@@ -125,39 +94,48 @@ sub iso2022_to_internal ($;\%) {
     $t = _iso2022_to_internal ($i2, $C);
     '';
   }gesx;
+  my $pad = '';
+  use re 'eval';
   $s =~ s{
      ## ISO/IEC 2022
-      \x1B\x25\x40((?:(?!\x1B\x25\x2F?[\x30-\x7E]).)*)
+      (??{"$pad\x1B$pad\x25$pad\x40"})((?:(?!\x1B\x25\x2F?[\x30-\x7E]).)*)
      ## UTF-8
-     |\x1B\x25(?:\x47|\x2F[\x47-\x49])((?:(?!\x1B\x25\x2F?[\x30-\x7E]).)*)
+     |(??{"$pad\x1B$pad\x25$pad(?:\x47|\x2F$pad"."[\x47-\x49])"})
+       ((?:(?!\x1B\x25\x2F?[\x30-\x7E]).)*)
      ## UCS-2, UTF-16
-     |\x1B\x25\x2F[\x40\x43\x45\x4A-\x4C]
-       ((?!\x00\x1B\x00\x25\x00\x2F?\x00[\x30-\x7E].)*)
+     |(??{"$pad\x1B$pad\x25$pad\x2F$pad"})([\x40\x43\x45\x4A-\x4C])
+       ((?:(?!\x00\x1B\x00\x25(?:\x00\x2F)?\x00[\x30-\x7E])..)*)
      ## UCS-4
-     |\x1B\x25\x2F[\x41\x44\x46]
-       ((?!\x00\x00\x00\x1B\x00\x00\x00\x25\x00\x00\x00\x2F?
-           \x00\x00\x00[\x30-\x7E].)*)
+     |(??{"$pad\x1B$pad\x25$pad\x2F$pad"})[\x41\x44\x46]
+       ((?:(?!\x00\x00\x00\x1B\x00\x00\x00\x25(?:\x00\x00\x00\x2F)?
+           \x00\x00\x00[\x30-\x7E])....)*)
      ## with standard return
-     |\x1B\x25([\x30-\x7E])((?:(?!\x1B\x25\x2F?[\x30-\x7E]).)*)
+     |(??{"$pad\x1B$pad\x25$pad"})([\x30-\x7E])
+       ((?:(?!\x1B\x25\x2F?[\x30-\x7E]).)*)
      ## without standard return
-     |\x1B\x25\x2F([\x30-\x7E])(.*)
+     |(??{"$pad\x1B$pad\x25$pad\x2F$pad"})([\x30-\x7E])(.*)
   }{
     my ($i2,$u8,$Fu2,$u2,$u4,$Fsr,$sr,$Fnsr,$nsr) = ($1,$2,$3,$4,$5,$6,$7,$8,$9);
     my $r = '';
     if (defined $i2) {
-      $r = _iso2022_to_internal ($i2, $C);
+      $r = _iso2022_to_internal ($i2, $C);  $pad = '';
     } elsif (defined $u8) {
-      $r = Encode::decode ('utf8', $u8);
+      $r = Encode::decode ('utf8', $u8);  $pad = '';
     } elsif ($Fu2) {
       if (ord ($Fu2) > 0x49) {
         $r = Encode::decode ('utf-16be', $u2);
       } else {
         $r = Encode::decode ('ucs-2be', $u2);
       }
+      $pad = "\x00";
     } elsif (defined $u4) {
-      $r = Encode::decode ('ucs-4be', $u2);
+      $r = Encode::decode ('ucs-4be', $u2);  $pad = "\x00\x00\x00";
+    } elsif (defined $Fsr && $CODING_SYSTEM{$Fsr}->{perl_name}) {
+      $r = Encode::decode ($CODING_SYSTEM{$Fsr}->{perl_name}, $sr);  $pad = '';
+    } elsif (defined $Fnsr && $CODING_SYSTEM{$Fnsr}->{perl_name}) {
+      $r = Encode::decode ($CODING_SYSTEM{$Fnsr}->{perl_name}, $nsr);  $pad = '';
     } else {	## temporary
-      $r = '?+';
+      $r = '?' x length ($sr.$nsr);  $pad = '';
     }
     $r;
   }gesx;
@@ -170,15 +148,13 @@ sub _iso2022_to_internal ($;\%) {
     "\x28"=>'G0',"\x29"=>'G1',"\x2A"=>'G2',"\x2B"=>'G3',
     "\x2C"=>'G0',"\x2D"=>'G1',"\x2E"=>'G2',"\x2F"=>'G3',
   );
-  $C ||= &new_object;
   
   use re 'eval';
   $s =~ s{
      ((??{ $_CHARS_to_RANGE{'l'.$C->{$C->{GL}}->{chars}}
          . qq/{$C->{$C->{GL}}->{dimension},$C->{$C->{GL}}->{dimension}}/ }))
-    |((??{ $_CHARS_to_RANGE{'r'.$C->{$C->{GL}}->{chars}}
+    |((??{ $_CHARS_to_RANGE{'r'.$C->{$C->{GR}}->{chars}}
          . qq/{$C->{$C->{GR}}->{dimension},$C->{$C->{GR}}->{dimension}}/ }))
-    
     |  (??{ q/(?:/ . ($C->{$C->{CR}}->{r_SS2} || '(?!)')
              . ($C->{$C->{ESC_Fe}}->{r_SS2_ESC} ?
                  qq/|$C->{$C->{ESC_Fe}}->{r_SS2_ESC}/ : '')
@@ -187,7 +163,7 @@ sub _iso2022_to_internal ($;\%) {
              ||$C->{$C->{CL}}->{r_LS1}?	## ISO/IEC 6429:1992 9
              qq/[$C->{$C->{CL}}->{r_LS0}$C->{$C->{CL}}->{r_LS1}]*/:'')
         })
-      ((??{ $_CHARS_to_RANGE{'b'.$C->{$C->{GL}}->{chars}}
+      ((??{ $_CHARS_to_RANGE{'b'.$C->{G2}->{chars}}
             . qq/{$C->{G2}->{dimension},$C->{G2}->{dimension}}/ }))
     |  (??{ q/(?:/ . ($C->{$C->{CR}}->{r_SS3} || '(?!)')
              . ($C->{$C->{ESC_Fe}}->{r_SS3_ESC} ?
@@ -197,12 +173,11 @@ sub _iso2022_to_internal ($;\%) {
             || $C->{$C->{CL}}->{r_LS1}?	## ISO/IEC 6429:1992 9
              qq/[$C->{$C->{CL}}->{r_LS0}$C->{$C->{CL}}->{r_LS1}]*/:'')
         })
-      ((??{ $_CHARS_to_RANGE{'b'.$C->{$C->{GL}}->{chars}}
+      ((??{ $_CHARS_to_RANGE{'b'.$C->{G3}->{chars}}
             . qq/{$C->{G3}->{dimension},$C->{G3}->{dimension}}/ }))
     
     ## Locking shift
-    |( \x1B[\x6E\x6F\x7C-\x7E]
-       |(??{ $C->{$C->{CL}}->{r_LS0}||'(?!)' })
+    |(  (??{ $C->{$C->{CL}}->{r_LS0}||'(?!)' })
        |(??{ $C->{$C->{CL}}->{r_LS1}||'(?!)' })
      )
     
@@ -343,10 +318,6 @@ sub _iso2022_to_internal ($;\%) {
         $C->{GL} = 'G0'; '';
       } elsif ($ls eq $C->{$C->{CL}}->{LS1}) {
         $C->{GL} = 'G1'; '';
-      } elsif ($ls =~ /\x1B([\x6E\x6F])/) {
-        $C->{GL} = {"\x6E"=>2, "\x6F"=>3}->{$1}; '';
-      } elsif ($ls =~ /\x1B([\x7C-\x7E])/) {
-        $C->{GR} = {"\x7E"=>1, "\x7D"=>2, "\x7C"=>3}->{$1}; '';
       }
     ## Control sequence
     } elsif ($csi) {
@@ -791,5 +762,5 @@ and/or modify it under the same terms as Perl itself.
 
 =cut
 
-# $Date: 2002/09/20 14:01:45 $
+# $Date: 2002/09/21 01:34:08 $
 ### ISO2022.pm ends here
