@@ -1,3 +1,13 @@
+2002-09-22  Wakaba <w@suika.fam.cx>
+
+	* ISO646.pm, RFC1345.pm: New modules.
+
+2002-09-21  Wakaba <w@suika.fam.cx>
+
+	* EightBit.pm:
+	- Add some aliases to each coding systems.
+	- (euc-twnn, euc-cwnn): New coding systems.
+
 2002-09-16  Wakaba <w@suika.fam.cx>
 
 	* EightBit.pm: New module.

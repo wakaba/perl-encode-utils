@@ -13,7 +13,7 @@ require 5.7.3;
 use strict;
 package Encode::ISO2022::SevenBit;
 use vars qw($VERSION);
-$VERSION=do{my @r=(q$Revision: 1.5 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.6 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use base qw(Encode::Encoding);
 __PACKAGE__->Define (qw/iso-2022-7bit iso-2022-7 jis junet jis7/);
 require Encode::ISO2022;
@@ -100,12 +100,14 @@ package Encode::ISO2022::SevenBit::JP1978IRV;
 use vars qw/@ISA/;
 push @ISA, 'Encode::ISO2022::SevenBit::JP';
 __PACKAGE__->Define (qw/iso-2022-jp-1978-irv japanese-iso-7bit-1978-irv old-jis
-  x-obsoleted-iso-2022-jp/);
+  x-obsoleted-iso-2022-jp jis78/);
 
 =item iso-2022-jp-1978-irv
 
-ISO/IEC 2022 based 7-bit encoding for Japanese.
-(Alias: japanese-iso-7bit-1978-irv (emacsen), old-jis (emacsen))
+ISO/IEC 2022 based 7-bit encoding for Japanese,
+using JIS X 0208-1978.
+(Alias: japanese-iso-7bit-1978-irv (emacsen), old-jis (emacsen),
+jis78)
 
 =cut
 
@@ -140,13 +142,14 @@ sub __2022__common ($) {
 package Encode::ISO2022::SevenBit::JP3;
 use vars qw/@ISA/;
 push @ISA, 'Encode::ISO2022::SevenBit::JP';
-__PACKAGE__->Define (qw/iso-2022-jp-3 x-iso-2022-jp-3   iso-2022-jp-3-compatible iso-2022-jp-3-strict/);
+__PACKAGE__->Define (qw/iso-2022-jp-3 x-iso-2022-jp-3
+ jis0213   iso-2022-jp-3-compatible iso-2022-jp-3-strict/);
 
 =item iso-2022-jp-3
 
 ISO/IEC 2022 based 7-bit encoding for Japanese,
 defined by JIS X 0213:2000 Appendix 2.
-(Alias: x-iso-2022-jp-3)
+(Alias: x-iso-2022-jp-3, jis0213)
 
 =item iso-2022-jp-3-compatible
 
@@ -506,5 +509,5 @@ and/or modify it under the same terms as Perl itself.
 
 =cut
 
-# $Date: 2002/09/20 14:01:45 $
+# $Date: 2002/09/22 11:08:23 $
 ### SevenBit.pm ends here

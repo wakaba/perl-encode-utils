@@ -13,7 +13,7 @@ require 5.7.3;
 use strict;
 package Encode::ISO2022::EightBit;
 use vars qw($VERSION);
-$VERSION=do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use base qw(Encode::Encoding);
 require Encode::ISO2022;
 
@@ -81,8 +81,8 @@ sub __2022__common ($) {
 package Encode::ISO2022::EightBit::EUCJapan;
 use vars qw/@ISA/;
 push @ISA, 'Encode::ISO2022::EightBit';
-__PACKAGE__->Define (qw/euc-japan euc-japan-1990 euc-jp eucjp euc_jp x-euc-jp
-  Extended_UNIX_Code_Packed_Format_for_Japanese csEUCPkdFmtJapanese
+__PACKAGE__->Define (qw/euc-japan euc-japan-1990 euc-jp euc-j eucjp euc_jp x-euc-jp
+  x-eucjp eucjis euc-jis Extended_UNIX_Code_Packed_Format_for_Japanese csEUCPkdFmtJapanese
   japanese-iso-8bit cp51932 japanese_euc
       ajec eucjp-open  ibm-eucjp cp33722 33722  sdeckanji/);
 
@@ -90,7 +90,7 @@ __PACKAGE__->Define (qw/euc-japan euc-japan-1990 euc-jp eucjp euc_jp x-euc-jp
 
 EUC (ISO/IEC 2022 based 8-bit encoding) for Japanese.
 (Alias: euc-japan-1990 (emacsen), euc-jp (IANA),
-eucjp (locale), euc_jp, x-euc-jp, 
+euc-j, eucjp (X), euc_jp, x-eucjp, x-euc-jp, eucjis, euc-jis,
 extended_unix_code_packed_format_for_japanese (IANA),
 cseucpkdfmtjapanese (IANA), japanese-iso-8bit (emacsen),
 cp51932 (M$), japanese_euc)
@@ -108,14 +108,14 @@ sub __2022__common ($) {
 package Encode::ISO2022::EightBit::EUCJISX0213;
 use vars qw/@ISA/;
 push @ISA, 'Encode::ISO2022::EightBit';
-__PACKAGE__->Define (qw/euc-jisx0213 x-euc-jisx0213
-      x-euc-jisx0213-packed  deckanji2000/);
+__PACKAGE__->Define (qw/euc-jisx0213 x-euc-jisx0213 eucjp0213
+ euc-jp-3     x-euc-jisx0213-packed  deckanji2000/);
 
 =item euc-jisx0213
 
 EUC (ISO/IEC 2022 based 8-bit encoding) for Japanese
 with JIS X 0213:2000, defined by JIS X 0213:2000.
-(Alias: x-euc-jisx0213)
+(Alias: x-euc-jisx0213, eucjp0213, euc-jp-3)
 
 =cut
 
@@ -148,14 +148,15 @@ sub __2022__common ($) {
 package Encode::ISO2022::EightBit::EUCCHINA;
 use vars qw/@ISA/;
 push @ISA, 'Encode::ISO2022::EightBit';
-__PACKAGE__->Define (qw/euc-china euc-cn cn-gb cn-gb-2312 chinese-iso-8bit
+__PACKAGE__->Define (qw/euc-china euc-cn euccn euc-gb
+ cn-gb cn-gb-2312 chinese-iso-8bit ugb
  gb2312 csgb2312 x-euc-cn cp51936   ibm-euccn CP1383 1383/);
 
 =item euc-china
 
 EUC (ISO/IEC 2022 based 8-bit encoding) for Chinese.
-(Alias: euc-cn (emacsen), cn-gb (RFC 1922), cn-gb-2312 (RFC 1922),
-chinese-iso-8bit (emacsen), gb2312 (IANA), csgb2312 (IANA),
+(Alias: euc-cn (emacsen), euccn, euc-gb, cn-gb (RFC 1922), cn-gb-2312 (RFC 1922),
+chinese-iso-8bit (emacsen), ugb, gb2312 (IANA), csgb2312 (IANA),
 x-euc-cn, CP51936 (M$))
 
 =cut
@@ -169,12 +170,13 @@ sub __2022__common ($) {
 package Encode::ISO2022::EightBit::EUCCHINA165;
 use vars qw/@ISA/;
 push @ISA, 'Encode::ISO2022::EightBit';
-__PACKAGE__->Define (qw/cn-gb-isoir165/);
+__PACKAGE__->Define (qw/cn-gb-isoir165 iso-ir-165/);
 
-=item euc-china
+=item cn-gb-isoir165
 
 EUC (ISO/IEC 2022 based 8-bit encoding) for Chinese
-with ISO-IR 165. (Alias: cn-gb-isoir165 (RFC 1922))
+with ISO-IR 165. (Alias: cn-gb-isoir165 (RFC 1922),
+ISO-IR-165)
 
 =cut
 
@@ -184,16 +186,40 @@ sub __2022__common ($) {
   $C;
 }
 
+package Encode::ISO2022::EightBit::EUCcwnn;
+use vars qw/@ISA/;
+push @ISA, 'Encode::ISO2022::EightBit';
+__PACKAGE__->Define (qw/euc-cwnn cwnn-iso-8bit/);
+
+=item euc-cwnn
+
+EUC (ISO/IEC 2022 based 8-bit encoding) for Chinese
+with GB 2312, used by cwnn input system (Alias: cwnn-iso-8bit)
+
+=cut
+
+# See <http://www.tomo.gr.jp/users/wnn/9912ml/msg00088.html>
+
+sub __2022__common ($) {
+  my $C = shift->SUPER::__2022__common;
+  $C->{G1} = $Encode::ISO2022::CHARSET{G94n}->{A};	## GB 2312
+  $C->{G2} = $Encode::ISO2022::CHARSET{G94}->{'0'};	# omron_udc_zh (sisheng)
+  	## TODO: Implement by private set support
+  $C;
+}
+
+## cn-gb-12345, gb12345, euc-gb12345
+
 package Encode::ISO2022::EightBit::EUCKorea;
 use vars qw/@ISA/;
 push @ISA, 'Encode::ISO2022::EightBit';
-__PACKAGE__->Define (qw/euc-korea euc-kr cp970 cp51949 ibm-euckr x-euc-kr
+__PACKAGE__->Define (qw/euc-korea euc-kr euckr cp970 cp51949 ibm-euckr x-euc-kr
  cseuckr korean-iso-8bit/);
 
 =item euc-korea
 
 EUC (ISO/IEC 2022 based 8-bit encoding) for Korean
-(Alias: euc-kr (IANA), cp970, cp51949 (M$), ibm-euckr,
+(Alias: euc-kr (IANA), euckr, cp970, cp51949 (M$), ibm-euckr,
 x-euc-kr, cseuckr (IANA), korean-iso-8bit (emacsen))
 
 =cut
@@ -207,21 +233,44 @@ sub __2022__common ($) {
 package Encode::ISO2022::EightBit::EUCTaiwan;
 use vars qw/@ISA/;
 push @ISA, 'Encode::ISO2022::EightBit';
-__PACKAGE__->Define (qw/euc-taiwan euc-tw x-euc-tw cns11643  ibm-euctw cp964/);
+__PACKAGE__->Define (qw/euc-taiwan euc-tw euctw x-euc-tw cns11643 cseuctw
+    ibm-euctw cp964/);
 
 =item euc-taiwan
 
 EUC (ISO/IEC 2022 based 8-bit encoding) for Chinese
-with CNS 11643.  (Alias: euc-tw, x-euc-tw, cns11643)
+with CNS 11643.  (Alias: euc-tw, euctw, x-euc-tw, cseuctw, cns11643)
 
 =cut
 
 sub __2022__common ($) {
   my $C = shift->SUPER::__2022__common;
   $C->{G1} = $Encode::ISO2022::CHARSET{G94n}->{G};	## plane 1
-  $C->{G2} = $Encode::ISO2022::CHARSET{G94n}->{H};	## plane 2
-  #$C->{G3} = 	## BUG: does not support plane 3-16 yet
-  $C->{G3} = $Encode::ISO2022::CHARSET{G94n}->{' `'};	# 3byte DRCS (temporary)
+  #$C->{G2} = 	## BUG: does not support plane 2-16 yet
+  $C->{G2} = $Encode::ISO2022::CHARSET{G94n}->{' `'};	# 3byte DRCS (temporary)
+  $C;
+}
+
+package Encode::ISO2022::EightBit::EUCtwnn;
+use vars qw/@ISA/;
+push @ISA, 'Encode::ISO2022::EightBit';
+__PACKAGE__->Define (qw/euc-twnn twnn-iso-8bit/);
+
+=item euc-twnn
+
+EUC (ISO/IEC 2022 based 8-bit encoding) for Chinese
+with CNS 11643, used by twnn input system (Alias: twnn-iso-8bit)
+
+=cut
+
+# See <http://www.tomo.gr.jp/users/wnn/9912ml/msg00088.html>
+
+sub __2022__common ($) {
+  my $C = shift->SUPER::__2022__common;
+  $C->{G1} = $Encode::ISO2022::CHARSET{G94n}->{G};	## plane 1
+  $C->{G2} = $Encode::ISO2022::CHARSET{G94}->{'0'};	# omron_udc_zh (sisheng)
+  	## TODO: Implement by private set support
+  $C->{G3} = $Encode::ISO2022::CHARSET{G94n}->{H};	## plane 2
   $C;
 }
 
@@ -268,12 +317,14 @@ sub __2022__common ($) {
 package Encode::ISO2022::EightBit::CompoundText;
 use vars qw/@ISA/;
 push @ISA, 'Encode::ISO2022::EightBit';
-__PACKAGE__->Define (qw/compound-text ctext x-ctext/);
+__PACKAGE__->Define (qw/compound-text compound_text 
+ x-compound-text ctext x-ctext/);
 
 =item compound-text
 
 ISO/IEC 2022 based 8-bit encoding used in inter-client
-communication of X Window System (Alias: ctext (emacsen), x-ctext (emacsen))
+communication of X Window System (Alias: ctext (emacsen), x-ctext (emacsen),
+compound_text, x-compound-text)
 
 Strictly, x-ctext, extended compound text (X Compound Text
 based encoding for unknown ISO/IEC 2022 based encoding) is a
@@ -331,5 +382,5 @@ and/or modify it under the same terms as Perl itself.
 
 =cut
 
-# $Date: 2002/09/20 14:01:45 $
+# $Date: 2002/09/22 11:08:23 $
 ### SevenBit.pm ends here

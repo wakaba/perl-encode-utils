@@ -15,7 +15,7 @@ require 5.7.3;
 use strict;
 package Encode::ISO2022::JIS;
 use vars qw($VERSION);
-$VERSION=do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use base qw(Encode::Encoding);
 require Encode::ISO2022;
 
@@ -61,13 +61,14 @@ package Encode::ISO2022::JIS::JISX0201Latin7;
 use vars qw/@ISA/;
 push @ISA, 'Encode::ISO2022::JIS';
 __PACKAGE__->Define (qw/jisx0201-1997-latin-7bit JIS_C6220-1969-ro
- iso-ir-14 jp ISO646-JP csISO14JISC6220ro/);
+ iso-ir-14 ir14 jp ISO646-JP 646-jp csISO14JISC6220ro/);
 
 =item jisx0201-1997-latin-7bit
 
 JIS X 0201:1997 6.1 7-bit code for Latin.
 (Alias: C<JIS_C6220-1969-ro> (RFC 1345), C<iso-ir-14> (RFC 1345),
-C<jp> (RFC 1345), C<ISO646-JP> (RFC 1345), C<csISO14JISC6220ro> (IANA))
+C<ir14>, C<jp> (RFC 1345), C<ISO646-JP> (RFC 1345), C<646-jp>,
+C<csISO14JISC6220ro> (IANA))
 
 =cut
 
@@ -75,6 +76,8 @@ sub __2022__common ($) {
   my $C = shift->SUPER::__2022__common;
   $C->{bit} = 7;
   $C->{G0} = $Encode::ISO2022::CHARSET{G94}->{J};	## JIS X 0201:1997 Latin set
+  $C->{G1} = $C->{G0}; $C->{G2} = $C->{G1};	## RFC 1345 (not in JIS)
+  $C->{G3} = $C->{G1};
   $C->{option}->{undef_char} = ["\x3F", {type => 'G94', charset => 'J'}];
   $C;
 }
@@ -83,13 +86,13 @@ package Encode::ISO2022::JIS::JISX0201Katakana7;
 use vars qw/@ISA/;
 push @ISA, 'Encode::ISO2022::JIS';
 __PACKAGE__->Define (qw/jisx0201-1997-katakana-7bit JIS_C6220-1969-jp JIS_C6220-1969
- iso-ir-13 katakana x0201-7 csISO13JISC6220jp/);
+ iso-ir-13 ir13 katakana x0201-7 csISO13JISC6220jp/);
 
 =item jisx0201-1997-katakana-7bit
 
 JIS X 0201:1997 6.2 7-bit code for Katakana
 (Alias: JIS_C6220-1969-jp (RFC 1345), JIS_C6220-1969 (RFC 1345),
-iso-ir-13 (RFC 1345), katakana (RFC 1345), x0201-7 (RFC 1345),
+iso-ir-13 (RFC 1345), ir13, katakana (RFC 1345), x0201-7 (RFC 1345),
 csISO13JISC6220jp (IANA))
 
 =cut
@@ -98,6 +101,8 @@ sub __2022__common ($) {
   my $C = shift->SUPER::__2022__common;
   $C->{bit} = 7;
   $C->{G0} = $Encode::ISO2022::CHARSET{G94}->{I};	## JIS X 0201:1997 Katakana set
+  $C->{G1} = $C->{G0}; $C->{G2} = $C->{G1};	## RFC 1345 (not in JIS)
+  $C->{G3} = $C->{G1};
   $C->{option}->{undef_char} = ["\x25", {type => 'G94', charset => 'I'}];
   $C;
 }
@@ -506,5 +511,5 @@ and/or modify it under the same terms as Perl itself.
 
 =cut
 
-# $Date: 2002/09/20 14:01:45 $
+# $Date: 2002/09/22 11:08:23 $
 ### JIS.pm ends here
