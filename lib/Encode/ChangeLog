@@ -1,3 +1,7 @@
+2002-08-04  Wakaba <w@suika.fam.cx>
+
+	* EUCFixed.pm: New module.
+
 2002-07-24  Wakaba <w@suika.fam.cx>
 
 	* HZ.pm: New module.
