@@ -41,7 +41,7 @@ require v5.7.3;
 package Encode::ISO2022;
 use strict;
 use vars qw(%CHARSET %CODING_SYSTEM $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.7 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.8 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use base qw(Encode::Encoding);
 __PACKAGE__->Define (qw!iso-2022 iso/iec2022 iso2022 2022 cp2022!);
 require Encode::Charset;
@@ -346,26 +346,26 @@ sub internal_to_iso2022 ($\%) {
       $t = _i2g ($c, $C, type => 'G94', charset => 'B');
     } elsif ($cc <= 0x9F) {
       $t = _i2c ($c, $C, type => 'C1', charset_id => '64291991C1',
-        charset => $C->{private_set}->{XC1}->{'64291991C1'});
+        charset => $C->{option}->{private_set}->{XC1}->{'64291991C1'});
     } elsif ($cc <= 0xFF) {
       $t = _i2g (chr($cc-0x80), $C, type => 'G96', charset => 'A');
     } elsif ($cc <= 0x24FF) {
       my $c = $cc - 0x100;
-      my $final = $C->{private_set}->{U96n}->[0];
+      my $final = $C->{option}->{private_set}->{U96n}->[0];
       if (length $final) {
         $t = _i2g (chr(($c / 96)+0x20).chr(($c % 96)+0x20), $C,
           type => 'G96n', charset => $final);
       }
     } elsif ($cc <= 0x33FF) {
       my $c = $cc - 0x2500;
-      my $final = $C->{private_set}->{U96n}->[1];
+      my $final = $C->{option}->{private_set}->{U96n}->[1];
       if (length $final) {
         $t = _i2g (chr(($c / 96)+0x20).chr(($c % 96)+0x20), $C,
           type => 'G96n', charset => $final);
       }
     } elsif (0xE000 <= $cc && $cc <= 0xFFFF) {
       my $c = $cc - 0xE000;
-      my $final = $C->{private_set}->{U96n}->[2];
+      my $final = $C->{option}->{private_set}->{U96n}->[2];
       if (length $final) {
         $t = _i2g (chr(($c / 96)+0x20).chr(($c % 96)+0x20), $C,
           type => 'G96n', charset => $final);
@@ -431,18 +431,18 @@ sub internal_to_iso2022 ($\%) {
     } elsif (0x70400000 <= $cc && $cc <= 0x7040FFED) {
       my $c = $cc - 0x70400000;
       $t = _i2g (chr(($c % 94)+0x21), $C, charset_id => 'P'.int ($c / 94),
-          type => 'G94', charset => $C->{private_set}->{G94}->[ $c / 94 ]);
+          type => 'G94', charset => $C->{option}->{private_set}->{G94}->[ $c / 94 ]);
     } elsif (0x70410000 <= $cc && $cc <= 0x7041FFBF) {
       my $c = $cc - 0x70410000;
       $t = _i2g (chr(($c % 96)+0x20), $C, charset_id => 'P'.int ($c / 96),
-          type => 'G96', charset => $C->{private_set}->{G96}->[ $c / 96 ]);
+          type => 'G96', charset => $C->{option}->{private_set}->{G96}->[ $c / 96 ]);
     } elsif (0x70420000 <= $cc && $cc <= 0x7046F19B) {
       my $c = $cc % 0x10000;
       $t = _i2g (chr((($c % 8836) / 94)+0x21).chr(($c % 94)+0x21), $C,
           type => 'G94n',
           charset_id => 'P'.int(($cc / 0x10000) - 0x7042).'_'.int($c / 8836),
-          charset => $C->{private_set}->{G94n}->[ ($cc / 0x10000) - 0x7042 ]
-                       ->[ $c / 8836 ]);
+          charset => $C->{option}->{private_set}->{G94n}
+                       ->[ ($cc / 0x10000) - 0x7042 ]->[ $c / 8836 ]);
     }
     if (defined $t) {
       $t = _i2o ($t, $C, cs_F => "\x40")
@@ -634,7 +634,7 @@ sub _i2o ($\%%) {
   if ($CS ne $C->{coding_system}) {
     my $e = '';
     $e .= "\x1B\x25";
-    $e .= $O{cs_F} || $C->{private_set}->{coding_system}->{ $O{cs_id} }
+    $e .= $O{cs_F} || $C->{option}->{private_set}->{coding_system}->{ $O{cs_id} }
           || return undef;
     if ($C->{coding_system} eq $CODING_SYSTEM{"\x2F\x40"}
      || $C->{coding_system} eq $CODING_SYSTEM{"\x2F\x43"}
@@ -766,5 +766,5 @@ and/or modify it under the same terms as Perl itself.
 
 =cut
 
-# $Date: 2002/09/22 11:09:38 $
+# $Date: 2002/10/12 11:03:00 $
 ### ISO2022.pm ends here

@@ -15,8 +15,9 @@ Other variants are defined in Encode::SJIS::* modules.
 package Encode::SJIS;
 use 5.7.3;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.1 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Encode::Charset;
+use base qw(Encode::Encoding);
 
 ### --- Perl Encode module common functions
 
@@ -96,14 +97,95 @@ sub sjis_to_internal ($$) {
   $s;
 }
 
+sub internal_to_sjis ($\%) {
+  use integer;
+  my ($s, $C) = @_;
+  $C ||= &new_object;
+  
+  my $r = '';
+  for my $c (split //, $s) {
+    my $cc = ord $c;
+    my $t;
+    if ($cc <= 0x1F) {
+      $t = $c if $C->{ $C->{CL} } eq $Encode::Charset::CHARSET{C0}->{"\x40"};
+    } elsif ($cc == 0x20 || $cc == 0x7F) {
+      $t = $c;
+    } elsif ($cc < 0x7F) {
+      $t = $c if $C->{ $C->{GL} } eq $Encode::Charset::CHARSET{G94}->{"\x42"};
+    } elsif ($C->{option}->{C1invoke_to_right} && $cc == 0x80) {
+      $t = $c if $C->{ $C->{CR} } eq $Encode::Charset::CHARSET{C1}->{'64291991C1'};
+    } elsif ($cc <= 0x9F) {
+      $t = "\x1B".chr ($cc - 0x40)
+        if $C->{ $C->{ESC_Fe} } eq $Encode::Charset::CHARSET{C1}->{'64291991C1'};
+    
+    } elsif (0xE9F6C0 <= $cc && $cc <= 0xF06F80) {
+      my $c = $cc - 0xE9F6C0;  my $F = chr (($c / 8836)+0x30);
+      if ($C->{G1} eq $Encode::Charset::CHARSET{G94n}->{ $F }) {
+        my ($c1, $c2) = ((($c % 8836) / 94)+0x21, ($c % 94)+0x21);
+        $t = pack ('CC', (($c1 - 1) >> 1) + ($c1 < 0x5F ? 0x71 : 0xB1),
+               $c2 + (($c1 & 1) ? ($c2 < 0x60 ? 0x1F : 0x20) : 0x7E));
+      } elsif ($C->{G3} eq $Encode::Charset::CHARSET{G94n}->{ $F }) {
+        my ($c1, $c2) = ((($c % 8836) / 94)+0x21, ($c % 94)+0x21);
+        if ($C->{G3}->{Csjis_first}) {
+          $t = pack ('CC', $C->{G3}->{Csjis_first}->{ ($c % 8836) / 94 },
+                     $c2 + (($c1 & 1) ? ($c2 < 0x60 ? 0x1F : 0x20) : 0x7E));
+        } else {
+          $t = pack ('CC', ($c / 188) + 0xF0,
+                     $c2 + (($c1 & 1) ? ($c2 < 0x60 ? 0x1F : 0x20) : 0x7E))
+               if ($c / 188) + 0xF0 < 0xFD;
+        }
+      }
+    } elsif (0xF49D7C <= $cc && $cc <= 0xF4BFFF) {
+      my $c = $cc - 0xF49D7C;
+      if ($C->{G1} eq $Encode::Charset::CHARSET{G94n}->{'B@'}) {
+        my ($c1, $c2) = ((($c % 8836) / 94)+0x21, ($c % 94)+0x21);
+        $t = pack ('CC', (($c1 - 1) >> 1) + ($c1 < 0x5F ? 0x71 : 0xB1),
+               $c2 + (($c1 & 1) ? ($c2 < 0x60 ? 0x1F : 0x20) : 0x7E));
+      }
+    
+    } elsif (0xE90940 <= $cc && $cc <= 0xE92641) {
+      my $c = $cc - 0xE90940;  my $F = chr (($c / 94)+0x30);
+      if ($C->{ $C->{GL} } eq $Encode::Charset::CHARSET{G94}->{ $F }) {
+        $t = chr (($c % 94) + 0x21);
+      } elsif ($C->{ $C->{GR} } eq $Encode::Charset::CHARSET{G94}->{ $F }) {
+        $t = chr (($c % 94) + 0xA1) if ($c % 94) < 0x3F;
+      }
+    } elsif (0x70420000 <= $cc && $cc <= 0x7046F19B) {
+      my $c = $cc % 0x10000;
+      my $F0=$C->{option}->{private_set}->{G94n}->[($cc/0x10000)-0x7042]->[$c/8836];
+      my $F1 = 'P'.(($cc / 0x10000) - 0x7042).'_'.($c / 8836);
+      if ($C->{G3} eq $Encode::Charset::CHARSET{G94n}->{ $F0 }
+       || $C->{G3} eq $Encode::Charset::CHARSET{G94n}->{ $F1 }) {
+        my ($c1, $c2) = ((($c % 8836) / 94)+0x21, ($c % 94)+0x21);
+        if ($C->{G3}->{Csjis_first}) {
+          $t = pack ('CC', $C->{G3}->{Csjis_first}->{ ($c % 8836) / 94 },
+                     $c2 + (($c1 & 1) ? ($c2 < 0x60 ? 0x1F : 0x20) : 0x7E));
+        } else {
+          $t = pack ('CC', ($c / 188) + 0xF0,
+                     $c2 + (($c1 & 1) ? ($c2 < 0x60 ? 0x1F : 0x20) : 0x7E))
+               if ($c / 188) + 0xF0 < 0xFD;
+        }
+      }
+    }
+    
+    if (defined $t) {
+      $r .= $t;
+    } elsif ($C->{GsmapR}->{ $c }) {
+      $r .= $C->{GsmapR}->{ $c };
+    } else {
+      $r .= $C->{option}->{undef_char_sjis} || "\x3F";
+    }
+  }
+  $r;
+}
+
 sub __clone ($) {
   my $self = shift;
   bless {%$self}, ref $self;
 };
 
-use base qw(Encode::Encoding);
 __PACKAGE__->Define (qw!shift_jisx0213 japanese-shift-jisx0213
-shift-jisx0213 x-shift_jisx0213 shift-jis-3
+shift-jisx0213 x-shift_jisx0213 shift-jis-3 shift-jis-2000
 sjis shift-jis x-sjis x_sjis x-sjis-jp shiftjis x-shiftjis
 x-shift-jis shift.jis!);
 
@@ -129,7 +211,7 @@ it to a shift JIS defined by JIS X 0208:1997.
 Shift_JISX0213 coded representation, defined by
 JIS X 0213:2000 Appendix 1 (implemention level 4).
 (Alias: shift-jisx0213, x-shift_jisx0213, japanese-shift-jisx0213 (emacsen),
-shift-jis-3 (Yudit))
+shift-jis-3 (Yudit), shift-jis-2000)
 
 =cut
 
@@ -159,7 +241,8 @@ sub __decode_map ($) {
 package Encode::SJIS::X0213ASCII;
 use vars qw/@ISA/;
 push @ISA, 'Encode::SJIS';
-__PACKAGE__->Define (qw/shift_jisx0213-ascii sjis-ascii shift-jis-ascii/);
+__PACKAGE__->Define (qw/shift_jisx0213-ascii shift-jis-2000-ascii
+sjis-ascii shift-jis-ascii/);
 
 =item sjis-ascii
 
@@ -177,6 +260,10 @@ as sjis is of shift_jisx0213.
 
 Same as Shift_JISX0213 but ASCII (ISO/IEC 646 IRV)
 instead of JIS X 0201:1997 Latin character set.
+(Alias: shift-jis-2000-ascii)
+
+Note that this coding system does NOT comform to
+JIS X 0213:2000 Appendix 1.
 
 =cut
 
@@ -194,6 +281,8 @@ sub __decode_map ($) {
 
 1;
 __END__
+
+=back
 
 =head1 SEE ALSO
 
@@ -223,5 +312,5 @@ and/or modify it under the same terms as Perl itself.
 
 =cut
 
-# $Date: 2002/10/12 07:27:01 $
+# $Date: 2002/10/12 11:03:00 $
 ### SJIS.pm ends here

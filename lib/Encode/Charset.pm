@@ -9,7 +9,7 @@ used by Encode::ISO2022, Encode::SJIS, and other modules.
 package Encode::Charset;
 use strict;
 use vars qw(%CHARSET %CODING_SYSTEM $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 ## --- Make initial charset definitions
 &_make_initial_charsets;
@@ -67,9 +67,11 @@ for my $f (0x30..0x5F, 0x7E) {
     $CHARSET{G96n}->{ $_.$F }->{chars} = 96;
     $CHARSET{G96n}->{ $_.$F }->{ucs} =
       ({'' => 0xF4C000}->{ $_ }||0) + 96*96 * ($f-0x30);
-      ## BUG: 94^n DRCSes with I byte have no mapping area
+      ## BUG: 96^n DRCSes with I byte have no mapping area
   }
 }
+  $CHARSET{G94n}->{"\x20\x40"}->{ucs} = 0x70460000;	## DRCS 94^2 04/00
+  
 for (0x60..0x6F) {
   my $F = pack 'C', $_;
   ## BUG: 9x^3 sets have no mapping area
@@ -243,7 +245,7 @@ sub new_object {
   		C0	=> [],
   		C1	=> [],
   		G94	=> [],
-  		G94n	=> [[],[],[],[],[]],
+  		G94n	=> [[],[],[],[],["\x20\x40"]],
   		G96	=> [],
   		#G96n	=> [],	## (not implemented)
   		U96n	=> [],	## mule-unicode sets
@@ -258,9 +260,6 @@ sub new_object {
   	undef_char	=> ["\x3F", {type => 'G94', charset => 'B'}],
   	use_revision	=> 1,	## Output IRR
   };
-  ## Special code area (such as 0xFD-0xFF of sjis'es)
-  $C{Gsmap} = {"\xA0" => "\x{F8F0}", "\xFD" => "\x{F8F1}", "\xFE" => "\x{F8F2}", "\xFF" => "\x{F8F3}"};
-  $C{GsmapR} = {};	## Reversed table
   \%C;
 }
 
@@ -269,10 +268,14 @@ sub new_object_sjis {
   $C->{coding_system} = $CODING_SYSTEM{Csjis};
   $C->{CR} = undef;
   $C->{GR} = 'G2';	## 0xA1-0xDF
-  #$C->{G0} = $CHARSET{G94}->{J};	## JIS X 0201:1997 Latin
-  $C->{G1} = $CHARSET{G94n}->{'B@'};	## JIS X 0208:1997
+  $C->{G0} = $CHARSET{G94}->{J};	## JIS X 0201:1997 Latin
+  $C->{G1} = $CHARSET{G94n}->{"\x4F"};	## JIS X 0213:2000
   $C->{G2} = $CHARSET{G94}->{I};	## JIS X 0201:1997 Katakana
   $C->{G3} = $CHARSET{G94n}->{"\x50"};	## JIS X 0213:2000 plane 2
+  ## Special code area (0xFD-0xFF)
+  $C->{Gsmap} = {"\xA0" => "\x{F8F0}", "\xFD" => "\x{F8F1}", "\xFE" => "\x{F8F2}", "\xFF" => "\x{F8F3}"};
+  $C->{GsmapR} = {};	## Reversed table
+  $C->{option}->{undef_char_sjis} = "\x81\xAC";
   $C;
 }
 
@@ -294,5 +297,5 @@ and/or modify it under the same terms as Perl itself.
 
 =cut
 
-# $Date: 2002/10/12 07:27:01 $
+# $Date: 2002/10/12 11:03:00 $
 ### Charset.pm ends here
