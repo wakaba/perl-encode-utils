@@ -1,0 +1,588 @@
+#?PESRC/1.0
+Name:
+	ISO2022::JIS
+ShortDescription:
+	An Encode module of 7-bit ISO/IEC 2022
+	based coding systems defined by JISes
+Description:
+	This module defines convertion between perl internal
+	representation and coding systems defined in standards
+	of JIS (Japan Industrial Standards).
+	
+	Note that frequently used coding systems of JIS
+	are included in other modules.  For instance,
+	C<ISO-2022-JP-3> (defined by JIS X 0213:2000) is
+	included in Encode::ISO2022::JUNET.
+
+{
+Name:
+	jisx0201-1997-latin-7bit
+Alias:
+	JIS_C6220-1969-ro iso-ir-14 ir14 jp ISO646-JP 646-jp csISO14JISC6220ro
+Cversion:
+	C:bit=7
+	C:G0=G94:J	## JIS X 0201:1997 Graphic character set for Latin letters
+	C:designate:*:default=-1
+	C:option:{undef_char}=["\x3F", {type => 'G94', charset => 'J'}]
+Encode:
+	C:GR=undef
+	C:G1=G96:~
+	C:option:{reset}->{Gdesignation}=0
+	C:option:{reset}->{Ginvoke}=0
+	=>ucs_to_jisx0201_latin
+	->iso2022:C
+Decode:
+	C:G1=G94:J
+	C:G2=G94:J
+	C:G3=G94:J
+	<-iso2022:C
+	<=jisx0201_latin_to_ucs
+Description:
+	The 7-bit code for Latin letters (JIS X 0201:1997 6.1).
+}
+
+{
+Name:
+	jisx0201-1997-katakana-7bit
+Alias:
+	JIS_C6220-1969-jp JIS_C6220-1969 iso-ir-13 ir13 katakana x0201-7 csISO13JISC6220jp
+Cversion:
+	C:bit=7
+	C:G0=G94:I	## JIS X 0201:1997 Graphic character set for Katakana
+	C:designate:*:default=-1
+	C:option:{undef_char}=["\x25", {type => 'G94', charset => 'I'}]
+Encode:
+	C:GR=undef
+	C:G1=G96:~
+	C:option:{reset}->{Gdesignation}=0
+	C:option:{reset}->{Ginvoke}=0
+	=>ucs_to_jisx0201_katakana
+	->iso2022:C
+Decode:
+	C:G1=G94:I
+	C:G2=G94:I
+	C:G3=G94:I
+	<-iso2022:C
+	<=jisx0201_katakana_to_ucs
+Description:
+	The 7-bit code for Katakana (JIS X 0201:1997 6.2).
+}
+
+{
+Name:
+	jisx0201-1997-latin-katakana-7bit
+Cversion:
+	C:bit=7
+	C:G0=G94:J	## JIS X 0201:1997 Graphic character set for Latin letters
+	C:G1=G94:I	## JIS X 0201:1997 Graphic character set for Katakana
+	C:designate:*:default=-1
+	C:option:{undef_char}=["\x3F", {type => 'G94', charset => 'J'}]
+Encode:
+	C:GL=undef
+	C:GR=undef
+	C:option:{Ginvoke_to_left}=[1,1,1,1]
+	C:option:{reset}->{Gdesignation}=0
+	C:option:{reset}->{Ginvoke}=1	## JIS X 0201:1997 doesn't have this limitation.
+	=>ucs_to_jisx0201_latin ucs_to_jisx0201_katakana
+	->iso2022:C
+Decode:
+	<-iso2022:C
+	<=jisx0201_latin_to_ucs jisx0201_katakana_to_ucs
+Description:
+	The 7-bit code for Latin and Katakana (JIS X 0201:1997 6.3).
+	
+	See also the description of C<jisx0201-1997-katakana-latin-7bit>.
+}
+
+{
+Name:
+	jisx0201-1997-katakana-latin-7bit
+Cversion:
+	C:bit=7
+	C:G0=G94:J	## JIS X 0201:1997 Graphic character set for Latin letters
+	C:G1=G94:I	## JIS X 0201:1997 Graphic character set for Katakana
+	C:designate:*:default=-1
+	C:option:{undef_char}=["\x3F", {type => 'G94', charset => 'J'}]
+Encode:
+	C:GL=undef
+	C:GR=undef
+	C:option:{Ginvoke_to_left}=[1,1,1,1]
+	C:option:{reset}->{Gdesignation}=0
+	C:option:{reset}->{Ginvoke}=1	## JIS X 0201:1997 doesn't have this limitation.
+	=>ucs_to_jisx0201_latin ucs_to_jisx0201_katakana
+	->iso2022:C
+Decode:
+	C:GL=G1	## In default, G1=Katakana is invoked
+	<-iso2022:C
+	<=jisx0201_latin_to_ucs jisx0201_katakana_to_ucs
+Description:
+	The 7-bit code for Latin and Katakana (JIS X 0201:1997 6.3).
+	
+	JIS X 0201:1997 does not define whether G0 or G1 is
+	invoked to GL at the initial status of information interchange.
+	(But recommends G0=Latin should be invoked.)
+	
+	In this module, C<jisx0201-1997-latin-katakana-7bit>
+	regards that G0=Latin is invoked to GL and
+	C<jisx0201-1997-katakana-latin-7bit> that G1=Katakana
+	is.  Note that on encoding, getting rid of this
+	ambiguity, GL is regarded as undefined so that
+	C<SI> or C<SO> is outputed before the first G0/G1 letter
+	in both coding systems.
+}
+
+{
+Name:
+	jisx0201-1997-latin-latin-8bit
+Alias:
+	JIS_X0201 X0201 csHalfWidthKatakana kana8
+Cversion:
+	C:bit=8
+	C:G0=G94:J	## JIS X 0201:1997 Graphic character set for Latin letters
+	C:G1=G94:I	## JIS X 0201:1997 Graphic character set for Katakana
+Encode:
+	C:designate:*:default=-1
+	C:option:{C1invoke_to_right}=1
+	C:option:{reset}->{Gdesignation}=0
+	C:option:{reset}->{Ginvoke}=0
+	C:option:{undef_char}=["\x3F", {type => 'G94', charset => 'J'}]
+	=>ucs_to_jisx0201_latin ucs_to_jisx0201_katakana
+	->iso2022:C
+Decode:
+	<-iso2022:C
+	<=jisx0201_latin_to_ucs jisx0201_katakana_to_ucs
+Description:
+	The 8-bit code for Latin and Katakana (JIS X 0201:1997 6.4).
+}
+
+{
+Name:
+	jisx0208-1997-kanji-7bit
+Cversion:
+	C:bit=7
+	C:G0=G94n:B@	## JIS X 0208:1997
+Encode:
+	C:GR=undef
+	C:G1=G96:~
+	C:designate:*:default=-1
+	C:option:{reset}->{Gdesignation}=0
+	C:option:{reset}->{Ginvoke}=0
+	C:option:{undef_char}=["\x22\x2E", {type => 'G94n', charset => 'B', revision => 'B@'}]
+	=>ucs_to_jisx0208_1997
+	->iso2022:C
+Decode:
+	<-iso2022:C
+	<=jisx0208_1997_to_ucs
+Description:
+	The 7-bit code for Kanji (JIS X 0208:1997 7.1.1).
+}
+
+{
+Name:
+	jisx0208-1997-kanji-8bit
+Cversion:
+	C:bit=8
+	C:G0=G94n:B@	## JIS X 0208:1997
+Encode:
+	C:GR=undef
+	C:G1=G96:~
+	C:designate:*:default=-1
+	C:option:{C1invoke_to_right}=1
+	C:option:{reset}->{Gdesignation}=0
+	C:option:{reset}->{Ginvoke}=0
+	C:option:{undef_char}=["\x22\x2E", {type => 'G94n', charset => 'B', revision => 'B@'}]
+	=>ucs_to_jisx0208_1997
+	->iso2022:C
+Decode:
+	<-iso2022:C
+	<=jisx0208_1997_to_ucs
+Description:
+	The 8-bit code for Kanji (JIS X 0208:1997 7.1.2).
+}
+
+{
+Name:
+	jisx0208-1997-irv-kanji-7bit
+Cversion:
+	C:bit=7
+	C:G0=G94:B	## ISO/IEC 646:1991 IRV
+	C:G1=G94n:B@	## JIS X 0208:1997
+Encode:
+	C:GL=undef
+	C:GR=undef
+	C:designate:*:default=-1
+	C:option:{undef_char}=["\x22\x2E", {type => 'G94n', charset => 'B', revision => 'B@'}]
+	C:option:{Ginvoke_to_left}=[1,1,1,1]
+	C:option:{reset}->{Gdesignation}=0
+	C:option:{reset}->{Ginvoke}=1	## JIS X 0208:1997 does not have this limitation.
+	=>ucs_to_ascii ucs_to_jisx0208_1997
+	->iso2022:C
+Decode:
+	<-iso2022:C
+	<=jisx0208_1997_to_ucs
+Description:
+	The 7-bit code for IRV and Kanji (JIS X 0208:1997 7.2.1).
+}
+
+{
+Name:
+	jisx0208-1997-kanji-irv-7bit
+Cversion:
+	C:bit=7
+	C:G0=G94:B	## ISO/IEC 646:1991 IRV
+	C:G1=G94n:B@	## JIS X 0208:1997
+Encode:
+	C:GL=undef
+	C:GR=undef
+	C:designate:*:default=-1
+	C:option:{undef_char}=["\x22\x2E", {type => 'G94n', charset => 'B', revision => 'B@'}]
+	C:option:{Ginvoke_to_left}=[1,1,1,1]
+	C:option:{reset}->{Gdesignation}=0
+	C:option:{reset}->{Ginvoke}=1	## JIS X 0208:1997 does not have this limitation.
+	=>ucs_to_ascii ucs_to_jisx0208_1997
+	->iso2022:C
+Decode:
+	C:GL=G1
+	<-iso2022:C
+	<=jisx0208_1997_to_ucs
+Description:
+	The 7-bit code for IRV and Kanji (JIS X 0208:1997 7.2.1).
+	
+	This coding system is same as C<jisx0208-1997-irv-kanji-7bit>
+	but start with Kanji set.  See description of
+	C<jisx0201-1997-katakana-latin-7bit>.
+}
+
+{
+Name:
+	jisx0208-1997-irv-kanji-8bit
+Cversion:
+	C:bit=8
+	C:G0=G94:B	## ISO/IEC 646:1991 IRV
+	C:G1=G94n:B@	## JIS X 0208:1997
+Encode:
+	C:GL=undef
+	C:GR=undef
+	C:designate:*:default=-1
+	C:option:{undef_char}=["\x22\x2E", {type => 'G94n', charset => 'B', revision => 'B@'}]
+	C:option:{C1invoke_to_right}=1
+	C:option:{reset}->{Gdesignation}=0
+	C:option:{reset}->{Ginvoke}=0
+	=>ucs_to_ascii ucs_to_jisx0208_1997
+	->iso2022:C
+Decode:
+	<-iso2022:C
+	<=jisx0208_1997_to_ucs
+Description:
+	The 8-bit code for IRV and Kanji (JIS X 0208:1997 7.2.2).
+	
+	Note that this coding system is considerable as
+	a subset of C<euc-jp>.  For the histrical reason,
+	not a small number of Japanese EUCed applications
+	did not support G2 and G3 sets (and some do not
+	even now).  This coding system can be used for
+	information interchanges with such implementions.
+}
+
+{
+Name:
+	jisx0208-1997-latin-kanji-7bit
+Cversion:
+	C:bit=7
+	C:G0=G94:J	## JIS X 0201:1997 Graphic character set for Latin letters
+	C:G1=G94n:B@	## JIS X 0208:1997
+Encode:
+	C:GL=undef
+	C:GR=undef
+	C:designate:*:default=-1
+	C:option:{undef_char}=["\x22\x2E", {type => 'G94n', charset => 'B', revision => 'B@'}]
+	C:option:{Ginvoke_to_left}=[1,1,1,1]
+	C:option:{reset}->{Gdesignation}=0
+	C:option:{reset}->{Ginvoke}=1	## JIS X 0208:1997 does not have this limitation.
+	=>ucs_to_jisx0201_latin ucs_to_jisx0208_1997
+	->iso2022:C
+Decode:
+	<-iso2022:C
+	<=jisx0201_latin_to_ucs jisx0208_1997_to_ucs
+Description:
+	The 7-bit code for Latin and Kanji (JIS X 0208:1997 7.3.1).
+}
+
+{
+Name:
+	jisx0208-1997-kanji-latin-7bit
+Cversion:
+	C:bit=7
+	C:G0=G94:J	## JIS X 0201:1997 Graphic character set for Latin letters
+	C:G1=G94n:B@	## JIS X 0208:1997
+Encode:
+	C:GL=undef
+	C:GR=undef
+	C:designate:*:default=-1
+	C:option:{undef_char}=["\x22\x2E", {type => 'G94n', charset => 'B', revision => 'B@'}]
+	C:option:{Ginvoke_to_left}=[1,1,1,1]
+	C:option:{reset}->{Gdesignation}=0
+	C:option:{reset}->{Ginvoke}=1	## JIS X 0208:1997 does not have this limitation.
+	=>ucs_to_jisx0201_latin ucs_to_jisx0208_1997
+	->iso2022:C
+Decode:
+	C:GL=G1
+	<-iso2022:C
+	<=jisx0201_latin_to_ucs jisx0208_1997_to_ucs
+Description:
+	The 7-bit code for Latin and Kanji (JIS X 0208:1997 7.3.1).
+	
+	This coding system is same as C<jisx0208-1997-latin-kanji-7bit>
+	but start with Kanji set.  See description of
+	C<jisx0201-1997-katakana-latin-7bit>.
+}
+
+{
+Name:
+	jisx0208-1997-latin-kanji-8bit
+Cversion:
+	C:bit=8
+	C:G0=G94:J	## JIS X 0201:1997 Graphic character set for Latin letters
+	C:G1=G94n:B@	## JIS X 0208:1997
+Encode:
+	C:GL=undef
+	C:GR=undef
+	C:designate:*:default=-1
+	C:option:{C1invoke_to_right}=1
+	C:option:{reset}->{Gdesignation}=0
+	C:option:{reset}->{Ginvoke}=0
+	C:option:{undef_char}=["\x22\x2E", {type => 'G94n', charset => 'B', revision => 'B@'}]
+	=>ucs_to_jisx0201_latin ucs_to_jisx0208_1997
+	->iso2022:C
+Decode:
+	<-iso2022:C
+	<=jisx0201_latin_to_ucs jisx0208_1997_to_ucs
+Description:
+	The 8-bit code for Latin and Kanji (JIS X 0208:1997 7.2.2).
+}
+
+{
+Name:
+	jisx0213-2000-kanji-7bit
+Cversion:
+	C:bit=7
+	C:G0=G94n:O	## JIS X 0213:2000 plane 1
+	C:G1=G94n:P	## JIS X 0213:2000 plane 2
+Encode:
+	C:GR=undef
+	C:designate:*:default=-1
+	C:option:{undef_char}=["\x22\x2E", {type => 'G94n', charset => 'B', revision => 'O'}]
+	C:option:{Ginvoke_to_left}=[1,1,1,1]
+	C:option:{reset}->{Gdesignation}=0
+	C:option:{reset}->{Ginvoke}=1	## JIS X 0213:2000 does not have this limitation.
+	=>ucs_to_jisx0213_2000_1 ucs_to_jisx0213_2000_2
+	->iso2022:C
+Decode:
+	<-iso2022:C
+	<=jisx0213_2000_1_to_ucs jisx0213_2000_2_to_ucs
+Description:
+	The 7-bit code for Kanji (JIS X 0213:2000 7.1.1).
+}
+
+{
+Name:
+	jisx0213-2000-kanji-8bit
+Cversion:
+	C:bit=8
+	C:G0=G94n:O	## JIS X 0213:2000 plane 1
+	C:G1=G94n:P	## JIS X 0213:2000 plane 2
+Encode:
+	C:GR=undef
+	C:designate:*:default=-1
+	C:option:{undef_char}=["\x22\x2E", {type => 'G94n', charset => 'B', revision => 'O'}]
+	C:option:{C1invoke_to_right}=1
+	C:option:{reset}->{Gdesignation}=0
+	C:option:{reset}->{Ginvoke}=0
+	=>ucs_to_jisx0213_2000_1 ucs_to_jisx0213_2000_2
+	->iso2022:C
+Decode:
+	<-iso2022:C
+	<=jisx0213_2000_1_to_ucs jisx0213_2000_2_to_ucs
+Description:
+	The 8-bit code for Kanji (JIS X 0213:2000 7.1.2).
+}
+
+{
+Name:
+	jisx0213-2000-irv-kanji-7bit
+Cversion:
+	C:bit=7
+	C:G0=G94:B	## ISO/IEC 646:1991 IRV
+	C:G1=G94n:O	## JIS X 0213:2000 plane 1
+	C:G3=G94n:P	## JIS X 0213:2000 plane 2
+Encode:
+	C:GR=undef
+	C:designate:*:default=-1
+	C:option:{undef_char}=["\x22\x2E", {type => 'G94n', charset => 'B', revision => 'O'}]
+	C:option:{Ginvoke_to_left}=[1,1,1,1]
+	C:option:{Ginvoked_by_single_shift}=[0,0,1,1]
+	C:option:{reset}->{Gdesignation}=0
+	C:option:{reset}->{Ginvoke}=1	## JIS X 0213:2000 does not have this limitation.
+	=>ucs_to_ascii ucs_to_jisx0213_2000_1 ucs_to_jisx0213_2000_2
+	->iso2022:C
+Decode:
+	<-iso2022:C
+	<=jisx0213_2000_1_to_ucs jisx0213_2000_2_to_ucs
+Description:
+	The 7-bit code for IRV and Kanji (JIS X 0213:2000 7.2.1).
+}
+
+{
+Name:
+	jisx0213-2000-irv-kanji-8bit
+Cversion:
+	C:bit=8
+	C:G0=G94:B	## ISO/IEC 646:1991 IRV
+	C:G1=G94n:O	## JIS X 0213:2000 plane 1
+	C:G3=G94n:P	## JIS X 0213:2000 plane 2
+Encode:
+	C:GR=undef
+	C:designate:*:default=-1
+	C:option:{undef_char}=["\x22\x2E", {type => 'G94n', charset => 'B', revision => 'O'}]
+	C:option:{Ginvoke_to_left}=[1,0,0,0]
+	C:option:{Ginvoked_by_single_shift}=[0,0,1,1]
+	C:option:{C1invoke_to_right}=1
+	C:option:{reset}->{Gdesignation}=0
+	C:option:{reset}->{Ginvoke}=1	## JIS X 0213:2000 does not have this limitation.
+	=>ucs_to_ascii ucs_to_jisx0213_2000_1 ucs_to_jisx0213_2000_2
+	->iso2022:C
+Decode:
+	<-iso2022:C
+	<=jisx0213_2000_1_to_ucs jisx0213_2000_2_to_ucs
+Description:
+	The 7-bit code for IRV and Kanji (JIS X 0213:2000 7.2.1).
+}
+
+{
+Name:
+	jisx0213-2000-latin-kanji-7bit
+Cversion:
+	C:bit=7
+	C:G0=G94:J	## JIS X 0201:1997 Graphic character set for Latin letters
+	C:G1=G94n:O	## JIS X 0213:2000 plane 1
+	C:G3=G94n:P	## JIS X 0213:2000 plane 2
+Encode:
+	C:GR=undef
+	C:designate:*:default=-1
+	C:option:{undef_char}=["\x22\x2E", {type => 'G94n', charset => 'B', revision => 'O'}]
+	C:option:{Ginvoke_to_left}=[1,1,1,1]
+	C:option:{Ginvoked_by_single_shift}=[0,0,1,1]
+	C:option:{reset}->{Gdesignation}=0
+	C:option:{reset}->{Ginvoke}=1	## JIS X 0213:2000 does not have this limitation.
+	=>ucs_to_jisx0201_latin ucs_to_jisx0213_2000_1 ucs_to_jisx0213_2000_2
+	->iso2022:C
+Decode:
+	<-iso2022:C
+	<=jisx0201_latin_to_ucs jisx0213_2000_1_to_ucs jisx0213_2000_2_to_ucs
+Description:
+	The 7-bit code for Latin and Kanji (JIS X 0213:2000 7.3.1).
+}
+
+{
+Name:
+	jisx0213-2000-latin-kanji-8bit
+Cversion:
+	C:bit=8
+	C:G0=G94:J	## JIS X 0201:1997 Graphic character set for Latin letters
+	C:G1=G94n:O	## JIS X 0213:2000 plane 1
+	C:G3=G94n:P	## JIS X 0213:2000 plane 2
+Encode:
+	C:GR=undef
+	C:designate:*:default=-1
+	C:option:{undef_char}=["\x22\x2E", {type => 'G94n', charset => 'B', revision => 'O'}]
+	C:option:{Ginvoke_to_left}=[1,0,0,0]
+	C:option:{Ginvoked_by_single_shift}=[0,0,1,1]
+	C:option:{C1invoke_to_right}=1
+	C:option:{reset}->{Gdesignation}=0
+	C:option:{reset}->{Ginvoke}=1	## JIS X 0213:2000 does not have this limitation.
+	=>ucs_to_jisx0201_latin ucs_to_jisx0213_2000_1 ucs_to_jisx0213_2000_2
+	->iso2022:C
+Decode:
+	<-iso2022:C
+	<=jisx0201_latin_to_ucs jisx0213_2000_1_to_ucs jisx0213_2000_2_to_ucs
+Description:
+	The 8-bit code for Latin and Kanji (JIS X 0213:2000 7.2.2).
+}
+
+{
+Name:
+	jisx4001-text-7bit
+Cversion:
+	C:bit=7
+	C:G0=G94n:B ## JIS X 0208-1983
+Encode:
+	C:GR=undef
+	C:C1=C1:~
+	C:G0=G0:~
+	C:designate:*:default=-1
+	C:designate:G94:J=0	## JIS X 0201-1976 Roman set
+	C:designate:G94n:B=0	## JIS X 0208-1983
+	C:option:{undef_char}=["\x22\x2E", {type => 'G94n', charset => 'B', revision => 'B'}]
+	C:option:{reset}->{Gdesignation}='J'	## JIS X 4001 does not have this limitation.
+	=>ucs_to_jisx0201_latin ucs_to_jisx0208_1983
+	->iso2022:C
+Decode:
+	<-iso2022:C
+	<=jisx0201_latin_to_ucs jisx0208_1983_to_ucs
+Description:
+	JIS X 4001 text (7-bit code, JIS X 4001-1989 6)
+}
+
+{
+Name:
+	jisx4001-text-8bit
+Cversion:
+	C:bit=8
+	C:G0=G94n:B ## JIS X 0208-1983
+Encode:
+	C:GR=undef
+	C:C1=C1:~
+	C:G0=G0:~
+	C:designate:*:default=-1
+	C:designate:G94:J=0	## JIS X 0201-1976 Roman set
+	C:designate:G94n:B=0	## JIS X 0208-1983
+	C:option:{C1invoke_to_right}=1
+	C:option:{undef_char}=["\x22\x2E", {type => 'G94n', charset => 'B', revision => 'B'}]
+	C:option:{reset}->{Gdesignation}='J'	## JIS X 4001 does not have this limitation.
+	=>ucs_to_jisx0201_latin ucs_to_jisx0208_1983
+	->iso2022:C
+Decode:
+	<-iso2022:C
+	<=jisx0201_latin_to_ucs jisx0208_1983_to_ucs
+Description:
+	JIS X 4001 text (8-bit code, JIS X 4001-1989 6)
+}
+
+POD:ENCODING:POSTAMBLE:
+	Note that although other JISes such as JIS X 0212 and JIS X 9010
+	define ISO/IEC 2022-comfprming coded character sets,
+	these standards do not define complete coding system (but define
+	as used on ISO/IEC 2022 environment), so this module
+	does not include those coded character sets.  (IETF RFC 1345
+	and IANAREG give charset name to coded character sets
+	consist of such standards.  But those are defined by RFC 1345,
+	not by JIS.  Such coded character sets should be implemented
+	in Encode::ISO2022::RFC1345.)
+
+POD:SEE ALSO:
+	%%ReferenceJISX0201_1997%%
+	
+	%%ReferenceJISX0208_1997%%
+	
+	%%ReferenceJISX0213_2000%%
+	
+	JIS X 4001-1989, "File Specification for Japanese Documents
+	interchange (Basic Type)", Japan Industrial Standarad
+	Committee (JISC) <http://www.jisc.go.jp/>, 1989.
+	
+	L<Encode::ISO2022::JUNET>, L<Encode::ISO2022::EUCJA>
+
+POD:LICENSE:
+	Copyright %%YEAR%% Wakaba <w@suika.fam.cx>
+	
+	%%PerlLicense%%

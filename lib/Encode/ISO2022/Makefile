@@ -5,7 +5,8 @@ ESR2PM = ../Table/tool/esr2pm.pl
 
 PMS = SevenBit.pm JUNET.pm JUNETCompatible.pm \
   EightBit.pm \
-  EUCJA.pm EUCJACompatible.pm EUCKR.pm EUCZH.pm
+  EUCJA.pm EUCJACompatible.pm EUCKR.pm EUCZH.pm \
+  JIS.pm
 
 all: $(PMS)
 

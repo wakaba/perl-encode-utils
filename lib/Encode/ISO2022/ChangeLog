@@ -1,3 +1,9 @@
+2002-11-08  Wakaba <w@suika.fam.cx>
+
+	* JIS.esr: New files.
+	* JIS.pm: Removed.
+	* Makefile: Updated.
+
 2002-11-06  Wakaba <w@suika.fam.cx>
 
 	* SevenBit.esr, EightBit.esr, JUNET.esr,
@@ -5,6 +11,7 @@
 	EUCKR.esr, EUCZH.esr: New files.
 	* SevenBit.pm, EightBit.pm: Removed.
 	(Now these modules are auto-generated from *.esr files.)
+	* Makefile: Updated.
 
 2002-10-13  Wakaba <w@suika.fam.cx>
 
