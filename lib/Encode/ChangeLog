@@ -1,3 +1,11 @@
+2002-09-16  Wakaba <w@suika.fam.cx>
+
+	* ISO2022.pm:
+	- (iso2022_to_internal): Invoke G1,G2,G3 by locking
+	shifts of ESC Fs style.
+	- (make_initial_charset): Create charset definition
+	of 94^2 DRCSes.
+
 2002-09-15  Wakaba <w@suika.fam.cx>
 
 	* ISO2022.pm: New module.

@@ -9,7 +9,7 @@ require v5.7.3;
 package Encode::ISO2022;
 use strict;
 use vars qw(%CHARSET $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use base qw(Encode::Encoding);
 __PACKAGE__->Define (qw/iso-2022 iso2022 2022 cp2022/);
 
@@ -75,12 +75,12 @@ for my $f (0x30..0x7E) {
 }
 for my $f (0x30..0x5F, 0x7E) {
   my $F = pack 'C', $f;
-  for ('', '!', '"', '#') {
+  for ('', '!', '"', '#', ' ') {
     $CHARSET{G94n}->{ $_.$F }->{dimension} = 2;
     $CHARSET{G94n}->{ $_.$F }->{chars} = 94;
     $CHARSET{G94n}->{ $_.$F }->{ucs} =
       ({'' => 0xE9F6C0}->{ $_ }||0) + 94*94 * ($f-0x30);
-      ## BUG: 94^n DRCSes with I byte have no mapping area
+      ## BUG: 94^n sets with I byte have no mapping area
     
     $CHARSET{G96n}->{ $_.$F }->{dimension} = 2;
     $CHARSET{G96n}->{ $_.$F }->{chars} = 96;
@@ -295,8 +295,11 @@ sub iso2022_to_internal ($;\%) {
       ((??{ $_CHARS_to_RANGE{'b'.$C->{$C->{GL}}->{chars}}
             . qq/{$C->{G3}->{dimension},$C->{G3}->{dimension}}/ }))
     
-    |((??{ $C->{$C->{CL}}->{r_LS0}||'(?!)' }))	## GL = G0
-    |((??{ $C->{$C->{CL}}->{r_LS1}||'(?!)' }))	## GL = G1
+    ## Locking shift
+    |( \x1B[\x6E\x6F\x7C-\x7E]
+       |(??{ $C->{$C->{CL}}->{r_LS0}||'(?!)' })
+       |(??{ $C->{$C->{CL}}->{r_LS1}||'(?!)' })
+     )
     
     ## Control sequence
     |(??{ '(?:'.($C->{$C->{CR}}->{r_CSI}||'(?!)')
@@ -314,8 +317,8 @@ sub iso2022_to_internal ($;\%) {
     ## Misc. sequence (SP, control, or broken data)
     |([\x00-\xFF])
   }{
-    my ($gl,$gr,$ss2,$ss3,$ls0,$ls1,$csi,$esc,$misc)
-      = ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10);
+    my ($gl,$gr,$ss2,$ss3,$ls,$csi,$esc,$misc)
+      = ($1,$2,$3,$4,$5,$6,$7,$8,$9);
     $C->{_irr} = undef unless defined $esc;
     ## GL graphic character
     if (defined $gl) {
@@ -353,11 +356,6 @@ sub iso2022_to_internal ($;\%) {
         $c = $c * $C->{G3}->{chars} + unpack ('C', $_) - $m;
       }
       chr ($C->{G3}->{ucs} + $c);
-    ## Locking shifts
-      } elsif ($ls0) {
-        $C->{GL} = 'G0'; '';
-      } elsif ($ls1) {
-        $C->{GL} = 'G1'; '';
     ## Escape sequence
     } elsif ($esc) {
       ## IRR (revision number)
@@ -434,6 +432,17 @@ sub iso2022_to_internal ($;\%) {
         $C->{_irr} = undef;
       }
       $esc;
+    ## Locking shifts
+    } elsif ($ls) {
+      if ($ls eq $C->{$C->{CL}}->{LS0}) {
+        $C->{GL} = 'G0'; '';
+      } elsif ($ls eq $C->{$C->{CL}}->{LS1}) {
+        $C->{GL} = 'G1'; '';
+      } elsif ($ls =~ /\x1B([\x6E\x6F])/) {
+        $C->{GL} = {"\x6E"=>2, "\x6F"=>3}->{$1}; '';
+      } elsif ($ls =~ /\x1B([\x7C-\x7E])/) {
+        $C->{GR} = {"\x7E"=>1, "\x7D"=>2, "\x7C"=>3}->{$1}; '';
+      }
     ## Control sequence
     } elsif ($csi) {
       $csi =~ tr/\xA0-\xFF/\x20-\x7F/d;
@@ -755,5 +764,5 @@ and/or modify it under the same terms as Perl itself.
 
 =cut
 
-# $Date: 2002/09/15 05:08:13 $
+# $Date: 2002/09/16 02:20:18 $
 ### ISO2022.pm ends here
