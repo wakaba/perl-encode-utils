@@ -2,12 +2,9 @@ package Encode::HZ;
 use strict;
 
 use vars qw($VERSION);
-$VERSION = do {my @r =(q$Revision: 1.3 $ =~ /\d+/g);sprintf "%d."."%02d" x $#r, @r};
-
-use Encode ();
-require Encode::CN;
+$VERSION = do {my @r =(q$Revision: 1.4 $ =~ /\d+/g);sprintf "%d."."%02d" x $#r, @r};
 use base qw(Encode::Encoding);
-__PACKAGE__->Define(qw/hz chinese-hz hz-gb-2312 cp52936/);
+__PACKAGE__->Define(qw/hz chinese-hz hz-gb-2312 hz-gb2312 cp52936/);
 
 sub needs_lines  { 1 }
 
@@ -90,7 +87,7 @@ sub encode ($$;$) {
 
 package Encode::HZ::HZ165;
 use base qw(Encode::HZ);
-__PACKAGE__->Define(qw/hz-isoir165 x-iso-ir-165-hz/);
+__PACKAGE__->Define(qw/hz-iso-ir-165 hz-isoir165 x-iso-ir-165-hz/);
 
 sub __hz_encoding_name { 'cn-gb-isoir165' }
 
@@ -119,22 +116,31 @@ HZ8 can't be encoded/decode.
 
 HZ 7-bit encoding for Chinese with GB 2312-80,
 defined by RFC 1842 and RFC 1843.
-(Alias: hz, chinese-hz (emacsen), CP52936 (M$))
+(Alias: hz, chinese-hz (emacsen), CP52936 (M$),
+hz-gb2312)
+
+Note that hz8 is also decodable with this encoding.
 
 =item hz8
 
 HZ 8-bit encoding for Chinese with GB 2312-80.
 (Alias: x-hz8)
 
-=item hz-isoir165
+Note that hz-gb-2312 is also decodable with this encoding.
+
+=item hz-iso-ir-165
 
 HZ 7-bit encoding for Chinese with ISO-IR 165
 (syntax is same as hz-gb-2312, but coded character
-set is differ) (Alias: x-iso-ir-165-hz)
+set is differ) (Alias: hz-isoir165, x-iso-ir-165-hz)
 
 Note that you need load Encode module that support
 'cn-gb-isoir165' encoding (defined by RFC 1922),
 such as Encode::ISO2022::EightBit.
+
+Also note that since ISO-IR 165 is nealy superset of GB 2312-80,
+hz-iso-ir-165 is also considerable as a superset of
+hz-gb-2312.
 
 =back
 
@@ -155,5 +161,5 @@ and/or modify it under the same terms as Perl itself.
 
 =cut
 
-# $Date: 2002/09/16 06:35:16 $
+# $Date: 2002/10/14 06:58:35 $
 ### HZ.pm ends here

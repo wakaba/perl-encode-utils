@@ -11,7 +11,7 @@ Encode::SJIS::JIS --- Encoder/decoder of standard Shift JIS coding systems
 
 package Encode::SJIS::JIS;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.1 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Encode::SJIS;
 require Encode::Encoding;
 
@@ -51,12 +51,13 @@ sub __decode_map ($) {
 
 package Encode::SJIS::JIS::SJIS1997ASCII;
 use base 'Encode::SJIS::JIS::SJIS1997';
-__PACKAGE__->Define (qw/shift-jis-1997-ascii/);
+__PACKAGE__->Define (qw/shift-jis-1997-ascii shift_jis-ascii/);
 
 =item shift-jis-1997-ascii
 
 Same as Shift_JISX0213 but ASCII (ISO/IEC 646 IRV)
 instead of JIS X 0201:1997 Latin character set.
+(Alias: shift_jis-ascii)
 
 Note that this coding system does NOT comform to
 JIS X 0208:1997 Appendix 1.
@@ -113,6 +114,15 @@ included in this module since these standards did not
 define them.  They are defined in Encode::SJIS::*
 other than this module.
 
+Being one of _JIS_ TR, shift JIS variants defined by
+JIS TR X 0015 "XML Japanese profile" is not supported
+by this module, but by other Encode::SJIS::*.  Shift JISes
+which is given name by JIS TR X 0015 are all vendor defined
+version of Shift JIS and NOT part of formal JIS coded
+character set standards.  It is also a reason of not including
+that the TR is too less quality to treat as same level
+with formal JIS standards.
+
 =head1 SEE ALSO
 
 JIS X 0208:1997, "7-bit and 8-bit double byte coded Kanji
@@ -138,5 +148,5 @@ and/or modify it under the same terms as Perl itself.
 
 =cut
 
-# $Date: 2002/10/12 11:02:38 $
+# $Date: 2002/10/14 06:58:35 $
 ### SJIS.pm ends here

@@ -15,7 +15,7 @@ Other variants are defined in Encode::SJIS::* modules.
 package Encode::SJIS;
 use 5.7.3;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Encode::Charset;
 use base qw(Encode::Encoding);
 
@@ -109,13 +109,16 @@ sub internal_to_sjis ($\%) {
     if ($cc <= 0x1F) {
       $t = $c if $C->{ $C->{CL} } eq $Encode::Charset::CHARSET{C0}->{"\x40"};
     } elsif ($cc == 0x20 || $cc == 0x7F) {
+      Encode::_utf8_off ($c);
       $t = $c;
     } elsif ($cc < 0x7F) {
+      Encode::_utf8_off ($c);
       $t = $c if $C->{ $C->{GL} } eq $Encode::Charset::CHARSET{G94}->{"\x42"};
     } elsif ($C->{option}->{C1invoke_to_right} && $cc == 0x80) {
-      $t = $c if $C->{ $C->{CR} } eq $Encode::Charset::CHARSET{C1}->{'64291991C1'};
+      $t = "\x80"
+        if $C->{ $C->{CR} } eq $Encode::Charset::CHARSET{C1}->{'64291991C1'};
     } elsif ($cc <= 0x9F) {
-      $t = "\x1B".chr ($cc - 0x40)
+      $t = "\x1B".pack 'C', ($cc - 0x40)
         if $C->{ $C->{ESC_Fe} } eq $Encode::Charset::CHARSET{C1}->{'64291991C1'};
     
     } elsif (0xE9F6C0 <= $cc && $cc <= 0xF06F80) {
@@ -146,9 +149,9 @@ sub internal_to_sjis ($\%) {
     } elsif (0xE90940 <= $cc && $cc <= 0xE92641) {
       my $c = $cc - 0xE90940;  my $F = chr (($c / 94)+0x30);
       if ($C->{ $C->{GL} } eq $Encode::Charset::CHARSET{G94}->{ $F }) {
-        $t = chr (($c % 94) + 0x21);
+        $t = pack 'C', (($c % 94) + 0x21);
       } elsif ($C->{ $C->{GR} } eq $Encode::Charset::CHARSET{G94}->{ $F }) {
-        $t = chr (($c % 94) + 0xA1) if ($c % 94) < 0x3F;
+        $t = pack 'C', (($c % 94) + 0xA1) if ($c % 94) < 0x3F;
       }
     } elsif (0x70420000 <= $cc && $cc <= 0x7046F19B) {
       my $c = $cc % 0x10000;
@@ -186,13 +189,13 @@ sub __clone ($) {
 
 __PACKAGE__->Define (qw!shift_jisx0213 japanese-shift-jisx0213
 shift-jisx0213 x-shift_jisx0213 shift-jis-3 shift-jis-2000
-sjis shift-jis x-sjis x_sjis x-sjis-jp shiftjis x-shiftjis
+sjis s-jis shift-jis x-sjis x_sjis x-sjis-jp shiftjis x-shiftjis
 x-shift-jis shift.jis!);
 
 =item sjis
 
 "Shift JIS" coding system.  (Alias: shift-jis, shiftjis,
-shift.jis, x-shiftjis, x-shift-jis, x-sjis, x_sjis,
+shift.jis, x-shiftjis, x-shift-jis, s-jis, x-sjis, x_sjis,
 x-sjis-jp)
 
 Since this name is ambiguous (it can now refer all or any
@@ -312,5 +315,5 @@ and/or modify it under the same terms as Perl itself.
 
 =cut
 
-# $Date: 2002/10/12 11:03:00 $
+# $Date: 2002/10/14 06:58:35 $
 ### SJIS.pm ends here

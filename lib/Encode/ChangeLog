@@ -1,3 +1,8 @@
+2002-10-14  Nanashi-san
+
+	* ISO2022.pm, SJIS.pm: Bug fix of utf8 flag control.
+	(Committed by Wakaba <w@suika.fam.cx>.)
+
 2002-10-12  Nanashi-san
 
 	* SJIS.pm: New module.

@@ -41,29 +41,12 @@ require v5.7.3;
 package Encode::ISO2022;
 use strict;
 use vars qw(%CHARSET %CODING_SYSTEM $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.8 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.9 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use base qw(Encode::Encoding);
 __PACKAGE__->Define (qw!iso-2022 iso/iec2022 iso2022 2022 cp2022!);
 require Encode::Charset;
 	*CHARSET = \%Encode::Charset::CHARSET;
 	*CODING_SYSTEM = \%Encode::Charset::CODING_SYSTEM;
-
-### --- Intialization
-
-my %_CHARS_to_RANGE = (
-	l94	=> q/[\x21-\x7E]/,
-	l96	=> q/[\x20-\x7F]/,
-	l128	=> q/[\x00-\x7F]/,
-	l256	=> q/[\x00-\xFF]/,
-	r94	=> q/[\xA1-\xFE]/,
-	r96	=> q/[\xA0-\xFF]/,
-	r128	=> q/[\x80-\xFF]/,
-	r256	=> q/[\x80-\xFF]/,
-	b94	=> q/[\x21-\x7E\xA1-\xFE]/,
-	b96	=> q/[\x20-\x7F\xA0-\xFF]/,
-	b128	=> q/[\x00-\xFF]/,
-	b256	=> q/[\x00-\xFF]/,
-);
 
 ### --- Perl Encode module common functions
 
@@ -87,13 +70,11 @@ sub iso2022_to_internal ($;\%) {
   my ($s, $C) = @_;
   $C ||= &new_object;
   my $t = '';
-  $s =~ s{
-    ^((?:(?!\x1B\x25\x2F?[\x30-\x7E]).)*)
-  }{
+  $s =~ s{^((?:(?!\x1B\x25\x2F?[\x30-\x7E]).)*)}{
     my $i2 = $1;
     $t = _iso2022_to_internal ($i2, $C);
     '';
-  }gesx;
+  }es;
   my $pad = '';
   use re 'eval';
   $s =~ s{
@@ -142,19 +123,36 @@ sub iso2022_to_internal ($;\%) {
   $t . $s;
 }
 
+# this is very very trickey.  my perl 5.8.0 does not process
+# regex with eval except the first time (i think it's a bug
+# of perl), so we redefine this function whenever being called!
+# when this unexpected behavior is fixed or someone finds
+# better way to avoid it, we will rewrite this code.
+&_iso2022_to_internal (undef);
 sub _iso2022_to_internal ($;\%) {
+  eval q{ sub __iso2022_to_internal ($;\%) { 0 } };
+  eval q{
+sub __iso2022_to_internal ($;\%) {
+  use re 'eval';
   my ($s, $C) = @_;
   my %_GB_to_GN = (
     "\x28"=>'G0',"\x29"=>'G1',"\x2A"=>'G2',"\x2B"=>'G3',
     "\x2C"=>'G0',"\x2D"=>'G1',"\x2E"=>'G2',"\x2F"=>'G3',
   );
+  my %_CHARS_to_RANGE = (
+	l94	=> q/[\x21-\x7E]/,	l96	=> q/[\x20-\x7F]/,
+	l128	=> q/[\x00-\x7F]/,	l256	=> q/[\x00-\xFF]/,
+	r94	=> q/[\xA1-\xFE]/,	r96	=> q/[\xA0-\xFF]/,
+	r128	=> q/[\x80-\xFF]/,	r256	=> q/[\x80-\xFF]/,
+	b94	=> q/[\x21-\x7E\xA1-\xFE]/,	b96	=> q/[\x20-\x7F\xA0-\xFF]/,
+	b128	=> q/[\x00-\xFF]/,	b256	=> q/[\x00-\xFF]/,
+  );
   
-  use re 'eval';
   $s =~ s{
      ((??{ $_CHARS_to_RANGE{'l'.$C->{$C->{GL}}->{chars}}
          . qq/{$C->{$C->{GL}}->{dimension},$C->{$C->{GL}}->{dimension}}/ }))
     |((??{ $_CHARS_to_RANGE{'r'.$C->{$C->{GR}}->{chars}}
-         . qq/{$C->{$C->{GR}}->{dimension},$C->{$C->{GR}}->{dimension}}/ }))
+         . qq/{$C->{$C->{GR}}->{dimension},$C->{$C->{GR}}->{dimension}}/  }))
     |  (??{ q/(?:/ . ($C->{$C->{CR}}->{r_SS2} || '(?!)')
              . ($C->{$C->{ESC_Fe}}->{r_SS2_ESC} ?
                  qq/|$C->{$C->{ESC_Fe}}->{r_SS2_ESC}/ : '')
@@ -164,7 +162,7 @@ sub _iso2022_to_internal ($;\%) {
              qq/[$C->{$C->{CL}}->{r_LS0}$C->{$C->{CL}}->{r_LS1}]*/:'')
         })
       ((??{ $_CHARS_to_RANGE{'b'.$C->{G2}->{chars}}
-            . qq/{$C->{G2}->{dimension},$C->{G2}->{dimension}}/ }))
+         . qq/{$C->{G2}->{dimension},$C->{G2}->{dimension}}/ }))
     |  (??{ q/(?:/ . ($C->{$C->{CR}}->{r_SS3} || '(?!)')
              . ($C->{$C->{ESC_Fe}}->{r_SS3_ESC} ?
                 qq/|$C->{$C->{ESC_Fe}}->{r_SS3_ESC}/ : '')
@@ -326,9 +324,14 @@ sub _iso2022_to_internal ($;\%) {
       $csi =~ s/$C->{$C->{CL}}->{LS1}//g if $C->{$C->{CL}}->{LS1};
       "\x9B".$csi;
     }
-  }gex;
+  }gesx;
   $s;
-}
+} # __iso2022_to_internal
+
+  };
+  &__iso2022_to_internal (@_) if defined $_[0];
+
+} # _iso2022_to_internal
 
 sub internal_to_iso2022 ($\%) {
   my ($s, $C) = @_;
@@ -336,7 +339,7 @@ sub internal_to_iso2022 ($\%) {
   
   my $r = '';
   for my $c (split //, $s) {
-    my $cc = ord $c;
+    my $cc = ord $c;  Encode::_utf8_off ($c);
     my $t;
     if ($cc <= 0x1F) {
       $t = _i2c ($c, $C, type => 'C0', charset => '@');
@@ -766,5 +769,5 @@ and/or modify it under the same terms as Perl itself.
 
 =cut
 
-# $Date: 2002/10/12 11:03:00 $
+# $Date: 2002/10/14 06:58:35 $
 ### ISO2022.pm ends here
