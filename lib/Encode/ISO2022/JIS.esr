@@ -22,19 +22,22 @@ Alias:
 Cversion:
 	C:bit=7
 	C:G0=G94:J	## JIS X 0201:1997 Graphic character set for Latin letters
+	C:designate:G94:B=-1
 	C:designate:*:default=-1
 	C:option:{undef_char}=["\x3F", {type => 'G94', charset => 'J'}]
-Encode:
+Encode:Prepare:
 	C:GR=undef
 	C:G1=G96:~
 	C:option:{reset}->{Gdesignation}=0
 	C:option:{reset}->{Ginvoke}=0
+Encode:
 	=>ucs_to_jisx0201_latin
 	->iso2022:C
-Decode:
+Decode:Prepare:
 	C:G1=G94:J
 	C:G2=G94:J
 	C:G3=G94:J
+Decode:
 	<-iso2022:C
 	<=jisx0201_latin_to_ucs
 Description:
@@ -49,19 +52,22 @@ Alias:
 Cversion:
 	C:bit=7
 	C:G0=G94:I	## JIS X 0201:1997 Graphic character set for Katakana
+	C:designate:G94:B=-1
 	C:designate:*:default=-1
 	C:option:{undef_char}=["\x25", {type => 'G94', charset => 'I'}]
-Encode:
+Encode:Prepare:
 	C:GR=undef
 	C:G1=G96:~
 	C:option:{reset}->{Gdesignation}=0
 	C:option:{reset}->{Ginvoke}=0
+Encode:
 	=>ucs_to_jisx0201_katakana
 	->iso2022:C
-Decode:
+Decode:Prepare:
 	C:G1=G94:I
 	C:G2=G94:I
 	C:G3=G94:I
+Decode:
 	<-iso2022:C
 	<=jisx0201_katakana_to_ucs
 Description:
@@ -75,14 +81,16 @@ Cversion:
 	C:bit=7
 	C:G0=G94:J	## JIS X 0201:1997 Graphic character set for Latin letters
 	C:G1=G94:I	## JIS X 0201:1997 Graphic character set for Katakana
+	C:designate:G94:B=-1
 	C:designate:*:default=-1
 	C:option:{undef_char}=["\x3F", {type => 'G94', charset => 'J'}]
-Encode:
+Encode:Prepare:
 	C:GL=undef
 	C:GR=undef
 	C:option:{Ginvoke_to_left}=[1,1,1,1]
 	C:option:{reset}->{Gdesignation}=0
 	C:option:{reset}->{Ginvoke}=1	## JIS X 0201:1997 doesn't have this limitation.
+Encode:
 	=>ucs_to_jisx0201_latin ucs_to_jisx0201_katakana
 	->iso2022:C
 Decode:
@@ -101,18 +109,21 @@ Cversion:
 	C:bit=7
 	C:G0=G94:J	## JIS X 0201:1997 Graphic character set for Latin letters
 	C:G1=G94:I	## JIS X 0201:1997 Graphic character set for Katakana
+	C:designate:G94:B=-1
 	C:designate:*:default=-1
 	C:option:{undef_char}=["\x3F", {type => 'G94', charset => 'J'}]
-Encode:
+Encode:Prepare:
 	C:GL=undef
 	C:GR=undef
 	C:option:{Ginvoke_to_left}=[1,1,1,1]
 	C:option:{reset}->{Gdesignation}=0
 	C:option:{reset}->{Ginvoke}=1	## JIS X 0201:1997 doesn't have this limitation.
+Encode:
 	=>ucs_to_jisx0201_latin ucs_to_jisx0201_katakana
 	->iso2022:C
-Decode:
+Decode:Prepare:
 	C:GL=G1	## In default, G1=Katakana is invoked
+Decode:
 	<-iso2022:C
 	<=jisx0201_latin_to_ucs jisx0201_katakana_to_ucs
 Description:
@@ -140,12 +151,14 @@ Cversion:
 	C:bit=8
 	C:G0=G94:J	## JIS X 0201:1997 Graphic character set for Latin letters
 	C:G1=G94:I	## JIS X 0201:1997 Graphic character set for Katakana
-Encode:
+Encode:Prepare:
 	C:designate:*:default=-1
+	C:designate:G94:B=-1
 	C:option:{C1invoke_to_right}=1
 	C:option:{reset}->{Gdesignation}=0
 	C:option:{reset}->{Ginvoke}=0
 	C:option:{undef_char}=["\x3F", {type => 'G94', charset => 'J'}]
+Encode:
 	=>ucs_to_jisx0201_latin ucs_to_jisx0201_katakana
 	->iso2022:C
 Decode:
@@ -161,13 +174,15 @@ Name:
 Cversion:
 	C:bit=7
 	C:G0=G94n:B@	## JIS X 0208:1997
-Encode:
+Encode:Prepare:
 	C:GR=undef
 	C:G1=G96:~
+	C:designate:G94:B=-1
 	C:designate:*:default=-1
 	C:option:{reset}->{Gdesignation}=0
 	C:option:{reset}->{Ginvoke}=0
-	C:option:{undef_char}=["\x22\x2E", {type => 'G94n', charset => 'B', revision => 'B@'}]
+	C:option:{undef_char}=["\x22\x2E", {type => 'G94n', charset => 'B', revision => '@'}]
+Encode:
 	=>ucs_to_jisx0208_1997
 	->iso2022:C
 Decode:
@@ -183,14 +198,16 @@ Name:
 Cversion:
 	C:bit=8
 	C:G0=G94n:B@	## JIS X 0208:1997
-Encode:
+Encode:Prepare:
 	C:GR=undef
 	C:G1=G96:~
+	C:designate:G94:B=-1
 	C:designate:*:default=-1
 	C:option:{C1invoke_to_right}=1
 	C:option:{reset}->{Gdesignation}=0
 	C:option:{reset}->{Ginvoke}=0
-	C:option:{undef_char}=["\x22\x2E", {type => 'G94n', charset => 'B', revision => 'B@'}]
+	C:option:{undef_char}=["\x22\x2E", {type => 'G94n', charset => 'B', revision => '@'}]
+Encode:
 	=>ucs_to_jisx0208_1997
 	->iso2022:C
 Decode:
@@ -207,14 +224,15 @@ Cversion:
 	C:bit=7
 	C:G0=G94:B	## ISO/IEC 646:1991 IRV
 	C:G1=G94n:B@	## JIS X 0208:1997
-Encode:
+Encode:Prepare:
 	C:GL=undef
 	C:GR=undef
 	C:designate:*:default=-1
-	C:option:{undef_char}=["\x22\x2E", {type => 'G94n', charset => 'B', revision => 'B@'}]
+	C:option:{undef_char}=["\x22\x2E", {type => 'G94n', charset => 'B', revision => '@'}]
 	C:option:{Ginvoke_to_left}=[1,1,1,1]
 	C:option:{reset}->{Gdesignation}=0
 	C:option:{reset}->{Ginvoke}=1	## JIS X 0208:1997 does not have this limitation.
+Encode:
 	=>ucs_to_ascii ucs_to_jisx0208_1997
 	->iso2022:C
 Decode:
@@ -231,18 +249,20 @@ Cversion:
 	C:bit=7
 	C:G0=G94:B	## ISO/IEC 646:1991 IRV
 	C:G1=G94n:B@	## JIS X 0208:1997
-Encode:
+Encode:Prepare:
 	C:GL=undef
 	C:GR=undef
 	C:designate:*:default=-1
-	C:option:{undef_char}=["\x22\x2E", {type => 'G94n', charset => 'B', revision => 'B@'}]
+	C:option:{undef_char}=["\x22\x2E", {type => 'G94n', charset => 'B', revision => '@'}]
 	C:option:{Ginvoke_to_left}=[1,1,1,1]
 	C:option:{reset}->{Gdesignation}=0
 	C:option:{reset}->{Ginvoke}=1	## JIS X 0208:1997 does not have this limitation.
+Encode:
 	=>ucs_to_ascii ucs_to_jisx0208_1997
 	->iso2022:C
-Decode:
+Decode:Prepare:
 	C:GL=G1
+Decode:
 	<-iso2022:C
 	<=jisx0208_1997_to_ucs
 Description:
@@ -260,14 +280,15 @@ Cversion:
 	C:bit=8
 	C:G0=G94:B	## ISO/IEC 646:1991 IRV
 	C:G1=G94n:B@	## JIS X 0208:1997
-Encode:
+Encode:Prepare:
 	C:GL=undef
 	C:GR=undef
 	C:designate:*:default=-1
-	C:option:{undef_char}=["\x22\x2E", {type => 'G94n', charset => 'B', revision => 'B@'}]
+	C:option:{undef_char}=["\x22\x2E", {type => 'G94n', charset => 'B', revision => '@'}]
 	C:option:{C1invoke_to_right}=1
 	C:option:{reset}->{Gdesignation}=0
 	C:option:{reset}->{Ginvoke}=0
+Encode:
 	=>ucs_to_ascii ucs_to_jisx0208_1997
 	->iso2022:C
 Decode:
@@ -291,14 +312,16 @@ Cversion:
 	C:bit=7
 	C:G0=G94:J	## JIS X 0201:1997 Graphic character set for Latin letters
 	C:G1=G94n:B@	## JIS X 0208:1997
-Encode:
+Encode:Prepare:
 	C:GL=undef
 	C:GR=undef
+	C:designate:G94:B=-1
 	C:designate:*:default=-1
-	C:option:{undef_char}=["\x22\x2E", {type => 'G94n', charset => 'B', revision => 'B@'}]
+	C:option:{undef_char}=["\x22\x2E", {type => 'G94n', charset => 'B', revision => '@'}]
 	C:option:{Ginvoke_to_left}=[1,1,1,1]
 	C:option:{reset}->{Gdesignation}=0
 	C:option:{reset}->{Ginvoke}=1	## JIS X 0208:1997 does not have this limitation.
+Encode:
 	=>ucs_to_jisx0201_latin ucs_to_jisx0208_1997
 	->iso2022:C
 Decode:
@@ -315,14 +338,16 @@ Cversion:
 	C:bit=7
 	C:G0=G94:J	## JIS X 0201:1997 Graphic character set for Latin letters
 	C:G1=G94n:B@	## JIS X 0208:1997
-Encode:
+Encode:Prepare:
 	C:GL=undef
 	C:GR=undef
+	C:designate:G94:B=-1
 	C:designate:*:default=-1
-	C:option:{undef_char}=["\x22\x2E", {type => 'G94n', charset => 'B', revision => 'B@'}]
+	C:option:{undef_char}=["\x22\x2E", {type => 'G94n', charset => 'B', revision => '@'}]
 	C:option:{Ginvoke_to_left}=[1,1,1,1]
 	C:option:{reset}->{Gdesignation}=0
 	C:option:{reset}->{Ginvoke}=1	## JIS X 0208:1997 does not have this limitation.
+Encode:
 	=>ucs_to_jisx0201_latin ucs_to_jisx0208_1997
 	->iso2022:C
 Decode:
@@ -344,14 +369,16 @@ Cversion:
 	C:bit=8
 	C:G0=G94:J	## JIS X 0201:1997 Graphic character set for Latin letters
 	C:G1=G94n:B@	## JIS X 0208:1997
-Encode:
+Encode:Prepare:
 	C:GL=undef
 	C:GR=undef
+	C:designate:G94:B=-1
 	C:designate:*:default=-1
 	C:option:{C1invoke_to_right}=1
 	C:option:{reset}->{Gdesignation}=0
 	C:option:{reset}->{Ginvoke}=0
-	C:option:{undef_char}=["\x22\x2E", {type => 'G94n', charset => 'B', revision => 'B@'}]
+	C:option:{undef_char}=["\x22\x2E", {type => 'G94n', charset => 'B', revision => '@'}]
+Encode:
 	=>ucs_to_jisx0201_latin ucs_to_jisx0208_1997
 	->iso2022:C
 Decode:
@@ -368,13 +395,15 @@ Cversion:
 	C:bit=7
 	C:G0=G94n:O	## JIS X 0213:2000 plane 1
 	C:G1=G94n:P	## JIS X 0213:2000 plane 2
-Encode:
+Encode:Prepare:
 	C:GR=undef
+	C:designate:G94:B=-1
 	C:designate:*:default=-1
-	C:option:{undef_char}=["\x22\x2E", {type => 'G94n', charset => 'B', revision => 'O'}]
+	C:option:{undef_char}=["\x22\x2E", {type => 'G94n', charset => 'O'}]
 	C:option:{Ginvoke_to_left}=[1,1,1,1]
 	C:option:{reset}->{Gdesignation}=0
 	C:option:{reset}->{Ginvoke}=1	## JIS X 0213:2000 does not have this limitation.
+Encode:
 	=>ucs_to_jisx0213_2000_1 ucs_to_jisx0213_2000_2
 	->iso2022:C
 Decode:
@@ -391,13 +420,15 @@ Cversion:
 	C:bit=8
 	C:G0=G94n:O	## JIS X 0213:2000 plane 1
 	C:G1=G94n:P	## JIS X 0213:2000 plane 2
-Encode:
+Encode:Prepare:
 	C:GR=undef
+	C:designate:G94:B=-1
 	C:designate:*:default=-1
-	C:option:{undef_char}=["\x22\x2E", {type => 'G94n', charset => 'B', revision => 'O'}]
+	C:option:{undef_char}=["\x22\x2E", {type => 'G94n', charset => 'O'}]
 	C:option:{C1invoke_to_right}=1
 	C:option:{reset}->{Gdesignation}=0
 	C:option:{reset}->{Ginvoke}=0
+Encode:
 	=>ucs_to_jisx0213_2000_1 ucs_to_jisx0213_2000_2
 	->iso2022:C
 Decode:
@@ -415,14 +446,15 @@ Cversion:
 	C:G0=G94:B	## ISO/IEC 646:1991 IRV
 	C:G1=G94n:O	## JIS X 0213:2000 plane 1
 	C:G3=G94n:P	## JIS X 0213:2000 plane 2
-Encode:
+Encode:Prepare:
 	C:GR=undef
 	C:designate:*:default=-1
-	C:option:{undef_char}=["\x22\x2E", {type => 'G94n', charset => 'B', revision => 'O'}]
+	C:option:{undef_char}=["\x22\x2E", {type => 'G94n', charset => 'O'}]
 	C:option:{Ginvoke_to_left}=[1,1,1,1]
 	C:option:{Ginvoked_by_single_shift}=[0,0,1,1]
 	C:option:{reset}->{Gdesignation}=0
 	C:option:{reset}->{Ginvoke}=1	## JIS X 0213:2000 does not have this limitation.
+Encode:
 	=>ucs_to_ascii ucs_to_jisx0213_2000_1 ucs_to_jisx0213_2000_2
 	->iso2022:C
 Decode:
@@ -440,15 +472,16 @@ Cversion:
 	C:G0=G94:B	## ISO/IEC 646:1991 IRV
 	C:G1=G94n:O	## JIS X 0213:2000 plane 1
 	C:G3=G94n:P	## JIS X 0213:2000 plane 2
-Encode:
+Encode:Prepare:
 	C:GR=undef
 	C:designate:*:default=-1
-	C:option:{undef_char}=["\x22\x2E", {type => 'G94n', charset => 'B', revision => 'O'}]
+	C:option:{undef_char}=["\x22\x2E", {type => 'G94n', charset => 'O'}]
 	C:option:{Ginvoke_to_left}=[1,0,0,0]
 	C:option:{Ginvoked_by_single_shift}=[0,0,1,1]
 	C:option:{C1invoke_to_right}=1
 	C:option:{reset}->{Gdesignation}=0
 	C:option:{reset}->{Ginvoke}=1	## JIS X 0213:2000 does not have this limitation.
+Encode:
 	=>ucs_to_ascii ucs_to_jisx0213_2000_1 ucs_to_jisx0213_2000_2
 	->iso2022:C
 Decode:
@@ -466,14 +499,16 @@ Cversion:
 	C:G0=G94:J	## JIS X 0201:1997 Graphic character set for Latin letters
 	C:G1=G94n:O	## JIS X 0213:2000 plane 1
 	C:G3=G94n:P	## JIS X 0213:2000 plane 2
-Encode:
+Encode:Prepare:
 	C:GR=undef
+	C:designate:G94:B=-1
 	C:designate:*:default=-1
-	C:option:{undef_char}=["\x22\x2E", {type => 'G94n', charset => 'B', revision => 'O'}]
+	C:option:{undef_char}=["\x22\x2E", {type => 'G94n', charset => 'O'}]
 	C:option:{Ginvoke_to_left}=[1,1,1,1]
 	C:option:{Ginvoked_by_single_shift}=[0,0,1,1]
 	C:option:{reset}->{Gdesignation}=0
 	C:option:{reset}->{Ginvoke}=1	## JIS X 0213:2000 does not have this limitation.
+Encode:
 	=>ucs_to_jisx0201_latin ucs_to_jisx0213_2000_1 ucs_to_jisx0213_2000_2
 	->iso2022:C
 Decode:
@@ -491,15 +526,17 @@ Cversion:
 	C:G0=G94:J	## JIS X 0201:1997 Graphic character set for Latin letters
 	C:G1=G94n:O	## JIS X 0213:2000 plane 1
 	C:G3=G94n:P	## JIS X 0213:2000 plane 2
-Encode:
+Encode:Prepare:
 	C:GR=undef
+	C:designate:G94:B=-1
 	C:designate:*:default=-1
-	C:option:{undef_char}=["\x22\x2E", {type => 'G94n', charset => 'B', revision => 'O'}]
+	C:option:{undef_char}=["\x22\x2E", {type => 'G94n', charset => 'O'}]
 	C:option:{Ginvoke_to_left}=[1,0,0,0]
 	C:option:{Ginvoked_by_single_shift}=[0,0,1,1]
 	C:option:{C1invoke_to_right}=1
 	C:option:{reset}->{Gdesignation}=0
 	C:option:{reset}->{Ginvoke}=1	## JIS X 0213:2000 does not have this limitation.
+Encode:
 	=>ucs_to_jisx0201_latin ucs_to_jisx0213_2000_1 ucs_to_jisx0213_2000_2
 	->iso2022:C
 Decode:
@@ -515,15 +552,17 @@ Name:
 Cversion:
 	C:bit=7
 	C:G0=G94n:B ## JIS X 0208-1983
-Encode:
+Encode:Prepare:
 	C:GR=undef
 	C:C1=C1:~
 	C:G0=G0:~
+	C:designate:G94:B=-1
 	C:designate:*:default=-1
 	C:designate:G94:J=0	## JIS X 0201-1976 Roman set
 	C:designate:G94n:B=0	## JIS X 0208-1983
-	C:option:{undef_char}=["\x22\x2E", {type => 'G94n', charset => 'B', revision => 'B'}]
+	C:option:{undef_char}=["\x22\x2E", {type => 'G94n', charset => 'B'}]
 	C:option:{reset}->{Gdesignation}='J'	## JIS X 4001 does not have this limitation.
+Encode:
 	=>ucs_to_jisx0201_latin ucs_to_jisx0208_1983
 	->iso2022:C
 Decode:
@@ -539,16 +578,18 @@ Name:
 Cversion:
 	C:bit=8
 	C:G0=G94n:B ## JIS X 0208-1983
-Encode:
+Encode:Prepare:
 	C:GR=undef
 	C:C1=C1:~
 	C:G0=G0:~
+	C:designate:G94:B=-1
 	C:designate:*:default=-1
 	C:designate:G94:J=0	## JIS X 0201-1976 Roman set
 	C:designate:G94n:B=0	## JIS X 0208-1983
 	C:option:{C1invoke_to_right}=1
-	C:option:{undef_char}=["\x22\x2E", {type => 'G94n', charset => 'B', revision => 'B'}]
+	C:option:{undef_char}=["\x22\x2E", {type => 'G94n', charset => 'B'}]
 	C:option:{reset}->{Gdesignation}='J'	## JIS X 4001 does not have this limitation.
+Encode:
 	=>ucs_to_jisx0201_latin ucs_to_jisx0208_1983
 	->iso2022:C
 Decode:
