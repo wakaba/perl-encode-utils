@@ -15,7 +15,7 @@ Other variants are defined in Encode::SJIS::* modules.
 package Encode::SJIS;
 use 5.7.3;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Encode::Charset;
 use base qw(Encode::Encoding);
 
@@ -188,7 +188,7 @@ sub __clone ($) {
 };
 
 __PACKAGE__->Define (qw!shift_jisx0213 japanese-shift-jisx0213
-shift-jisx0213 x-shift_jisx0213 shift-jis-3 shift-jis-2000
+shift-jisx0213 x-shift_jisx0213 shift-jis-3 shift-jis-2000 sjisx0213
 sjis s-jis shift-jis x-sjis x_sjis x-sjis-jp shiftjis x-shiftjis
 x-shift-jis shift.jis!);
 
@@ -214,7 +214,7 @@ it to a shift JIS defined by JIS X 0208:1997.
 Shift_JISX0213 coded representation, defined by
 JIS X 0213:2000 Appendix 1 (implemention level 4).
 (Alias: shift-jisx0213, x-shift_jisx0213, japanese-shift-jisx0213 (emacsen),
-shift-jis-3 (Yudit), shift-jis-2000)
+shift-jis-3 (Yudit), shift-jis-2000, sjisx0213)
 
 =cut
 
@@ -315,5 +315,5 @@ and/or modify it under the same terms as Perl itself.
 
 =cut
 
-# $Date: 2002/10/14 06:58:35 $
+# $Date: 2002/12/12 08:17:16 $
 ### SJIS.pm ends here

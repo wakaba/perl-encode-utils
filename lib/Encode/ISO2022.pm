@@ -41,7 +41,7 @@ require v5.7.3;
 package Encode::ISO2022;
 use strict;
 use vars qw(%CHARSET %CODING_SYSTEM $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.10 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.11 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use base qw(Encode::Encoding);
 __PACKAGE__->Define (qw!iso-2022 iso/iec2022 iso2022 2022 cp2022!);
 require Encode::Charset;
@@ -773,5 +773,4 @@ and/or modify it under the same terms as Perl itself.
 
 =cut
 
-# $Date: 2002/10/16 10:39:35 $
-### ISO2022.pm ends here
+# $Date: 2002/12/12 08:17:16 $

@@ -2,7 +2,7 @@ package Encode::HZ;
 use strict;
 
 use vars qw($VERSION);
-$VERSION = do {my @r =(q$Revision: 1.4 $ =~ /\d+/g);sprintf "%d."."%02d" x $#r, @r};
+$VERSION = do {my @r =(q$Revision: 1.5 $ =~ /\d+/g);sprintf "%d."."%02d" x $#r, @r};
 use base qw(Encode::Encoding);
 __PACKAGE__->Define(qw/hz chinese-hz hz-gb-2312 hz-gb2312 cp52936/);
 
@@ -25,22 +25,24 @@ sub decode
 		|		#     or
 	    \{			# opening brace of GB data
 		(		#  set $2 to any number of...
-		    (?:	
-			[^~]	#  non-tilde GB character
-			    |   #     or
-			~(?!\}) #  tilde not followed by a closing brace
-		    )*
+		    (?:[\x21-\x7D][\x21-\x7E])*
 		)
 	    ~\}			# closing brace of GB data
-		|		# XXX: invalid escape - maybe die on $chk?
+	        |
+	    \{
+	        ((?:[\x21-\x7D][\x21-\x7E])+[\x0D\x0A])
+	#	|		# XXX: invalid escape - maybe die on $chk?
 	)
     }{
-      my ($t, $c) = ($1, $2);
+      my ($t, $c, $d) = ($1, $2, $3);
       if (defined $t) {	# two tildes make one tilde
         '~';
       } elsif (defined $c) {	# decode the characters
         $c =~ tr/\x21-\x7E/\xA1-\xFE/;
         $gb->decode($c, $chk);
+      } elsif (defined $d) {	# decode the characters
+        $d =~ tr/\x21-\x7E/\xA1-\xFE/;
+        $gb->decode($d, $chk);
       } else {	# ~\n and invalid escape = ''
         '';
       }
@@ -161,5 +163,5 @@ and/or modify it under the same terms as Perl itself.
 
 =cut
 
-# $Date: 2002/10/14 06:58:35 $
+# $Date: 2002/12/12 08:17:16 $
 ### HZ.pm ends here
