@@ -1,8 +1,8 @@
-require 5.8.0;
+require 5.7.3;
 package Encode::Unicode::UTF1;
 use strict;
-use vars qw(%DEFAULT $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+use vars qw($VERSION);
+$VERSION=do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use base qw(Encode::Encoding);
 __PACKAGE__->Define (qw/ISO-10646-UTF-1 utf-1 utf1 csISO10646UTF1 iso-ir-178/);
 
@@ -112,6 +112,6 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/07/25 11:24:36 $
+$Date: 2002/08/16 12:09:21 $
 
 =cut
