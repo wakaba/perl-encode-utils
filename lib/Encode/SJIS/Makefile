@@ -3,7 +3,7 @@ PERLINC = ../../
 PERLOPTION = -I$(PERLINC)
 ESR2PM = ../Table/tool/esr2pm.pl
 
-PMS = JIS.pm
+PMS = JIS.pm Pictogram.pm
 
 all: $(PMS)
 

@@ -41,7 +41,7 @@ require v5.7.3;
 package Encode::ISO2022;
 use strict;
 use vars qw(%CHARSET %CODING_SYSTEM $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.13 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.14 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use base qw(Encode::Encoding);
 __PACKAGE__->Define (qw!iso-2022 iso/iec2022 iso2022 2022 cp2022!);
 require Encode::Charset;
@@ -483,7 +483,7 @@ sub internal_to_iso2022 ($;%) {
               reason => sprintf (q(U+%04X: There is no character mapped to), $cc));
     } else {
       ## Try to output with fallback escape sequence (if specified)
-      my $t = Encode::Charset::fallback_escape ($C, $c);
+      my $t = Encode::Charset->fallback_escape ($C, $c);
       if (defined $t) {
         my %D = (fallback => $C->{option}->{fallback_from_ucs}, reset => $C->{option}->{reset});
         $C->{option}->{fallback_from_ucs} = 'croak';
@@ -795,4 +795,4 @@ and/or modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2002/12/16 10:25:01 $
+1; # $Date: 2002/12/18 10:21:09 $

@@ -16,7 +16,7 @@ for Shift JISes are included in Encode::SJIS::*.
 package Encode::SJIS;
 use 5.7.3;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.5 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.6 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Encode::Charset;
 use base qw(Encode::Encoding);
 
@@ -52,13 +52,27 @@ sub sjis_to_internal ($$) {
         $f -= $f < 0xA0 ? 0x81 : 0xC1;  $s -= 0x40 + ($s > 0x7F);
         chr ($C->{G1}->{ucs} + $f * 188 + $s);
       } else {	## [\xF0-\xFC].
-        my ($f, $s) = unpack ('CC', $c2);
-        if ($C->{G3}->{Csjis_kuE}) {
-          $f = $s > 0x9E ? $C->{G3}->{Csjis_kuE}->{ $f }:
-                           $C->{G3}->{Csjis_kuO}->{ $f };
-          $s -= ($s > 0x9E ? 0x9F : $s > 0x7F ? 0x41 : 0x40);
-          chr ($C->{G3}->{ucs} + $f * 94 + $s);
-        } else {
+        my ($f, $s) = (ord substr ($c2, 0, 1), ord substr ($c2, 1, 1));
+        if ($C->{G3}->{Csjis_kuE}) {	## 94^2 set with first-byte->ku mapping
+          my $F = $s > 0x9E ? $C->{G3}->{Csjis_kuE}->{ $f }:	## ku of even number
+                              $C->{G3}->{Csjis_kuO}->{ $f };	## ku of odd number
+          if (defined $F) {
+            $s -= ($s > 0x9E ? 0x9F : $s > 0x7F ? 0x41 : 0x40);
+            chr ($C->{G3}->{ucs} + $F * 94 + $s);
+          } else {	## Mapping is not defined
+            $f -= 0xF0; $s -= 0x40 + ($s > 0x7F);
+            chr ($Encode::Charset::CHARSET{G94n}->{"\x20\x40"}->{ucs} + $f * 188 + $s);
+          }
+        } elsif ($C->{G3}->{Csjis_ku}) {	## n^2 set with first-byte->ku mapping
+          if (defined $C->{G3}->{Csjis_ku}->{ $f }) {
+            $f = $C->{G3}->{Csjis_ku}->{ $f };
+            $s -= ($s > 0x9E ? 0x9F : $s > 0x7F ? 0x41 : 0x40);
+            chr ($C->{G3}->{ucs} + $f * $C->{G3}->{chars} + $s);
+          } else {	## Mapping is not defined
+            $f -= 0xF0; $s -= 0x40 + ($s > 0x7F);
+            chr ($Encode::Charset::CHARSET{G94n}->{"\x20\x40"}->{ucs} + $f * 188 + $s);
+          }
+        } else {	## 94^2 set without special mapping information
           $f -= 0xF0; $s -= 0x40 + ($s > 0x7F);
           chr ($C->{G3}->{ucs} + $f * 188 + $s);
         }
@@ -150,6 +164,16 @@ sub internal_to_sjis ($\%) {
                if ($c / 188) + 0xF0 < 0xFD;
         }
       }
+    ## Non-ISO/IEC 2022 Coded Character Sets Mapping Area
+    } elsif (0x71000000 <= $cc && $cc <= 0x71FFFFFF) {
+      if ($C->{G3}->{ucs} <= $cc) {
+        my $c = $cc - $C->{G3}->{ucs};
+        my $f = $C->{G3}->{Csjis_first}->{$c / $C->{G3}->{chars}};
+        if ($f) {
+          my $s = $c % $C->{G3}->{chars};
+          $t = pack ('CC', $f, 0x40 + $s + ($s > 62));
+        }
+      }
     ## Other character sets are not supported now (and there is no plan to implement them).
     }
     
@@ -169,14 +193,12 @@ sub internal_to_sjis ($\%) {
     ## 
     } else {
       ## Try to output with fallback escape sequence (if specified)
-      my $t = Encode::Charset::fallback_escape ($C, $c);
+      my $t = Encode::Charset->fallback_escape ($C, $c);
       if (defined $t) {
         my %D = (fallback => $C->{option}->{fallback_from_ucs}, reset => $C->{option}->{reset});
         $C->{option}->{fallback_from_ucs} = 'croak';
-        $C->{option}->{reset} = {Gdesignation => 0, Ginvoke => 0};
         eval q{$t = $C->{_encoder}->_encode_internal ($t, $C)} or undef $t;
         $C->{option}->{fallback_from_ucs} = $D{fallback};
-        $C->{option}->{reset} = $D{reset};
       }
       if (defined $t) {
         $r .= $t;
@@ -186,6 +208,35 @@ sub internal_to_sjis ($\%) {
     }
   }
   $r;
+}
+
+sub page_to_internal ($$) {
+  my ($C, $s) = @_;
+  $s = pack ('U*', unpack ('C*', $s));
+  $s =~ s(\x1B\x24([EFGOPQ])([\x21-\x7E]+)\x0F)(
+    my $page = {qw/E 1 F 2 G 3 O 4 P 5 Q 6/}->{$1};
+    my $r = '';
+    for my $c (split //, $2) {
+      $r .= chr ($Encode::Charset::CHARSET{G94}->{'CSpictogram_page_'.$page}->{ucs} + ord ($c) - 0x21);
+    }
+    $r;
+  )gex;
+  $s;
+}
+
+sub _internal_to_page ($$$%) {
+  my ($yourself, $C, $c, $option) = @_;
+  my $cc = ord $c;
+  for my $page (1..6) {
+    my $cs = $Encode::Charset::CHARSET{G94}->{'CSpictogram_page_'.$page};
+    if ($cs->{ucs} <= $cc && $cc < $cs->{ucs} + $cs->{chars} * $cs->{dimension}) {
+      return "\x1B\x24" . ([qw/_ E F G O P Q/]->[$page])
+            .pack ('C', 0x21 + $cc - $cs->{ucs}) . "\x0F";
+    }
+  }
+  ## $c is not a pictogram
+  $option->{fallback_from_ucs} = $C->{option}->{fallback_from_ucs_2};
+  $yourself->fallback_escape ($C, $c, %$option);
 }
 
 =back
@@ -215,4 +266,4 @@ and/or modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2002/12/16 10:25:01 $
+1; # $Date: 2002/12/18 10:21:09 $

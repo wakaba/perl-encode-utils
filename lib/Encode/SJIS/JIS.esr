@@ -52,7 +52,7 @@ Cversion:
 	C:G0=G94:J	## JIS X 0201:1997 Graphic character set for Latin letters
 	C:G1=G94n:B@	## JIS X 0208:1997
 	C:G2=G94:I	## JIS X 0201:1997 Graphic character set for Katakana
-	C:G3=G94n: @	## undefined
+	C:G3=G94n:~	## undefined
 	C:option:{undef_char}=["\x22\x2E", {type => 'G94n', charset => 'B', revision => '@'}]
 Encode:
 	=>ucs_to_jisx0201_latin ucs_to_jisx0208_1997 ucs_to_jisx0201_katakana
@@ -82,7 +82,7 @@ Cversion:
 	C:G0=G94:B	## ISO/IEC 646:1991 IRV
 	C:G1=G94n:B@	## JIS X 0208:1997
 	C:G2=G94:I	## JIS X 0201:1997 Graphic character set for Katakana
-	C:G3=G94n: @	## undefined
+	C:G3=G94n:~	## undefined
 	C:option:{undef_char}=["\x22\x2E", {type => 'G94n', charset => 'B', revision => '@'}]
 Encode:
 	=>ucs_to_ascii ucs_to_jisx0208_1997 ucs_to_jisx0201_katakana
@@ -156,7 +156,7 @@ Cversion:
 	C:G0=G94:J	## JIS X 0201:1997 Graphic character set for Latin letters
 	C:G1=G94n:O	## JIS X 0213:2000 plane 1
 	C:G2=G94:I	## JIS X 0201:1997 Graphic character set for Katakana
-	C:G3=G94n: @	## undefined
+	C:G3=G94n:~	## undefined
 	C:option:{undef_char}=["\x22\x2E", {type => 'G94n', charset => 'O'}]
 Encode:
 	=>ucs_to_jisx0201_latin ucs_to_jisx0213_2000_1 ucs_to_jisx0201_katakana

@@ -1,3 +1,16 @@
+2002-12-18  Wakaba  <w@suika.fam.cx>
+
+	* Charset.pm (fallback_escape): $option{fallback_from_ucs} is supported.
+	An argument is added (in order to do Encode::Charset->fallback_escape).
+	* ISO2022.pm (internal_to_iso2022): Use Encode::Charset->fallback_escape.
+	* SJIS.pm (internal_to_sjis): Likewise.
+	(page_to_internal, _internal_to_page): New.
+
+2002-12-17  Wakaba  <w@suika.fam.cx>
+
+	* SJIS.pm (sjis_to_internal, internal_to_sjis): 256^2 charset is supported
+	for G3 set.
+
 2002-12-16  Wakaba  <w@suika.fam.cx>
 
 	* SJIS.pm (sjis, sjis-ascii, shift_jisx0213, shift_jisx0213-ascii): Removed.

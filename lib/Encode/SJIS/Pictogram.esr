@@ -1,0 +1,139 @@
+#?PESRC/1.0
+Name:
+	SJIS::Pictogram
+ShortDescription:
+	The Encode module for shift JIS coding systems
+Description:
+	This module defines convertion between perl internal
+	representation and shift JIS coding systems defined
+	in standards of JIS (Japan Industrial Standards).
+
+{
+Name:
+	sjis-imode
+Alias:
+	x-sjis-imode
+Cversion:
+	use:charset:Pictogram
+	C:bit=8
+	C:G0=G94:J	## JIS X 0201:1997 Graphic character set for Latin letters
+	C:G1=G94n:B@	## JIS X 0208:1997
+	C:G2=G94:I	## JIS X 0201:1997 Graphic character set for Katakana
+	C:G3=G256n:CSimode_g3	## i-mode pictograph set
+	C:option:{undef_char}=["\x22\x2E", {type => 'G94n', charset => 'B', revision => '@'}]
+Encode:
+	=>ucs_to_jisx0201_latin ucs_to_jisx0208_1997_latin ucs_to_jisx0201_katakana_hw ucs_to_imode
+	->sjis:C
+Decode:
+	<-sjis:C
+	<=jisx0201_latin_to_ucs jisx0208_1997_latin_to_ucs jisx0201_katakana_hw_to_ucs imode_to_ucs
+Description:
+	Shift JIS with i-mode extended pictographs
+}
+
+{
+Name:
+	sjis-lmode
+Alias:
+	x-sjis-lmode
+Cversion:
+	use:charset:Pictogram
+	C:bit=8
+	C:G0=G94:J	## JIS X 0201:1997 Graphic character set for Latin letters
+	C:G1=G94n:B@	## JIS X 0208:1997
+	C:G2=G94:I	## JIS X 0201:1997 Graphic character set for Katakana
+	C:G3=G256n:CSlmode_g3	## L-mode pictograph set
+	C:option:{undef_char}=["\x22\x2E", {type => 'G94n', charset => 'B', revision => '@'}]
+Encode:
+	=>ucs_to_jisx0201_latin ucs_to_jisx0208_1997_latin ucs_to_jisx0201_katakana_hw ucs_to_lmode
+	->sjis:C
+Decode:
+	<-sjis:C
+	<=jisx0201_latin_to_ucs jisx0208_1997_latin_to_ucs jisx0201_katakana_hw_to_ucs lmode_to_ucs
+Description:
+	Shift JIS with L-mode extended pictographs
+}
+
+{
+Name:
+	sjis-doti
+Alias:
+	x-sjis-doti
+Cversion:
+	use:charset:Pictogram
+	C:bit=8
+	C:G0=G94:J	## JIS X 0201:1997 Graphic character set for Latin letters
+	C:G1=G94n:B@	## JIS X 0208:1997
+	C:G2=G94:I	## JIS X 0201:1997 Graphic character set for Katakana
+	C:G3=G256n:CSdoti_g3	## dot-i pictograph set
+	C:option:{undef_char}=["\x22\x2E", {type => 'G94n', charset => 'B', revision => '@'}]
+Encode:
+	=>ucs_to_jisx0201_latin ucs_to_jisx0208_1997_latin ucs_to_jisx0201_katakana_hw ucs_to_doti
+	->sjis:C
+Decode:
+	<-sjis:C
+	<=jisx0201_latin_to_ucs jisx0208_1997_latin_to_ucs jisx0201_katakana_hw_to_ucs doti_to_ucs
+Description:
+	Shift JIS with dot-i extended pictographs
+}
+
+{
+Name:
+	sjis-jphone
+Alias:
+	x-sjis-jphone
+Cversion:
+	use:charset:Pictogram
+	C:bit=8
+	C:G0=G94:J	## JIS X 0201:1997 Graphic character set for Latin letters
+	C:G1=G94n:B@	## JIS X 0208:1997
+	C:G2=G94:I	## JIS X 0201:1997 Graphic character set for Katakana
+	C:G3=G94n:~	## undef
+	C:option:{undef_char}=["\x22\x2E", {type => 'G94n', charset => 'B', revision => '@'}]
+Encode:Prepare:
+	C:option:{fallback_from_ucs}=\&Encode::SJIS::_internal_to_page
+Encode:
+	=>ucs_to_jisx0201_latin ucs_to_jisx0208_1997_latin ucs_to_jisx0201_katakana_hw ucs_to_jphone
+	->sjis:C
+Decode:
+	!& Encode::SJIS::page_to_internal
+	<-sjis:C
+	<=jisx0201_latin_to_ucs jisx0208_1997_latin_to_ucs jisx0201_katakana_hw_to_ucs jphone_to_ucs
+Description:
+	Shift JIS with JPHONE extended pictographs
+	
+	RESTRICTION: In current implemention, pictograms can't be outputed in
+	shortest form.  For example, C<0x1B 0x24 0x45 0x41 0x0F 0x1B 0x24 0x45 0x42 0x0F>
+	can be represented as C<0x1B 0x24 0x45 0x41 0x42 0x0F> but this encoder
+	always output former style.  (Although it is lengthy, it does not mean
+	invalid and decoder supprots both form.)
+}
+
+POD:ENCODING:POSTAMBLE:
+	
+
+POD:SEE ALSO:
+	[ASTEL] "Astel Pictograms",
+	<http://www.yozan.co.jp/asteltokyo/doti/siyou/emoji.htm>.
+	
+	[JGUIDE] "HTML Contents for J-Sky Service Development Guide", J-Phone Co., LTD,
+	2002-01-15, <http://www.dp.j-phone.com/file/JSkyHTMLGuide_20020115.pdf>.
+	See also <http://www.dp.j-phone.com/jsky/tech.html>.
+	(Note that J-PHONE and J-SKY is the trademarks or registered trademarks
+	of J-PHONE Corporation.)
+	
+	[LSPEC] "'L-mode' Technical Specification for Contents Providers, Version 2.2",
+	Nippon Telegraph and Telephone East Corporation,
+	Nippon Telegraph and Telephone West Corportation, 2002-11.
+	Available from <http://www.ntt-east.co.jp/Lmode/06_contents/02_tsukuri.html>.
+	(Note that L-mode is the trade mark of NTT EAST and WEST.)
+	
+	SuikaWiki:"Extention to Shift JIS on portable phones"
+	<http://suika.fam.cx/~wakaba/-temp/wiki/wiki?%B7%C8%C2%D3%C5%C5%CF%C3%A4%CE%A5%B7%A5%D5%A5%C8JIS%B3%C8%C4%A5>
+	
+	L<Encode::SJIS>
+
+POD:LICENSE:
+	Copyright %%YEAR%% Nanashi-san <nanashi-san@nanashi.invalid>
+	
+	%%PerlLicense%%

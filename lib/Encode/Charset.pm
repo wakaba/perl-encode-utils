@@ -9,7 +9,7 @@ used by Encode::ISO2022, Encode::SJIS, and other modules.
 package Encode::Charset;
 use strict;
 use vars qw(%CHARSET %CODING_SYSTEM $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.6 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.7 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 ## --- Make initial charset definitions
 &_make_initial_charsets;
@@ -289,19 +289,24 @@ sub new_object_sjis {
 }
 
 our %FallbackFromUCS = (
-	perl	=> sub { my $c = $_[1]; sprintf '\x{%04X}', ord $c },
-	sgml	=> sub { my $c = $_[1]; sprintf '&#%d;', ord $c },
-	'sgml-hex'	=> sub { my $c = $_[1]; sprintf '&#x%04X;', ord $c },
-	'x-u-escaped'	=> sub { my $c = $_[1]; my $C = ord $c; sprintf $C > 0xFFFF ? '\U%08X' : '\u%04X', $C },
+	perl	=> sub { my $c = $_[2]; sprintf '\x{%04X}', ord $c },
+	sgml	=> sub { my $c = $_[2]; sprintf '&#%d;', ord $c },
+	'sgml-hex'	=> sub { my $c = $_[2]; sprintf '&#x%04X;', ord $c },
+	'x-u-escaped'	=> sub { my $c = $_[2]; my $C = ord $c; sprintf $C > 0xFFFF ? '\U%08X' : '\u%04X', $C },
 );
 
-sub fallback_escape ($$;%) {
-  my ($C, $c, %option) = @_;
-  my $f = ref ($C->{option}->{fallback_from_ucs}) eq 'CODE' ? $C->{option}->{fallback_from_ucs} :
-          $FallbackFromUCS{$C->{option}->{fallback_from_ucs}};
+sub fallback_escape ($$$;%) {
+  my (undef, $C, $c, %option) = @_;
+  my $f = $option{fallback_from_ucs} ?
+            (ref ($option{fallback_from_ucs}) eq 'CODE' ? $option{fallback_from_ucs} :
+             $FallbackFromUCS{$option{fallback_from_ucs}}):
+            (ref ($C->{option}->{fallback_from_ucs}) eq 'CODE' ? $C->{option}->{fallback_from_ucs} :
+             $FallbackFromUCS{$C->{option}->{fallback_from_ucs}});
   if (ref $f) {
+    return undef if $option{_recursive} <= -10;  $option{_recursive}--;	## To avoid loop
+    my $self = bless {}, __PACKAGE__;
     Encode::_utf8_on ($c);
-    return &$f ($C, $c, %option);
+    return &$f ($self, $C, $c, \%option);
   }
   undef;
 }
@@ -321,4 +326,4 @@ and/or modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2002/12/14 11:02:25 $
+1; # $Date: 2002/12/18 10:21:09 $
