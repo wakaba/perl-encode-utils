@@ -1,3 +1,16 @@
+2002-12-16  Wakaba  <w@suika.fam.cx>
+
+	* JIS.esr: Definition of Shift JIS coding systems are moved from
+	../SJIS.pm and ./JIS.pm.
+	* JIS.pm: Removed.
+
+2002-12-15  Wakaba  <w@suika.fam.cx>
+
+	* Makefile: New file.
+
+	* Makefile (%.pm): Do syntax check of outputed perl module.
+	* JIS.esr: New file.
+
 2002-10-12  Nanashi-san
 
 	* JIS.pm: New module.

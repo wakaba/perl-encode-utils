@@ -1,0 +1,174 @@
+#?PESRC/1.0
+Name:
+	SJIS::JIS
+ShortDescription:
+	The Encode module for shift JIS coding systems
+Description:
+	This module defines convertion between perl internal
+	representation and shift JIS coding systems defined
+	in standards of JIS (Japan Industrial Standards).
+
+{
+Name:
+	shift-jis-1997
+Alias:
+	shift_jis csshiftjis japanese-shift-jis
+Cversion:
+	C:bit=8
+	C:G0=G94:J	## JIS X 0201:1997 Graphic character set for Latin letters
+	C:G1=G94n:B@	## JIS X 0208:1997
+	C:G2=G94:I	## JIS X 0201:1997 Graphic character set for Katakana
+	C:G3=G94n: @	## undefined
+	C:option:{undef_char}=["\x22\x2E", {type => 'G94n', charset => 'B', revision => '@'}]
+Encode:
+	=>ucs_to_jisx0201_latin ucs_to_jisx0208_1997 ucs_to_jisx0201_katakana
+	->sjis:C
+Decode:
+	<-sjis:C
+	<=jisx0201_latin_to_ucs jisx0208_1997_to_ucs jisx0201_katakana_to_ucs
+Description:
+	Shift coded representation defined by JIS X 0208:1997 Appendix 1.
+	
+	Note that although IANA registry [IANAREG] assignes the name "MS_Kanji"
+	as an alias of "Shift_JIS", in this module this name is not aliased
+	for the shift-coded representation of JIS X 0208, since it is more
+	apropreate to associate this name with
+	Microsoft-defined-Shift-JIS.  (Microsoft's shift JIS is a superset of
+	"shifted" form of JIS X 0208-1990, so it causes no problem to decode,
+	despite MS Shift JIS does not comform to JIS X 0208:1997.)
+}
+
+{
+Name:
+	shift-jis-1997-ascii
+Alias:
+	shift_jis-ascii
+Cversion:
+	C:bit=8
+	C:G0=G94:B	## ISO/IEC 646:1991 IRV
+	C:G1=G94n:B@	## JIS X 0208:1997
+	C:G2=G94:I	## JIS X 0201:1997 Graphic character set for Katakana
+	C:G3=G94n: @	## undefined
+	C:option:{undef_char}=["\x22\x2E", {type => 'G94n', charset => 'B', revision => '@'}]
+Encode:
+	=>ucs_to_ascii ucs_to_jisx0208_1997 ucs_to_jisx0201_katakana
+	->sjis:C
+Decode:
+	<-sjis:C
+	<=jisx0208_1997_to_ucs jisx0201_katakana_to_ucs
+Description:
+	Same as shift-jis-1997 but ASCII (ISO/IEC 646 IRV)
+	instead of JIS X 0201:1997 Latin character set.
+	
+	Note that this coding system does NOT comform to
+	JIS X 0208:1997 Appendix 1.
+}
+
+{
+Name:
+	shift_jisx0213
+Alias:
+	japanese-shift-jisx0213 shift-jisx0213 x-shift_jisx0213 shift-jis-3 shift-jis-2000 sjisx0213
+Cversion:
+	C:bit=8
+	C:G0=G94:J	## JIS X 0201:1997 Graphic character set for Latin letters
+	C:G1=G94n:O	## JIS X 0213:2000 plane 1
+	C:G2=G94:I	## JIS X 0201:1997 Graphic character set for Katakana
+	C:G3=G94n:P	## JIS X 0213:2000 plane 2
+	C:option:{undef_char}=["\x22\x2E", {type => 'G94n', charset => 'O'}]
+Encode:
+	=>ucs_to_jisx0201_latin ucs_to_jisx0213_2000_1 ucs_to_jisx0213_2000_2 ucs_to_jisx0201_katakana
+	->sjis:C
+Decode:
+	<-sjis:C
+	<=jisx0201_latin_to_ucs jisx0213_2000_1_to_ucs jisx0213_2000_2_to_ucs jisx0201_katakana_to_ucs
+Description:
+	Shift_JISX0213 coded representation, defined by
+	JIS X 0213:2000 Appendix 1 (implemention level 4).
+}
+
+{
+Name:
+	shift_jisx0213-ascii
+Alias:
+	shift-jis-2000-ascii
+Cversion:
+	C:bit=8
+	C:G0=G94:B	## ISO/IEC 646:1991 IRV
+	C:G1=G94n:O	## JIS X 0213:2000 plane 1
+	C:G2=G94:I	## JIS X 0201:1997 Graphic character set for Katakana
+	C:G3=G94n:P	## JIS X 0213:2000 plane 2
+	C:option:{undef_char}=["\x22\x2E", {type => 'G94n', charset => 'O'}]
+Encode:
+	=>ucs_to_ascii ucs_to_jisx0213_2000_1 ucs_to_jisx0213_2000_2 ucs_to_jisx0201_katakana
+	->sjis:C
+Decode:
+	<-sjis:C
+	<=jisx0213_2000_1_to_ucs jisx0213_2000_2_to_ucs jisx0201_katakana_to_ucs
+Description:
+	Same as Shift_JISX0213 but using ASCII (ISO/IEC 646 IRV)
+	instead of JIS X 0201:1997 Latin character set.
+	(Alias: shift-jis-2000-ascii)
+	
+	Note that this coding system does NOT comform to
+	JIS X 0213:2000 Appendix 1.
+}
+
+{
+Name:
+	shift_jisx0213-plane1
+Cversion:
+	C:bit=8
+	C:G0=G94:J	## JIS X 0201:1997 Graphic character set for Latin letters
+	C:G1=G94n:O	## JIS X 0213:2000 plane 1
+	C:G2=G94:I	## JIS X 0201:1997 Graphic character set for Katakana
+	C:G3=G94n: @	## undefined
+	C:option:{undef_char}=["\x22\x2E", {type => 'G94n', charset => 'O'}]
+Encode:
+	=>ucs_to_jisx0201_latin ucs_to_jisx0213_2000_1 ucs_to_jisx0201_katakana
+	->sjis:C
+Decode:
+	<-sjis:C
+	<=jisx0201_latin_to_ucs jisx0213_2000_1_to_ucs jisx0201_katakana_to_ucs
+Description:
+	Shift_JISX0213-plane1 coded representation defined by JIS X 0213:2000
+	Appendix 1 (i.e. implemention level 3).
+}
+
+POD:ENCODING:POSTAMBLE:
+	Shift JISes using alternative character names defined
+	by JIS X 0208:1997 or JIS X 0213:2000 (so some characters
+	are mapped to HALFWIDTH or FULLWIDTH area of UCS) are not
+	included in this module but in L<Encode::SJIS::JISCompatible>.
+	
+	Shift JISes with JIS X 0208-1978, -1983, -1990 are not
+	included in this module since these standards did NOT
+	define them (but some vendor did implement them as non-standard
+	encodings).  They are defined in Encode::SJIS::* modules
+	other than this.
+	
+	Being ones of Shift JISes defined in *JIS* TR, Shift JIS
+	variants defined by JIS TR X 0015 "XML Japanese profile"
+	is not supported by this module, but by other Encode::SJIS::*
+	modulss.  Shift JISes which is given their names by JIS TR X 0015
+	are all vendor defined variants of Shift JISes and do NOT part
+	of formal JIS coded character set standards NOR comform to
+	those standards.  (It might sound strange that JIS TR defines
+	names for encodings clealy not comforming to JIS standards.
+	JIS TR "standalization" process is much looser than JIS standard's.)
+
+POD:SEE ALSO:
+	%%ReferenceJISX0201_1997%%
+	
+	%%ReferenceJISX0208_1997%%
+	
+	%%ReferenceJISX0213_2000%%
+	
+	L<Encode::SJIS>
+	
+	%%ReferemceIANAREG%%
+
+POD:LICENSE:
+	Copyright %%YEAR%% Nanashi-san <nanashi-san@nanashi.invalid>
+	
+	%%PerlLicense%%
