@@ -1,3 +1,10 @@
+2002-12-14  Wakaba  <w@suika.fam.cx>
+
+	* Charset.pm (%FallbackFromUCS): New hash.
+	(fallback_escape): New function.
+	($C->{option}->{fallback_from_ucs}): New option parameter.
+	* ISO2022.pm (internal_to_iso2022): Fallback support.
+
 2002-12-12  Wakaba  <w@suika.fam.cx>
 
 	* MNEM/, Restore/: New directories.

@@ -9,7 +9,7 @@ used by Encode::ISO2022, Encode::SJIS, and other modules.
 package Encode::Charset;
 use strict;
 use vars qw(%CHARSET %CODING_SYSTEM $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.5 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.6 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 ## --- Make initial charset definitions
 &_make_initial_charsets;
@@ -240,6 +240,10 @@ sub new_object {
   			default => -1,
   		},
   	},
+  	fallback_from_ucs	=> 'replacement',
+  		## 'replacement' / 'perl' / 'sgml' / 'sgml-hex' / 'x-u-escaped' / 'code'
+  		## / 'quiet' / 'quiet+back' / 'quiet+warn' / 'quiet+back+warn' / 'croak'
+  		## / code
   	final_to_set	=> {
   		C0 => {}, C1 => {}, G94 => {}, G94n => {},
   		G96 => {}, G96n => {}, coding_system => {},
@@ -284,23 +288,37 @@ sub new_object_sjis {
   $C;
 }
 
-1;
-__END__
+our %FallbackFromUCS = (
+	perl	=> sub { my $c = $_[1]; sprintf '\x{%04X}', ord $c },
+	sgml	=> sub { my $c = $_[1]; sprintf '&#%d;', ord $c },
+	'sgml-hex'	=> sub { my $c = $_[1]; sprintf '&#x%04X;', ord $c },
+	'x-u-escaped'	=> sub { my $c = $_[1]; my $C = ord $c; sprintf $C > 0xFFFF ? '\U%08X' : '\u%04X', $C },
+);
+
+sub fallback_escape ($$;%) {
+  my ($C, $c, %option) = @_;
+  my $f = ref ($C->{option}->{fallback_from_ucs}) eq 'CODE' ? $C->{option}->{fallback_from_ucs} :
+          $FallbackFromUCS{$C->{option}->{fallback_from_ucs}};
+  if (ref $f) {
+    Encode::_utf8_on ($c);
+    return &$f ($C, $c, %option);
+  }
+  undef;
+}
 
 =head1 AUTHORS
 
-Nanashi-san
+Nanashi-san <nanashi-san@nanashi.invalid>
 
 Wakaba <w@suika.fam.cx>
 
 =head1 LICENSE
 
-Copyright 2002 AUTHORS
+Copyright 2002 AUTHORS, all rights reserved.
 
 This library is free software; you can redistribute it
 and/or modify it under the same terms as Perl itself.
 
 =cut
 
-# $Date: 2002/10/16 10:39:35 $
-### Charset.pm ends here
+1; # $Date: 2002/12/14 11:02:25 $

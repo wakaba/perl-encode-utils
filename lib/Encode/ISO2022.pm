@@ -41,7 +41,7 @@ require v5.7.3;
 package Encode::ISO2022;
 use strict;
 use vars qw(%CHARSET %CODING_SYSTEM $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.11 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.12 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use base qw(Encode::Encoding);
 __PACKAGE__->Define (qw!iso-2022 iso/iec2022 iso2022 2022 cp2022!);
 require Encode::Charset;
@@ -342,8 +342,9 @@ sub internal_to_iso2022 ($;%) {
   $C ||= &new_object;
   
   my $r = '';
-  for my $c (split //, $s) {
-    my $cc = ord $c;  Encode::_utf8_off ($c);
+  my @c = split //, $s;
+  for my $i (0..$#c) {
+    my $c = $c[$i]; my $cc = ord $c;  Encode::_utf8_off ($c);
     my $t;
     if ($cc <= 0x1F) {
       $t = _i2c ($c, $C, type => 'C0', charset => '@');
@@ -452,9 +453,11 @@ sub internal_to_iso2022 ($;%) {
                        ->[ ($cc / 0x10000) - 0x7042 ]->[ $c / 8836 ]);
     }
     if (defined $t) {
+      ## Back to ISO/IEC 2022 if necessary
       $t = _i2o ($t, $C, cs_F => "\x40")
         if $C->{coding_system} ne $CODING_SYSTEM{"\x40"};
     } else {
+      ## Output in UCS-n or UTF-n if character can't be represented in ISO/IEC 2022
       my $F;  my @F = qw~G /G /H /I  B  /A /D /F~;
       push @F, qw~/J /K /L~ if $cc <= 0x10FFFF;
       push @F, qw~/@ /C /E~ if $cc <= 0xFFFF;
@@ -468,20 +471,42 @@ sub internal_to_iso2022 ($;%) {
       }
       $t = _i2o ($c, $C, cs_F => $F) if $F;
     }
-    if (defined $t) {
+    if (defined $t) {	## Output character itself
       $r .= $t;
+    } elsif ($C->{option}->{fallback_from_ucs} =~ /quiet/) {
+      $r .= _back2ascii ($C) if $C->{option}->{fallback_from_ucs} =~ /back/;
+      return ($r, halfway => 1, converted_length => $i,
+              warn => $C->{option}->{fallback_from_ucs} =~ /warn/ ? 1 : 0,
+              reason => sprintf (q(U+%04X: There is no character mapped to), $cc));
+    } elsif ($C->{option}->{fallback_from_ucs} eq 'croak') {
+      return ($r, halfway => 1, die => 1,
+              reason => sprintf (q(U+%04X: There is no character mapped to), $cc));
     } else {
-      unless ($C->{option}->{undef_char}->[0] eq "\x20") {
-        $t = _i2g ($C->{option}->{undef_char}->[0], $C,
-                    %{ $C->{option}->{undef_char}->[1] });
-      } else {	## SP
-        $t = _back2ascii ($C) . "\x20";
+      ## Try to output with fallback escape sequence (if specified)
+      my $t = Encode::Charset::fallback_escape ($C, $c);
+      if (defined $t) {
+        my %D = (fallback => $C->{option}->{fallback_from_ucs}, reset => $C->{option}->{reset});
+        $C->{option}->{fallback_from_ucs} = 'croak';
+        $C->{option}->{reset} = {Gdesignation => 0, Ginvoke => 0};
+        eval q{$t = $C->{_encoder}->_encode_internal ($t, $C)} or undef $t;
+        $C->{option}->{fallback_from_ucs} = $D{fallback};
+        $C->{option}->{reset} = $D{reset};
       }
-      $r .= $C->{coding_system} eq $CODING_SYSTEM{"\x40"} ?
-            $t : _i2o ($t, $C, cs_F => "\x40");
+      if (defined $t) {
+        $r .= $t;
+      } else {	## Replacement character specified in charset definition
+        unless ($C->{option}->{undef_char}->[0] eq "\x20") {	## A graphic character
+          $t = _i2g ($C->{option}->{undef_char}->[0], $C,
+                      %{ $C->{option}->{undef_char}->[1] });
+        } else {	## SPACE
+          $t = _back2ascii ($C) . "\x20";
+        }
+        $r .= $C->{coding_system} eq $CODING_SYSTEM{"\x40"} ?
+              $t : _i2o ($t, $C, cs_F => "\x40");
+      }
     }
   }
-  $r . _back2ascii ($C);
+  ($r . _back2ascii ($C));	## Back to ASCII at the end of document if specified
 }
 
 ## $O{charset} eq undef means that charset is same as the current designated one.
@@ -689,9 +714,6 @@ sub _i2o ($\%%) {
   $r . $s;
 }
 
-1;
-__END__
-
 =head1 SEE ALSO
 
 ISO/IEC 646:1991, "7-bit coded graphic character set for intormation interchange".
@@ -707,7 +729,7 @@ ISO/IEC 6429:1992, "Control Functions for Coded Character Sets".
 
 ISO/IEC 8859, "8-Bit Single-Byte Coded Graphic Character Sets".
 
-Encode, perlunicode
+L<Encode>, perlunicode
 
 =head1 TODO
 
@@ -760,17 +782,17 @@ not implemented yet.
 
 =head1 AUTHORS
 
-Nanashi-san
+Nanashi-san  <nanashi.san@nanashi.invalid>
 
 Wakaba <w@suika.fam.cx>
 
 =head1 LICENSE
 
-Copyright 2002 AUTHORS
+Copyright 2002 AUTHORS, all rights reserved.
 
 This library is free software; you can redistribute it
 and/or modify it under the same terms as Perl itself.
 
 =cut
 
-# $Date: 2002/12/12 08:17:16 $
+1; # $Date: 2002/12/14 11:02:25 $
