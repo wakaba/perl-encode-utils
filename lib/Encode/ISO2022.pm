@@ -9,7 +9,7 @@ require v5.7.3;
 package Encode::ISO2022;
 use strict;
 use vars qw(%CHARSET $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use base qw(Encode::Encoding);
 __PACKAGE__->Define (qw/iso-2022 iso2022 2022 cp2022/);
 
@@ -254,6 +254,7 @@ sub new_object {
   		Gdesignation	=> "\x42",	## F of designation or 0
   		Ginvoke	=> 1,
   	},
+  	undef_char	=> ["\x3F", {type => 'G94', charset => 'B'}],
   	use_revision	=> 1,	## Output IRR
   };
   \%C;
@@ -571,7 +572,8 @@ sub internal_to_iso2022 ($\%) {
     if (defined $t) {
       $r .= $t;
     } else {
-      $r .= _i2g ("\x3F", $C, type => 'G94', charset => 'B');
+      $r .= _i2g ($C->{option}->{undef_char}->[0], $C,
+                  %{ $C->{option}->{undef_char}->[1] });
     }
   }
   $r . _back2ascii ($C);
@@ -625,7 +627,8 @@ sub _i2c ($%%) {
 sub _i2g ($%%) {
   my ($s, $C, %O) = @_;
   my $r = '';
-  my $set = $CHARSET{$O{type}}->{$O{charset}};
+  my $set = $CHARSET{$O{type}}->{$O{charset}.
+    ($O{revision}&&$C->{option}->{use_revision}?$O{revision}:'')};
   my $set0 = $CHARSET{$O{type}}->{$O{charset_id}};
   ## -- designate character set
   my $G = 0;
@@ -679,6 +682,7 @@ sub _i2g ($%%) {
       } elsif ($C->{C0}->{'C_SS'.$G}) {
         $r .= _i2c ($C->{C0}->{'C_SS'.$G}, $C, type => 'C0') || return undef;
       } else {	## Both C0 and C1 set do not have SS2/3.
+        $left = 0 if $G == 1 && !$C->{C0}->{C_LS1};
         $r .= __invoke ($C, $G => $left) if $C->{$left?'GL':'GR'} ne 'G'.$G;
       }
     } else {
@@ -755,6 +759,55 @@ ISO/IEC 8859, "8-Bit Single-Byte Coded Graphic Character Sets".
 
 Encode, perlunicode
 
+=head1 TODO
+
+=over 4
+
+=item NCR (coding system other than ISO/IEC 2022) support
+
+=over 2
+
+=item ESC 02/05 02/15 03/x of X Compound Text
+
+=back
+
+=item Output of control character sets, single control functions
+
+=item Designation sequence of control character sets (input)
+
+=item Special graphic character sets such as G3 of EUC-TW
+
+=item SUPER SHIFT (SS) invoke function of old control character set
+
+=item Safe transparent of control string (ISO/IEC 6429)
+
+=item Output of unoutputable characters as alternative notation such as SGML-like entity
+
+=item C0 set invoked to CR area like ISIRI code
+
+Really need?
+
+=item special treatment of 0x20, 0x7E, 0xA0, 0xFF
+
+For example, GB mongolian sets use MSP (MONGOLIAN SPACE)
+with these code positions.
+
+And, no less coding systems does not use (or does ban using) DEL.
+
+=item A lot of character sets don't have pseudo-UCS mapping.
+
+Most of 9m^n (n >= 3) sets, 9m^n sets with I byte, 9m^n
+DRCSes do not have pseudo-UCS mapping area.  It is
+questionable to allocate lots of code positions to these
+rarely-(or no-)used character sets.
+
+=item Even character sets that have pseudo-UCS mapping, some of them can't be outputed in ISO/IEC 2022.
+
+Because output of rarely-used character sets is
+not implemented yet.
+
+=back
+
 =head1 LICENSE
 
 Copyright 2002 wakaba <w@suika.fam.cx>
@@ -764,5 +817,5 @@ and/or modify it under the same terms as Perl itself.
 
 =cut
 
-# $Date: 2002/09/16 02:20:18 $
+# $Date: 2002/09/16 06:35:16 $
 ### ISO2022.pm ends here

@@ -2,12 +2,12 @@ package Encode::HZ;
 use strict;
 
 use vars qw($VERSION);
-$VERSION = do {my @r =(q$Revision: 1.2 $ =~ /\d+/g);sprintf "%d."."%02d" x $#r, @r};
+$VERSION = do {my @r =(q$Revision: 1.3 $ =~ /\d+/g);sprintf "%d."."%02d" x $#r, @r};
 
 use Encode ();
 require Encode::CN;
 use base qw(Encode::Encoding);
-__PACKAGE__->Define(qw/hz hz-gb-2312/);
+__PACKAGE__->Define(qw/hz chinese-hz hz-gb-2312 cp52936/);
 
 sub needs_lines  { 1 }
 
@@ -18,7 +18,7 @@ sub perlio_ok {
 sub decode
 {
     my ($obj,$str,$chk) = @_;
-    my $gb = Encode::find_encoding('gb2312-raw');
+    my $gb = Encode::find_encoding($obj->__hz_encoding_name);
 
     $str =~ s{~			# starting tilde
 	(?:
@@ -42,7 +42,7 @@ sub decode
       if (defined $t) {	# two tildes make one tilde
         '~';
       } elsif (defined $c) {	# decode the characters
-        $c =~ tr/\xA1-\xFE/\x21-\x7E/;
+        $c =~ tr/\x21-\x7E/\xA1-\xFE/;
         $gb->decode($c, $chk);
       } else {	# ~\n and invalid escape = ''
         '';
@@ -55,7 +55,7 @@ sub decode
 sub encode ($$;$) {
   my ($obj,$str,$chk) = @_;
   $_[1] = '';
-  my $gb = Encode::find_encoding('euc-cn');
+  my $gb = Encode::find_encoding($obj->__hz_encoding_name);
   
   $str =~ s/~/~~/g;
   $str = $gb->encode ($str, 1);
@@ -68,15 +68,16 @@ sub encode ($$;$) {
   $str;
 }
 
-package Encode::HZ::HZ8;
+sub __hz_encoding_name { 'euc-cn' }
 
+package Encode::HZ::HZ8;
 use base qw(Encode::HZ);
 __PACKAGE__->Define(qw/hz8 x-hz8/);
 
 sub encode ($$;$) {
   my ($obj,$str,$chk) = @_;
   $_[1] = '';
-  my $gb = Encode::find_encoding('euc-cn');
+  my $gb = Encode::find_encoding($obj->__hz_encoding_name);
   
   $str =~ s/~/~~/g;
   $str = $gb->encode ($str, 1);
@@ -87,13 +88,19 @@ sub encode ($$;$) {
   $str;
 }
 
+package Encode::HZ::HZ165;
+use base qw(Encode::HZ);
+__PACKAGE__->Define(qw/hz-isoir165 x-iso-ir-165-hz/);
+
+sub __hz_encoding_name { 'cn-gb-isoir165' }
+
 1;
 __END__
 
-
 =head1 NAME
 
-Encode::HZ --- Encode module for HZ (HZ-GB-2312), HZ8
+Encode::HZ --- Encode module for HZ (HZ-GB-2312 and HZ for
+ISO-IR 165) and HZ8
 
 =head1 DESCRIPTION
 
@@ -103,6 +110,33 @@ to be able to encode/decode HZ and its variant coding systems.
 Note that Encode::CN::HZ, standard module of Perl, can encode/decode
 HZ (HZ-GB-2312 in IANA name), but other variants such as
 HZ8 can't be encoded/decode.
+
+=head1 ENCODINGS
+
+=over 4
+
+=item hz-gb-2312
+
+HZ 7-bit encoding for Chinese with GB 2312-80,
+defined by RFC 1842 and RFC 1843.
+(Alias: hz, chinese-hz (emacsen), CP52936 (M$))
+
+=item hz8
+
+HZ 8-bit encoding for Chinese with GB 2312-80.
+(Alias: x-hz8)
+
+=item hz-isoir165
+
+HZ 7-bit encoding for Chinese with ISO-IR 165
+(syntax is same as hz-gb-2312, but coded character
+set is differ) (Alias: x-iso-ir-165-hz)
+
+Note that you need load Encode module that support
+'cn-gb-isoir165' encoding (defined by RFC 1922),
+such as Encode::ISO2022::EightBit.
+
+=back
 
 =head1 TODO
 
@@ -120,3 +154,6 @@ This library is free software; you can redistribute it
 and/or modify it under the same terms as Perl itself.
 
 =cut
+
+# $Date: 2002/09/16 06:35:16 $
+### HZ.pm ends here

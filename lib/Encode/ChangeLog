@@ -5,6 +5,13 @@
 	shifts of ESC Fs style.
 	- (make_initial_charset): Create charset definition
 	of 94^2 DRCSes.
+	- (undef_char): New option.
+	- (pod:TODO): New section.
+	* HZ.pm:
+	- (__hz_encoding_name): New function.
+	- (Encode::HZ): Added new alias names.
+	- (Encode::HZ::HZ165): New package.
+	- (pod:ENCODINGS): New section.
 
 2002-09-15  Wakaba <w@suika.fam.cx>
 
