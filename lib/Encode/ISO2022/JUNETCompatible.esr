@@ -20,8 +20,8 @@ POD:DESCRIPTION:
 	coding systems that comform to JIS and that based
 	on 7-bit ISO/IEC 2022 structure.
 	
-	Those coding systems SHOULD not be used for new
-	implemention or new data.  They may not comform
+	Those coding systems SHOULD NOT be used for new
+	implemention NOR new data.  They may not comform
 	to future version of JIS or other standards.
 
 {
@@ -110,7 +110,10 @@ POD:SEE ALSO:
 	
 	%%ReferenceRFC1468%%
 	
-	L<Encode::ISO2022::EightBit>
+	L<Encode::ISO2022::JUNET>
+	
+	L<Encode::ISO2022::EightBit>, L<Encode::ISO2022::EUCJACompatible>,
+	L<Encode::SJIS::JISCompatible>
 
 POD:LICENSE:
 	Copyright %%YEAR%% Wakaba <w@suika.fam.cx>

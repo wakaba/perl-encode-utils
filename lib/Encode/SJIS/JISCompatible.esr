@@ -1,0 +1,142 @@
+#?PESRC/1.0
+Name:
+	SJIS::JISCompatible
+ShortDescription:
+	The Encode module for shift JIS compatible coding systems
+Description:
+	This module defines convertion between perl internal
+	representation and compatible shift JIS coding systems defined
+	in standards of JIS (Japan Industrial Standards).
+	
+	Although this situation is undesirable, we can't ignore
+	such historical implementions and latest JIS coded
+	character set standards admire such dupulicate
+	encoding to and only to "keep compatibility with
+	current practice."
+	
+	This module provides encoder and decoder for such
+	coding systems that comform to JIS and that based
+	on the Shift JIS structure.
+	
+	Those coding systems SHOULD NOT be used for new
+	implemention NOR new data.  They may not comform
+	to future version of JIS or other standards.
+
+{
+Name:
+	shift-jis-1997-fullwidth
+Cversion:
+	C:bit=8
+	C:G0=G94:J	## JIS X 0201:1997 Graphic character set for Latin letters
+	C:G1=G94n:B@	## JIS X 0208:1997
+	C:G2=G94:I	## JIS X 0201:1997 Graphic character set for Katakana
+	C:G3=G94n:~	## undefined
+	C:option:{undef_char}=["\x22\x2E", {type => 'G94n', charset => 'B', revision => '@'}]
+Encode:
+	=>ucs_to_jisx0201_latin ucs_to_jisx0208_1997_latin ucs_to_jisx0201_katakana_hw
+	->sjis:C
+Decode:
+	<-sjis:C
+	<=jisx0201_latin_to_ucs jisx0208_1997_latin_to_ucs jisx0201_katakana_hw_to_ucs
+Description:
+	Shift coded representation defined by JIS X 0208:1997 Appendix 1,
+	with "compatible" mapping table as defined in JIS X 0208:1997.
+	
+	This coding system is the "compatible" version of C<shift-jis-1997>
+	defined in L<Encode::SJIS::JIS>.
+}
+
+{
+Name:
+	shift-jis-1997-ascii-fullwidth
+Cversion:
+	C:bit=8
+	C:G0=G94:B	## ISO/IEC 646:1991 IRV
+	C:G1=G94n:B@	## JIS X 0208:1997
+	C:G2=G94:I	## JIS X 0201:1997 Graphic character set for Katakana
+	C:G3=G94n:~	## undefined
+	C:option:{undef_char}=["\x22\x2E", {type => 'G94n', charset => 'B', revision => '@'}]
+Encode:
+	=>ucs_to_ascii ucs_to_jisx0208_1997_irv ucs_to_jisx0201_katakana_hw
+	->sjis:C
+Decode:
+	<-sjis:C
+	<=jisx0208_1997_irv_to_ucs jisx0201_katakana_hw_to_ucs
+Description:
+	Same as shift-jis-1997-fullwidth but ASCII (ISO/IEC 646 IRV)
+	instead of JIS X 0201:1997 Latin character set.
+	
+	Note that this coding system DOES NOT comform to
+	JIS X 0208:1997 Appendix 1.
+	
+	This coding system is the "compatible" version of C<shift-jis-1997-ascii>
+	defined in L<Encode::SJIS::JIS>.
+}
+
+{
+Name:
+	shift_jisx0213-fullwidth
+Cversion:
+	C:bit=8
+	C:G0=G94:J	## JIS X 0201:1997 Graphic character set for Latin letters
+	C:G1=G94n:O	## JIS X 0213:2000 plane 1
+	C:G2=G94:I	## JIS X 0201:1997 Graphic character set for Katakana
+	C:G3=G94n:P	## JIS X 0213:2000 plane 2
+	C:option:{undef_char}=["\x22\x2E", {type => 'G94n', charset => 'O'}]
+Encode:
+	=>ucs_to_jisx0201_latin ucs_to_jisx0213_2000_1_latin ucs_to_jisx0213_2000_2 ucs_to_jisx0201_katakana_hw
+	->sjis:C
+Decode:
+	<-sjis:C
+	<=jisx0201_latin_to_ucs jisx0213_2000_1_latin_to_ucs jisx0213_2000_2_to_ucs jisx0201_katakana_hw_to_ucs
+Description:
+	Shift_JISX0213 coded representation, defined by
+	JIS X 0213:2000 Appendix 1 (implemention level 4),
+	with the "compatible" mapping defined by JIS X 0213:2000.
+	
+	This coding system is the "compatible" version of C<shift_jisx0213>
+	defined in L<Encode::SJIS::JIS>.
+}
+
+{
+Name:
+	shift_jisx0213-ascii-fullwidth
+Cversion:
+	C:bit=8
+	C:G0=G94:B	## ISO/IEC 646:1991 IRV
+	C:G1=G94n:O	## JIS X 0213:2000 plane 1
+	C:G2=G94:I	## JIS X 0201:1997 Graphic character set for Katakana
+	C:G3=G94n:P	## JIS X 0213:2000 plane 2
+	C:option:{undef_char}=["\x22\x2E", {type => 'G94n', charset => 'O'}]
+Encode:
+	=>ucs_to_ascii ucs_to_jisx0213_2000_1_irv ucs_to_jisx0213_2000_2 ucs_to_jisx0201_katakana_hw
+	->sjis:C
+Decode:
+	<-sjis:C
+	<=jisx0213_2000_1_irv_to_ucs jisx0213_2000_2_to_ucs jisx0201_katakana_hw_to_ucs
+Description:
+	Same as Shift_JISX0213-fullwidth but using ASCII (ISO/IEC 646 IRV)
+	instead of JIS X 0201:1997 Latin character set.
+	
+	Note that this coding system does NOT comform to
+	JIS X 0213:2000 Appendix 1.
+	
+	This coding system is the "compatible" version of C<shift_jisx0213-ascii>
+	defined in L<Encode::SJIS::JIS>.
+}
+
+POD:SEE ALSO:
+	%%ReferenceJISX0201_1997%%
+	
+	%%ReferenceJISX0208_1997%%
+	
+	%%ReferenceJISX0213_2000%%
+	
+	L<Encode::SJIS>, L<Encode::SJIS::JIS>
+	
+	L<Encode::ISO2022::JUNETCompatible>, L<Encode::ISO2022::EUCJACompatible>
+
+POD:LICENSE:
+	Copyright %%YEAR%% Nanashi-san <nanashi-san@nanashi.invalid>
+	
+	%%PerlLicense%%

@@ -1,3 +1,8 @@
+2002-12-19  Wakaba  <w@suika.fam.cx>
+
+	* JISCompatible.esr: New file.
+	* Makefile: Updated.
+
 2002-12-18  Wakaba  <w@suika.fam.cx>
 
 	* Pictograph.esr: New file.

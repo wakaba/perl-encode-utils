@@ -7,6 +7,8 @@ ShortDescription:
 {
 Name:
 	jphone-iso-2022-jp
+Alias:
+	jphone-iso2022-jp
 Cversion:
 	use:charset:Pictogram
 	use:Encode::SJIS
@@ -24,7 +26,7 @@ Encode:Prepare:
 	C:option:{undef_char}=["\x22\x2E", {type => 'G94n', charset => 'B', revision => '@'}]
 	C:option:{fallback_from_ucs}=\&Encode::SJIS::_internal_to_page
 Encode:
-	=>ucs_to_ascii_yen ucs_to_jisx0208_1997_yen ucs_to_jphone
+	=>ucs_to_ascii_yen ucs_to_jisx0208_1997_yen ucs_to_jisx0208_to_katakana_hw ucs_to_jphone
 	->iso2022:C
 Decode:Prepare:
 	C:option:{final_to_set}->{G94n}->{B}='B@'
@@ -58,14 +60,14 @@ Encode:Prepare:
 	C:option:{undef_char}=["\x22\x2E", {type => 'G94n', charset => 'B', revision => '@'}]
 	C:option:{fallback_from_ucs}=\&Encode::SJIS::_internal_to_page
 Encode:
-	=>ucs_to_ascii_yen ucs_to_jisx0208_1997_yen ucs_to_jphone
+	=>ucs_to_ascii_yen ucs_to_jisx0208_1997_yen ucs_to_jisx0201_katakana_hw ucs_to_jphone
 	->iso2022:C
 Decode:Prepare:
 	C:G3=G94n:D	## JIS X 0212-1990
 Decode:
 	!& Encode::SJIS::page_to_internal
 	<-iso2022:C
-	<=ascii_yen_to_ucs jisx0208_1997_to_ucs jphone_to_ucs jisx0212_1990_to_ucs
+	<=ascii_yen_to_ucs jisx0208_1997_to_ucs jisx0201_katakana_hw_to_ucs jphone_to_ucs jisx0212_1990_to_ucs
 Description:
 	EUC-JP for J-SKY defined by [JGUIDE].
 	

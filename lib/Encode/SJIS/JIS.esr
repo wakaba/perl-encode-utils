@@ -142,7 +142,6 @@ Decode:
 Description:
 	Same as Shift_JISX0213 but using ASCII (ISO/IEC 646 IRV)
 	instead of JIS X 0201:1997 Latin character set.
-	(Alias: shift-jis-2000-ascii)
 	
 	Note that this coding system does NOT comform to
 	JIS X 0213:2000 Appendix 1.
