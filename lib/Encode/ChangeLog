@@ -1,13 +1,19 @@
+2002-09-22  Wakaba <w@suika.fam.cx>
+
+	* ISO2022.pm (_internal_to_iso2022): Allow SP as a
+	replacement character.
+
 2002-09-21  Wakaba <w@suika.fam.cx>
 
 	* ISO2022.pm:
 	- More DOCS support.
 	- (new_object): Redefined as alias of Encode::Charset's.
 	- (pod:ENCODINGS): New section.
-	- Regists 'iso/iec2022' as encoding name.
+	- Regist 'iso/iec2022' as encoding name.
 	* Charset.pm:
 	- (new_object): Moved from Encode::ISO2022.
 	- (make_initial_coding_system): Define 'Csjis' coding system.
+	* EUCFixed.pm (pod:ENCODINGS): New section.
 
 2002-09-20  Wakaba <w@suika.fam.cx>
 

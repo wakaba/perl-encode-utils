@@ -2,7 +2,7 @@ require 5.7.3;
 package Encode::EUCFixed;
 use strict;
 use vars qw(%DEFAULT $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 package Encode::EUCFixed::JP;
 use base qw(Encode::Encoding);
@@ -45,7 +45,7 @@ sub decode ($$;$) {
 
 package Encode::EUCFixed::TW;
 use base qw(Encode::Encoding);
-__PACKAGE__->Define (qw/cns-11643-1986-appendix/);
+__PACKAGE__->Define (qw/cns-11643-1986-appendix DEC.CNS11643.1986-2/);
 
 sub encode ($$;$) {
   require Encode::HanExtra;
@@ -91,6 +91,23 @@ __END__
 
 Encode::EUCFixed --- Fixed width (or wide) coding system of EUC
 
+=head1 ENCODINGS
+
+=over 4
+
+=item Extended_UNIX_Code_Fixed_Width_for_Japanese
+
+EUC-japan (packed) based fixed width coding system
+for wide char. (Alias: csEUCFixWidJapanese (IANA))
+
+=item cns-11643-1986-appendix
+
+Fixed width coding system for ASCII and CNS 11643 plane 1 and 2,
+defined by CNS 11643-1986 appendix.
+(Alias: DEC.CNS11643.1986-2 (X))
+
+=back
+
 =head1 LICENSE
 
 Copyright 2002 Wakaba <w@suika.fam.cx>
@@ -100,6 +117,6 @@ and/or modify it under the same terms as Perl itself.
 
 =head1 CHANGE
 
-Last update $Date: 2002/09/20 14:01:45 $
+Last update $Date: 2002/09/22 11:09:38 $
 
 =cut

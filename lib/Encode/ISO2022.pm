@@ -41,7 +41,7 @@ require v5.7.3;
 package Encode::ISO2022;
 use strict;
 use vars qw(%CHARSET %CODING_SYSTEM $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.6 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.7 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use base qw(Encode::Encoding);
 __PACKAGE__->Define (qw!iso-2022 iso/iec2022 iso2022 2022 cp2022!);
 require Encode::Charset;
@@ -292,11 +292,11 @@ sub _iso2022_to_internal ($;\%) {
               $C->{GL} = 'G2'; '';
             } elsif ($Fs eq "\x6F") {	## LS3
               $C->{GL} = 'G3'; '';
-            } elsif ($Fs eq "\x7E") {	## LS1R
+            } elsif ($Fs eq "\x7E" || $Fs eq "\x6B") {	## LS1R
               $C->{GR} = 'G1';  $C->{GL} = 'G1' if $C->{bit} == 7; '';
-            } elsif ($Fs eq "\x7D") {	## LS2R
+            } elsif ($Fs eq "\x7D" || $Fs eq "\x6C") {	## LS2R
               $C->{GR} = 'G2';  $C->{GL} = 'G2' if $C->{bit} == 7; '';
-            } elsif ($Fs eq "\x7C") {	## LS3R
+            } elsif ($Fs eq "\x7C" || $Fs eq "\x6D") {	## LS3R
               $C->{GR} = 'G3';  $C->{GL} = 'G3' if $C->{bit} == 7; '';
             } else {
               chr ($CHARSET{single_control}->{Fs}->{ucs} + (ord ($Fs) - 0x60));
@@ -464,8 +464,12 @@ sub internal_to_iso2022 ($\%) {
     if (defined $t) {
       $r .= $t;
     } else {
-      $t = _i2g ($C->{option}->{undef_char}->[0], $C,
-                  %{ $C->{option}->{undef_char}->[1] });
+      unless ($C->{option}->{undef_char}->[0] eq "\x20") {
+        $t = _i2g ($C->{option}->{undef_char}->[0], $C,
+                    %{ $C->{option}->{undef_char}->[1] });
+      } else {	## SP
+        $t = _back2ascii ($C) . "\x20";
+      }
       $r .= $C->{coding_system} eq $CODING_SYSTEM{"\x40"} ?
             $t : _i2o ($t, $C, cs_F => "\x40");
     }
@@ -762,5 +766,5 @@ and/or modify it under the same terms as Perl itself.
 
 =cut
 
-# $Date: 2002/09/21 01:34:08 $
+# $Date: 2002/09/22 11:09:38 $
 ### ISO2022.pm ends here
