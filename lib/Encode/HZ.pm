@@ -2,7 +2,7 @@ package Encode::HZ;
 use strict;
 
 use vars qw($VERSION);
-$VERSION = do { my @r = (q$Revision: 1.1 $ =~ /\d+/g); sprintf "%d."."%02d" x $#r, @r };
+$VERSION = do {my @r =(q$Revision: 1.2 $ =~ /\d+/g);sprintf "%d."."%02d" x $#r, @r};
 
 use Encode ();
 require Encode::CN;
@@ -71,7 +71,7 @@ sub encode ($$;$) {
 package Encode::HZ::HZ8;
 
 use base qw(Encode::HZ);
-__PACKAGE__->Define(qw/hz8/);
+__PACKAGE__->Define(qw/hz8 x-hz8/);
 
 sub encode ($$;$) {
   my ($obj,$str,$chk) = @_;
@@ -103,6 +103,10 @@ to be able to encode/decode HZ and its variant coding systems.
 Note that Encode::CN::HZ, standard module of Perl, can encode/decode
 HZ (HZ-GB-2312 in IANA name), but other variants such as
 HZ8 can't be encoded/decode.
+
+=head1 TODO
+
+Support of extended HZ such as EHZ.
 
 =head1 ACKNOWLEDGEMENTS
 

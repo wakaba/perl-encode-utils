@@ -2,10 +2,10 @@ require 5.7.3;
 package Encode::Unicode::UTF7;
 use strict;
 use vars qw(%OPTION $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.1 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use base qw(Encode::Encoding);
 require MIME::Base64;
-__PACKAGE__->Define (qw/utf-7 utf7 unicode-2-0-utf-7 unicode-2-0-utf7 x-unicode-2-0-utf7 unicode-1-1-utf-7/);
+__PACKAGE__->Define (qw/utf-7 utf7 unicode-2-0-utf-7 unicode-2-0-utf7 x-unicode-2-0-utf7 cp65000 unicode-1-1-utf-7 csunicode11utf7/);
 ## BUG: Unicode-1-1-UTF-7 is actually not suitable.  (We need Unicode 1.1 support.)
 
 $OPTION{encode_o_set} = 1;
@@ -130,5 +130,5 @@ Boston, MA 02111-1307, USA.
 
 =cut
 
-## $Date: 2002/08/16 12:09:21 $
+## $Date: 2002/09/15 04:15:51 $
 ### UTF7.pm ends here
