@@ -1,3 +1,7 @@
+2002-12-24  Nanashi-san  <nanashi-san@nanashi.invalid>
+
+	* Escape.pm: New module.
+
 2002-09-23  Nanashi-san
 
 	* UTF8.pm, UTF9.pm: New modules.  (Committed by
