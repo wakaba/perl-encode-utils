@@ -41,7 +41,7 @@ require v5.7.3;
 package Encode::ISO2022;
 use strict;
 use vars qw(%CHARSET %CODING_SYSTEM $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.9 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.10 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use base qw(Encode::Encoding);
 __PACKAGE__->Define (qw!iso-2022 iso/iec2022 iso2022 2022 cp2022!);
 require Encode::Charset;
@@ -66,7 +66,7 @@ sub decode ($$;$) {
 ### --- Encode::ISO2022 unique functions
 *new_object = \&Encode::Charset::new_object;
 
-sub iso2022_to_internal ($;\%) {
+sub iso2022_to_internal ($;%) {
   my ($s, $C) = @_;
   $C ||= &new_object;
   my $t = '';
@@ -129,10 +129,10 @@ sub iso2022_to_internal ($;\%) {
 # when this unexpected behavior is fixed or someone finds
 # better way to avoid it, we will rewrite this code.
 &_iso2022_to_internal (undef);
-sub _iso2022_to_internal ($;\%) {
-  eval q{ sub __iso2022_to_internal ($;\%) { 0 } };
+sub _iso2022_to_internal ($;%) {
+  eval q{ sub __iso2022_to_internal ($;%) { 0 } };
   eval q{
-sub __iso2022_to_internal ($;\%) {
+sub __iso2022_to_internal ($;%) {
   use re 'eval';
   my ($s, $C) = @_;
   my %_GB_to_GN = (
@@ -206,10 +206,6 @@ sub __iso2022_to_internal ($;\%) {
         $c = $c * $C->{$C->{GL}}->{chars} + unpack ('C', $_) - $m;
       }
       chr ($C->{$C->{GL}}->{ucs} + $c);
-    ## Control, SP, or broken data
-    ## TODO: support control sets other than ISO/IEC 6429's
-    } elsif (defined $misc) {
-      $misc;
     ## GR graphic character
     } elsif ($gr) {
       my $c = 0;
@@ -218,6 +214,10 @@ sub __iso2022_to_internal ($;\%) {
         $c = $c * $C->{$C->{GR}}->{chars} + unpack ('C', $_) - $m;
       }
       chr ($C->{$C->{GR}}->{ucs} + $c);
+    ## Control, SP, or broken data
+    ## TODO: support control sets other than ISO/IEC 6429's
+    } elsif (defined $misc) {
+      $misc;
     ## Graphic character with SS2
     } elsif ($ss2) {
       $ss2 =~ tr/\x80-\xFF/\x00-\x7F/;
@@ -236,8 +236,7 @@ sub __iso2022_to_internal ($;\%) {
       chr ($C->{G3}->{ucs} + $c);
     ## Escape sequence
     } elsif ($esc) {
-      ## IRR (revision number)
-      if ($esc =~ /\x1B\x26([\x40-\x7E])/) {
+      if ($esc =~ /\x1B\x26([\x40-\x7E])/) {	## 6F (IRR) = ESC 02/06 Ft
         $C->{_irr} = $1;  $esc = '';
       } else {
         $esc =~ s{
@@ -261,31 +260,30 @@ sub __iso2022_to_internal ($;\%) {
               $CZD, $C1D, $Fs, $sI, $sF,$ACS)
               = ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15);
           my $rev = $C->{_irr} || '';
-          if ($g94_g) {
-            $C->{ $_GB_to_GN{ $g94_g } } = $CHARSET{G94}->{ $g94_f.$rev }
-                                      || $CHARSET{G94}->{ $g94_f }
-                                      || $CHARSET{G94}->{ "\x7E" }; '';
-          } elsif (defined $g94n_f) {
-            $C->{ $_GB_to_GN{ $g94n_g } || 'G0' } = $CHARSET{G94n}->{ $g94n_f.$rev }
-                                      || $CHARSET{G94n}->{ $g94n_f }
-                                      || $CHARSET{G94n}->{ "\x7E" }; '';
-          } elsif ($g96_g) {
-            $C->{ $_GB_to_GN{ $g96_g } } = $CHARSET{G96}->{ $g96_f.$rev }
-                                      || $CHARSET{G96}->{ $g96_f }
-                                      || $CHARSET{G96}->{ "\x7E" }; '';
-          } elsif (defined $g96n_f) {
-            $C->{ $_GB_to_GN{ $g96n_g } } = $CHARSET{G96n}->{ $g96n_f.$rev }
-                                      || $CHARSET{G96n}->{ $g96n_f }
-                                      || $CHARSET{G96n}->{ "\x7E" }; '';
-          } elsif ($Fe) {	## ESC Fe => C1
+          my $f2s = $C->{option}->{final_to_set};
+          if ($g94_g) {	## ESC 02/08 [I] F
+            $C->{ $_GB_to_GN{ $g94_g } }
+              =    $CHARSET{G94}->{ $f2s->{G94}->{$g94_f.$rev} || $g94_f.$rev }
+                || $CHARSET{G94}->{ $f2s->{G94}->{$g94_f} || $g94_f }
+                || $CHARSET{G94}->{ "\x7E" }; '';
+          } elsif (defined $g94n_f) {	## ESC 02/04 [02/08..11] [I] F
+            $C->{ $_GB_to_GN{ $g94n_g } || 'G0' }
+              =    $CHARSET{G94n}->{ $f2s->{G94n}->{$g94n_f.$rev} || $g94n_f.$rev }
+                || $CHARSET{G94n}->{ $f2s->{G94n}->{$g94n_f} || $g94n_f }
+                || $CHARSET{G94n}->{ "\x7E" }; '';
+          } elsif ($g96_g) {	## ESC 02/12..15 [I] F
+            $C->{ $_GB_to_GN{ $g96_g } }
+              =    $CHARSET{G96}->{ $f2s->{G96}->{$g96_f.$rev} || $g96_f.$rev }
+                || $CHARSET{G96}->{ $f2s->{G96}->{$g96_f} || $g96_f }
+                || $CHARSET{G96}->{ "\x7E" }; '';
+          } elsif ($g96n_g) {	## ESC 02/04 02/12..15 [I] F
+            $C->{ $_GB_to_GN{ $g96n_g } }
+              =    $CHARSET{G96n}->{ $f2s->{G96n}->{$g96n_f.$rev} || $g96n_f.$rev }
+                || $CHARSET{G96n}->{ $f2s->{G96n}->{$g96n_f} || $g96n_f }
+                || $CHARSET{G96n}->{ "\x7E" }; '';
+          } elsif ($Fe) {	## ESC Fe = C1
             chr ($C->{ $C->{ESC_Fe} }->{ucs} + (ord ($Fe) - 0x40));
-          } elsif ($CZD) {
-            $C->{C0} = $CHARSET{C0}->{ $CZD.$rev }
-                    || $CHARSET{C0}->{ $CZD } || $CHARSET{C0}->{ "\x7E" }; '';
-          } elsif ($C1D) {
-            $C->{C1} = $CHARSET{C1}->{ $C1D.$rev }
-                    || $CHARSET{C1}->{ $C1D } || $CHARSET{C1}->{ "\x7E" }; '';
-          } elsif ($Fs) {
+          } elsif (defined $Fs) {	## ESC Fs
             if ($Fs eq "\x6E") {	## LS2
               $C->{GL} = 'G2'; '';
             } elsif ($Fs eq "\x6F") {	## LS3
@@ -299,9 +297,17 @@ sub __iso2022_to_internal ($;\%) {
             } else {
               chr ($CHARSET{single_control}->{Fs}->{ucs} + (ord ($Fs) - 0x60));
             }
-          } elsif ($sI) {
+          } elsif (defined $CZD) {	## 1F (CZD) = ESC 02/01 [I] F
+            $C->{C0} = $CHARSET{C0}->{ $f2s->{C0}->{$CZD.$rev} || $CZD.$rev }
+                    || $CHARSET{C0}->{ $f2s->{C0}->{$CZD} || $CZD }
+                    || $CHARSET{C0}->{ "\x7E" }; '';
+          } elsif (defined $C1D) {	## 2F (C1D) = ESC 02/02 [I] F
+            $C->{C1} = $CHARSET{C1}->{ $f2s->{C1}->{$C1D.$rev} || $C1D.$rev }
+                    || $CHARSET{C1}->{ $f2s->{C1}->{$C1D} || $C1D }
+                    || $CHARSET{C1}->{ "\x7E" }; '';
+          } elsif ($sI) {	## 3F = ESC 02/03 [I] F
             chr ($CHARSET{single_control}->{'3F'.$sI}->{ucs} + (ord ($sF) - 0x30));
-          } elsif ($ACS) {	## Announcer
+          } elsif ($ACS) {	## 0F (Announcer) = ESC 02/00 F
             if ($ACS eq "\x4A") { $C->{bit} = 7 }
             elsif ($ACS eq "\x4B") { $C->{bit} = 8 }
             '';
@@ -310,15 +316,13 @@ sub __iso2022_to_internal ($;\%) {
         $C->{_irr} = undef;
       }
       $esc;
-    ## Locking shifts
-    } elsif ($ls) {
+    } elsif ($ls) {	## Locking shifts = LS0 / LS1
       if ($ls eq $C->{$C->{CL}}->{LS0}) {
         $C->{GL} = 'G0'; '';
       } elsif ($ls eq $C->{$C->{CL}}->{LS1}) {
         $C->{GL} = 'G1'; '';
       }
-    ## Control sequence
-    } elsif ($csi) {
+    } elsif ($csi) {	## Control sequence = CSI [P..] [I] F
       $csi =~ tr/\xA0-\xFF/\x20-\x7F/d;
       $csi =~ s/$C->{$C->{CL}}->{LS0}//g if $C->{$C->{CL}}->{LS0};
       $csi =~ s/$C->{$C->{CL}}->{LS1}//g if $C->{$C->{CL}}->{LS1};
@@ -333,7 +337,7 @@ sub __iso2022_to_internal ($;\%) {
 
 } # _iso2022_to_internal
 
-sub internal_to_iso2022 ($\%) {
+sub internal_to_iso2022 ($;%) {
   my ($s, $C) = @_;
   $C ||= &new_object;
   
@@ -348,10 +352,10 @@ sub internal_to_iso2022 ($\%) {
     } elsif ($cc < 0x7F) {
       $t = _i2g ($c, $C, type => 'G94', charset => 'B');
     } elsif ($cc <= 0x9F) {
-      $t = _i2c ($c, $C, type => 'C1', charset_id => '64291991C1',
+      $t = _i2c (pack ('C', $cc), $C, type => 'C1', charset_id => '64291991C1',
         charset => $C->{option}->{private_set}->{XC1}->{'64291991C1'});
     } elsif ($cc <= 0xFF) {
-      $t = _i2g (chr($cc-0x80), $C, type => 'G96', charset => 'A');
+      $t = _i2g (pack ('C', $cc-0x80), $C, type => 'G96', charset => 'A');
     } elsif ($cc <= 0x24FF) {
       my $c = $cc - 0x100;
       my $final = $C->{option}->{private_set}->{U96n}->[0];
@@ -520,7 +524,7 @@ sub _i2c ($%%) {
     }
     $r .= _back2ascii ($C, reset_all => $C->{C1}->{reset_all}->{$s});
     unless ($C->{option}->{C1invoke_to_right}) {	## ESC Fe
-      $s =~ s/([\x80-\x9F])/"\x1B" . chr (ord ($1) - 0x40)/ge;
+      $s =~ s/([\x80-\x9F])/"\x1B" . pack ('C', ord ($1) - 0x40)/ge;
     }
     return $r . $s;
   }
@@ -769,5 +773,5 @@ and/or modify it under the same terms as Perl itself.
 
 =cut
 
-# $Date: 2002/10/14 06:58:35 $
+# $Date: 2002/10/16 10:39:35 $
 ### ISO2022.pm ends here

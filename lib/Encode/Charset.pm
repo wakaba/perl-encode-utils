@@ -9,7 +9,7 @@ used by Encode::ISO2022, Encode::SJIS, and other modules.
 package Encode::Charset;
 use strict;
 use vars qw(%CHARSET %CODING_SYSTEM $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.5 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 ## --- Make initial charset definitions
 &_make_initial_charsets;
@@ -71,6 +71,7 @@ for my $f (0x30..0x5F, 0x7E) {
   }
 }
   $CHARSET{G94n}->{"\x20\x40"}->{ucs} = 0x70460000;	## DRCS 94^2 04/00
+  $CHARSET{G94n}->{P4_0} = $CHARSET{G94n}->{"\x20\x40"};
   
 for (0x60..0x6F) {
   my $F = pack 'C', $_;
@@ -215,7 +216,7 @@ sub new_object {
   $C{option} = {
   	C1invoke_to_right	=> 0,	## C1 invoked to: (0: ESC Fe, 1: CR)
   	G94n_designate_long	=> 0,	## (1: ESC 02/04 02/08 04/00..02)
-  	designate_to	=> {	## Designated G buffer (-1: not be outputed)
+  	designate_to	=> {	## Designated G buffer (-1: not to be outputed)
   		C0	=> {
   			default	=> 0,
   		},
@@ -238,6 +239,10 @@ sub new_object {
   		coding_system => {
   			default => -1,
   		},
+  	},
+  	final_to_set	=> {
+  		C0 => {}, C1 => {}, G94 => {}, G94n => {},
+  		G96 => {}, G96n => {}, coding_system => {},
   	},
   	Ginvoke_by_single_shift	=> [0,0,0,0],	## Invoked by SS
   	Ginvoke_to_left	=> [1,1,1,1],	## Which invoked to? (1: L, 0: R)
@@ -264,7 +269,7 @@ sub new_object {
 }
 
 sub new_object_sjis {
-  my $C = new_object;
+  my $C = &new_object;
   $C->{coding_system} = $CODING_SYSTEM{Csjis};
   $C->{CR} = undef;
   $C->{GR} = 'G2';	## 0xA1-0xDF
@@ -297,5 +302,5 @@ and/or modify it under the same terms as Perl itself.
 
 =cut
 
-# $Date: 2002/10/12 11:03:00 $
+# $Date: 2002/10/16 10:39:35 $
 ### Charset.pm ends here
