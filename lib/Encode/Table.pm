@@ -8,7 +8,7 @@ Encode::Table --- Inter-coding-space table convertion
 package Encode::Table;
 use strict;
 use vars qw(%TABLE $VERSION);
-$VERSION = do {my @r =(q$Revision: 1.2 $ =~ /\d+/g);sprintf "%d."."%02d" x $#r, @r};
+$VERSION = do {my @r =(q$Revision: 1.3 $ =~ /\d+/g);sprintf "%d."."%02d" x $#r, @r};
 
 ## Builtin tables
 for (0x00..0x7F) {
@@ -17,9 +17,16 @@ for (0x00..0x7F) {
   $TABLE{ucs_to_ascii}->{$c} = $c;
 }
 $Encode::Table::ascii::VERSION = $VERSION;
+for (0xA0..0xFF) {
+  my $c = chr $_;
+  $TABLE{isoiec8859_1_to_ucs}->{$c} = $c;
+  $TABLE{ucs_to_isoiec8859_1}->{$c} = $c;
+}
+$Encode::Table::isoiec8859_1::VERSION = $VERSION;
 
 my %_Cache;
 sub convert ($@%) {
+  return $_[0] unless @{$_[1]} > 0;
   my @s = split //, shift;
   my $tbl = shift;
   my $tbls = join ' ', @$tbl;
@@ -67,5 +74,5 @@ and/or modify it under the same terms as Perl itself.
 
 =cut
 
-# $Date: 2002/10/05 01:34:55 $
+# $Date: 2002/10/05 05:01:24 $
 ### $RCSfile: Table.pm,v $ ends here

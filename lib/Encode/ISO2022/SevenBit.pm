@@ -13,7 +13,7 @@ require 5.7.3;
 use strict;
 package Encode::ISO2022::SevenBit;
 use vars qw($VERSION);
-$VERSION=do{my @r=(q$Revision: 1.8 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.9 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use base qw(Encode::Encoding);
 __PACKAGE__->Define (qw/iso-2022-7bit iso-2022-7 jis junet jis7
   7bit-jis/);
@@ -22,14 +22,27 @@ require Encode::ISO2022;
 sub encode ($$;$) {
   my ($obj, $str, $chk) = @_;
   $_[1] = '' if $chk;
+  if (!defined $obj->{_encode_mapping} || $obj->{_encode_mapping}) {
+    require Encode::Table;
+    $str = Encode::Table::convert ($str, $obj->__encode_map,
+      -autoload => defined $obj->{_encode_mapping_autoload} ?
+                   $obj->{_encode_mapping_autoload} : 1);
+  }
   $str = &Encode::ISO2022::internal_to_iso2022 ($str, $obj->__2022_encode);
-  return $str;
+  $str;
 }
 
 sub decode ($$;$) {
   my ($obj, $str, $chk) = @_;
   $_[1] = '' if $chk;
-  return &Encode::ISO2022::iso2022_to_internal ($str, $obj->__2022_decode);
+  $str = &Encode::ISO2022::iso2022_to_internal ($str, $obj->__2022_decode);
+  if (!defined $obj->{_decode_mapping} || $obj->{_decode_mapping}) {
+    require Encode::Table;
+    $str = Encode::Table::convert ($str, $obj->__decode_map,
+      -autoload => defined $obj->{_decode_mapping_autoload} ?
+                   $obj->{_decode_mapping_autoload} : 1);
+  }
+  $str;
 }
 
 =item iso-2022-7bit
@@ -56,6 +69,12 @@ sub __2022_decode ($) {
   my $C = shift->__2022__common;
   
   $C;
+}
+sub __encode_map ($) {
+  [];
+}
+sub __decode_map ($) {
+  [];
 }
 
 package Encode::ISO2022::SevenBit::JP;
@@ -96,6 +115,12 @@ sub __2022_encode ($) {
   $C->{G1} = $Encode::ISO2022::CHARSET{G96}->{"\x7E"};	## empty set
   $C;
 }
+sub __encode_map ($) {
+  [qw/ucs_to_ascii ucs_to_jisx0208_1983 ucs_to_jisx0208_1990 ucs_to_jisx0208_1978 ucs_to_jisx0201_latin/];
+}
+sub __decode_map ($) {
+  [qw/jisx0208_1983_to_ucs jisx0208_1990_to_ucs jisx0208_1978_to_ucs jisx0201_latin_to_ucs/];
+}
 
 package Encode::ISO2022::SevenBit::JP1978IRV;
 use vars qw/@ISA/;
@@ -120,6 +145,12 @@ sub __2022_encode ($) {
   $C->{option}->{designate_to}->{G94n}->{"\x42\x40"} = -1;	## JIS X 0208-1990
   $C;
 }
+sub __encode_map ($) {
+  [qw/ucs_to_ascii ucs_to_jisx0208_1978 ucs_to_jisx0208_1983 ucs_to_jisx0208_1990 ucs_to_jisx0201_latin/];
+}
+sub __decode_map ($) {
+  [qw/jisx0208_1983_to_ucs jisx0208_1990_to_ucs jisx0208_1978_to_ucs jisx0201_latin_to_ucs/];
+}
 
 package Encode::ISO2022::SevenBit::JP1;
 use vars qw/@ISA/;
@@ -139,27 +170,24 @@ sub __2022__common ($) {
   $C->{option}->{designate_to}->{G94n}->{"\x42\x40"} = -1;	## JIS X 0208-1990
   $C;
 }
+sub __encode_map ($) {
+  [qw/ucs_to_ascii ucs_to_jisx0208_1983 ucs_to_jisx0212_1990 ucs_to_jisx0208_1978 ucs_to_jisx0201_latin/];
+}
+sub __decode_map ($) {
+  [qw/jisx0208_1983_to_ucs jisx0212_1990_to_ucs jisx0208_1978_to_ucs jisx0201_latin_to_ucs/];
+}
 
 package Encode::ISO2022::SevenBit::JP3;
 use vars qw/@ISA/;
 push @ISA, 'Encode::ISO2022::SevenBit::JP';
 __PACKAGE__->Define (qw/iso-2022-jp-3 x-iso-2022-jp-3 iso2022jp-3
- jis0213   iso-2022-jp-3-compatible iso-2022-jp-3-strict/);
+ jis0213/);
 
 =item iso-2022-jp-3
 
 ISO/IEC 2022 based 7-bit encoding for Japanese,
 defined by JIS X 0213:2000 Appendix 2.
 (Alias: x-iso-2022-jp-3, iso2022jp-3, jis0213)
-
-=item iso-2022-jp-3-compatible
-
-ISO/IEC 2022 based 7-bit encoding for Japanese
-
-=item iso-2022-jp-3-strict
-
-ISO/IEC 2022 based 7-bit encoding for Japanese.
-A subset of iso-2022-jp-3.
 
 =cut
 
@@ -172,6 +200,45 @@ sub __2022__common ($) {
   $C->{option}->{designate_to}->{G94n}->{"\x4F"} = 0;	## JIS X 0213:2000 plane 1
   $C->{option}->{designate_to}->{G94n}->{"\x50"} = 0;	## JIS X 0213:2000 plane 2
   $C;
+}
+sub __encode_map ($) {
+  [qw/ucs_to_ascii ucs_to_jisx0213_2000_1 ucs_to_jisx0213_2000_2/];
+}
+sub __decode_map ($) {
+  [qw/jisx0213_2000_1_to_ucs jisx0212_0213_to_ucs jisx0208_1983_to_ucs jisx0208_1978_to_ucs jisx0201_latin_to_ucs/];
+}
+
+package Encode::ISO2022::SevenBit::JP3Strict;
+use vars qw/@ISA/;
+push @ISA, 'Encode::ISO2022::SevenBit::JP3';
+__PACKAGE__->Define (qw/iso-2022-jp-3-strict/);
+
+=item iso-2022-jp-3-strict
+
+ISO/IEC 2022 based 7-bit encoding for Japanese.
+A subset of iso-2022-jp-3.
+See <http://www.m17n.org/m17n2000_all_but_registration/proceedings/kawabata/jisx0213.html>.
+
+=cut
+
+sub __encode_map ($) {
+  [qw/ucs_to_ascii ucs_to_jisx0213_2000_1_esc_24_42 ucs_to_jisx0213_2000_1 ucs_to_jisx0213_2000_2/];
+}
+
+package Encode::ISO2022::SevenBit::JP3Compatible;
+use vars qw/@ISA/;
+push @ISA, 'Encode::ISO2022::SevenBit::JP3';
+__PACKAGE__->Define (qw/iso-2022-jp-3-compatible/);
+
+=item iso-2022-jp-3-compatible
+
+ISO/IEC 2022 based 7-bit encoding for Japanese.
+See <http://www.m17n.org/m17n2000_all_but_registration/proceedings/kawabata/jisx0213.html>.
+
+=cut
+
+sub __encode_map ($) {
+  [qw/ucs_to_ascii ucs_to_jisx0208_1983 ucs_to_jisx0213_2000_1 ucs_to_jisx0213_2000_2/];
 }
 
 package Encode::ISO2022::SevenBit::JP3Plane1;
@@ -190,6 +257,12 @@ sub __2022__common ($) {
   my $C = shift->SUPER::__2022__common;
   $C->{option}->{designate_to}->{G94n}->{"\x50"} = -1;	## JIS X 0213:2000 plane 2
   $C;
+}
+sub __encode_map ($) {
+  [qw/ucs_to_ascii ucs_to_jisx0213_2000_1/];
+}
+sub __decode_map ($) {
+  [qw/jisx0213_2000_1_to_ucs jisx0208_1983_to_ucs/];
 }
 
 package Encode::ISO2022::SevenBit::SS2;
@@ -232,13 +305,13 @@ sub __2022__common ($) {
   $C->{option}->{designate_to}->{C0}->{"\x40"} = 0;
   $C->{option}->{designate_to}->{C1}->{default} = -1;
   $C->{C1} = $Encode::ISO2022::CHARSET{C1}->{"\x47"};	## Minimum C1
-  $C->{option}->{designate_to}->{C1}->{"\x47"} = 1;
+  $C->{option}->{designate_to}->{C1}->{"\x47"} = -1;
   $C->{option}->{designate_to}->{G94}->{default} = -1;
   $C->{option}->{designate_to}->{G94n}->{default} = -1;
   $C->{option}->{designate_to}->{G96}->{default} = -1;
   $C->{option}->{designate_to}->{G96n}->{default} = -1;
   $C->{option}->{designate_to}->{G94}->{"\x4A"} = 0;	## JIS X 0201 roman
-  for ("\x40", "\x41", "\x42", "\x43") {
+  for ("\x40", "\x41", "\x42", "\x43", "\x44") {
     $C->{option}->{designate_to}->{G94n}->{ $_ } = 0;
   }
   for ("\x41", "\x46") {
@@ -252,6 +325,12 @@ sub __2022_encode ($) {
   $C->{C1} = $Encode::ISO2022::CHARSET{C1}->{"\x7E"};	## empty set
   $C->{G1} = $Encode::ISO2022::CHARSET{G96}->{"\x7E"};	## empty set
   $C;
+}
+sub __encode_map ($) {
+  [qw/ucs_to_ascii ucs_to_jisx0208_1983 ucs_to_jisx0212_1990 ucs_to_gb2312_1980 ucs_to_ksx1001_1992 ucs_to_jisx0208_1978 ucs_to_isoiec8859_1 ucs_to_isoiec8859_7 ucs_to_jisx0201_latin/];
+}
+sub __decode_map ($) {
+  [qw/jisx0208_1983_to_ucs jisx0208_1978_to_ucs jisx0201_latin_to_ucs gb2312_1980_to_ucs ksx1001_1992_to_ucs isoiec8859_7_to_ucs/];
 }
 
 package Encode::ISO2022::SevenBit::Lock;
@@ -342,6 +421,12 @@ sub __2022_decode ($) {
   $C->{G1} = $Encode::ISO2022::CHARSET{G94n}->{"\x43"};	## KS X 1001
   $C;
 }
+sub __encode_map ($) {
+  [qw/ucs_to_ascii ksx1001_1992_to_ucs/];
+}
+sub __decode_map ($) {
+  [qw/ksx1001_1992_to_ucs/];
+}
 
 package Encode::ISO2022::SevenBit::INT1;
 use vars qw/@ISA/;
@@ -365,7 +450,7 @@ sub __2022__common ($) {
   $C->{option}->{designate_to}->{G96}->{default} = -1;
   $C->{option}->{designate_to}->{G96n}->{default} = -1;
   $C->{option}->{designate_to}->{G94}->{"\x4A"} = 0;	## JIS X 0201 roman
-  for ("\x40", "\x41", "\x42") {
+  for ("\x40", "\x41", "\x42", "\x44") {
     $C->{option}->{designate_to}->{G94n}->{ $_ } = 0;
   }
   $C->{option}->{designate_to}->{G94n}->{"\x43"} = 1;	## KS X 1001
@@ -385,6 +470,12 @@ sub __2022_decode ($) {
   my $C = shift->__2022__common;
   $C->{G1} = $Encode::ISO2022::CHARSET{G94n}->{"\x43"};	## KS X 1001
   $C;
+}
+sub __encode_map ($) {
+  [qw/ucs_to_ascii ucs_to_isoiec8859_1 ucs_to_jisx0208_1983 ucs_to_jisx0212_1990 ucs_to_gb2312_1980 ucs_to_ksx1001_1992 ucs_to_isoiec8859_7 ucs_to_jisx0208_1978 ucs_to_jisx0201_latin/];
+}
+sub __decode_map ($) {
+  [qw/jisx0208_1983_to_ucs jisx0208_1978_to_ucs jisx0201_latin_to_ucs gb2312_1980_to_ucs ksx1001_1992_to_ucs isoiec8859_7_to_ucs/];
 }
 
 package Encode::ISO2022::SevenBit::LockSS2;
@@ -502,14 +593,20 @@ __END__
 
 =back
 
+=head1 AUTHORS
+
+Wakaba <w@suika.fam.cx>
+
+Nanashi-san
+
 =head1 LICENSE
 
-Copyright 2002 Wakaba <w@suika.fam.cx>
+Copyright 2002 AUTHORS
 
 This library is free software; you can redistribute it
 and/or modify it under the same terms as Perl itself.
 
 =cut
 
-# $Date: 2002/10/04 23:58:04 $
+# $Date: 2002/10/05 05:01:24 $
 ### SevenBit.pm ends here
