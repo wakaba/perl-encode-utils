@@ -2,7 +2,7 @@ require 5.7.3;
 package Encode::Unicode::UTF1;
 use strict;
 use vars qw($VERSION);
-$VERSION=do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.5 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use base qw(Encode::Encoding);
 __PACKAGE__->Define (qw/ISO-10646-UTF-1 utf-1 utf1 csISO10646UTF1 iso-ir-178/);
 
@@ -22,7 +22,6 @@ sub decode ($$;$) {
   $str =~ s{([\xA0-\xF5].|[\xF6-\xFB]..|[\xFC-\xFF]....)}{
     chr (_utf1toucs4 (unpack 'C*', $1))
   }gex;
-  Encode::_utf8_on ($str);
   $_[1] = '' if $chk;
   return $str;
 }
@@ -111,5 +110,5 @@ Boston, MA 02111-1307, USA.
 
 =cut
 
-# $Date: 2002/09/20 14:01:45 $
+# $Date: 2002/09/23 08:28:39 $
 ### UTF1.pm ends here
