@@ -13,7 +13,7 @@ require 5.7.3;
 use strict;
 package Encode::ISO2022::EightBit;
 use vars qw($VERSION);
-$VERSION=do{my @r=(q$Revision: 1.1 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use base qw(Encode::Encoding);
 require Encode::ISO2022;
 
@@ -275,6 +275,12 @@ __PACKAGE__->Define (qw/compound-text ctext x-ctext/);
 ISO/IEC 2022 based 8-bit encoding used in inter-client
 communication of X Window System (Alias: ctext (emacsen), x-ctext (emacsen))
 
+Strictly, x-ctext, extended compound text (X Compound Text
+based encoding for unknown ISO/IEC 2022 based encoding) is a
+different coding system from X Compound Text.  See
+[mule-jp:7455] <mid:rsqsoa5s2hr.fsf@crane.jaist.ac.jp> and
+[mule-jp:7457] <mid:rsq4smlky85.fsf@crane.jaist.ac.jp>.
+
 =cut
 
 sub __2022__common ($) {
@@ -303,6 +309,12 @@ sub __2022__common ($) {
   $C->{option}->{reset}->{Ginvoke} = 0;
   $C;
 }
+sub __2022_decode ($) {
+  my $C = shift->__2022__common;
+  ## Emacsen's x-ctext
+  $C->{G1} = $Encode::ISO2022::CHARSET{G96}->{A};	## ISO/IEC 8859-1
+  $C;
+}
 
 
 1;
@@ -312,12 +324,12 @@ __END__
 
 =head1 LICENSE
 
-Copyright 2002 wakaba <w@suika.fam.cx>
+Copyright 2002 Wakaba <w@suika.fam.cx>
 
 This library is free software; you can redistribute it
 and/or modify it under the same terms as Perl itself.
 
 =cut
 
-# $Date: 2002/09/16 02:17:48 $
+# $Date: 2002/09/20 14:01:45 $
 ### SevenBit.pm ends here

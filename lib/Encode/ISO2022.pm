@@ -8,10 +8,13 @@ Encode::ISO2022 --- ISO/IEC 2022 encoder and decoder
 require v5.7.3;
 package Encode::ISO2022;
 use strict;
-use vars qw(%CHARSET $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+use vars qw(%CHARSET %CODING_SYSTEM $VERSION);
+$VERSION=do{my @r=(q$Revision: 1.5 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use base qw(Encode::Encoding);
 __PACKAGE__->Define (qw/iso-2022 iso2022 2022 cp2022/);
+require Encode::Charset;
+	*CHARSET = \%Encode::Charset::CHARSET;
+	*CODING_SYSTEM = \%Encode::Charset::CODING_SYSTEM;
 
 ### --- Intialization
 
@@ -29,158 +32,6 @@ my %_CHARS_to_RANGE = (
 	b128	=> q/[\x00-\xFF]/,
 	b256	=> q/[\x00-\xFF]/,
 );
-
-## --- Make initial charset definitions
-&_make_initial_charsets;
-sub _make_initial_charsets () {
-for my $f (0x30..0x7E) {
-  my $F = pack 'C', $f;
-  for ('', '!', '"', '#') {
-    $CHARSET{G94}->{ $_.$F }->{dimension} = 1;
-    $CHARSET{G94}->{ $_.$F }->{chars} = 94;
-    $CHARSET{G94}->{ $_.$F }->{ucs} =
-      {'' => 0xE90940, '!' => 0xE944A0, '"' => 0xE98000, '#' => 0xE9BB60}->{ $_ }
-      + 94 * ($f-0x30);
-    
-    $CHARSET{G96}->{ $_.$F }->{dimension} = 1;
-    $CHARSET{G96}->{ $_.$F }->{chars} = 96;
-    $CHARSET{G96}->{ $_.$F }->{ucs} =
-      {'' => 0xE926A0, '!' => 0xE96200, '"' => 0xE99D60, '#' => 0xE9D8C0}->{ $_ }
-      + 96 * ($f-0x30);
-    
-    $CHARSET{C0}->{ $_.$F }->{dimension} = 1;
-    $CHARSET{C0}->{ $_.$F }->{chars} = 32;
-    $CHARSET{C0}->{ $_.$F }->{ucs} =
-      {'' => 0x70000000, '!' => 0x70001400,
-      '"' => 0x70002800, '#' => 0x70003C00}->{ $_ } + 32 * ($f-0x30);
-    
-    $CHARSET{C1}->{ $_.$F }->{dimension} = 1;
-    $CHARSET{C1}->{ $_.$F }->{chars} = 32;
-    $CHARSET{C1}->{ $_.$F }->{ucs} =
-      {'' => 0x70000A00, '!' => 0x70001E00,
-      '"' => 0x70003200, '#' => 0x70004600}->{ $_ } + 32 * ($f-0x30);
-    
-    $CHARSET{G94}->{ ' '.$_.$F }->{dimension} = 1;	## DRCS
-    $CHARSET{G94}->{ ' '.$_.$F }->{chars} = 94;
-    $CHARSET{G94}->{ ' '.$_.$F }->{ucs} =
-      {'' => 0x70090940, '!' => 0x700944A0,
-      '"' => 0x70098000, '#' => 0x7009BB60}->{ $_ } + 94 * ($f-0x30);
-    
-    $CHARSET{G96}->{ ' '.$_.$F }->{dimension} = 1;	## DRCS
-    $CHARSET{G96}->{ ' '.$_.$F }->{chars} = 96;
-    $CHARSET{G96}->{ ' '.$_.$F }->{ucs} =
-      {'' => 0x700926A0, '!' => 0x70096200,
-      '"' => 0x70099D60, '#' => 0x7009D8C0}->{ $_ } + 96 * ($f-0x30);
-  }
-}
-for my $f (0x30..0x5F, 0x7E) {
-  my $F = pack 'C', $f;
-  for ('', '!', '"', '#', ' ') {
-    $CHARSET{G94n}->{ $_.$F }->{dimension} = 2;
-    $CHARSET{G94n}->{ $_.$F }->{chars} = 94;
-    $CHARSET{G94n}->{ $_.$F }->{ucs} =
-      ({'' => 0xE9F6C0}->{ $_ }||0) + 94*94 * ($f-0x30);
-      ## BUG: 94^n sets with I byte have no mapping area
-    
-    $CHARSET{G96n}->{ $_.$F }->{dimension} = 2;
-    $CHARSET{G96n}->{ $_.$F }->{chars} = 96;
-    $CHARSET{G96n}->{ $_.$F }->{ucs} =
-      ({'' => 0xF4C000}->{ $_ }||0) + 96*96 * ($f-0x30);
-      ## BUG: 94^n DRCSes with I byte have no mapping area
-  }
-}
-for (0x60..0x6F) {
-  my $F = pack 'C', $_;
-  ## BUG: 9x^3 sets have no mapping area
-  for ('', '!', '"', '#', ' ') {
-    $CHARSET{G94n}->{ $_.$F }->{dimension} = 3;
-    $CHARSET{G94n}->{ $_.$F }->{chars} = 94;
-    
-    $CHARSET{G96n}->{ $_.$F }->{dimension} = 3;
-    $CHARSET{G96n}->{ $_.$F }->{chars} = 96;
-  }
-}
-for (0x70..0x7D) {
-  my $F = pack 'C', $_;
-  ## BUG: 9x^4 sets have no mapping area
-  for ('', '!', '"', '#', ' ') {
-    $CHARSET{G94n}->{ $_.$F }->{dimension} = 4;
-    $CHARSET{G94n}->{ $_.$F }->{chars} = 94;
-    
-    $CHARSET{G96n}->{ $_.$F }->{dimension} = 4;
-    $CHARSET{G96n}->{ $_.$F }->{chars} = 96;
-  }
-}
-for my $f (0x40..0x4E) {
-  my $F = pack 'C', $f;
-    $CHARSET{G96n}->{ ' '.$F }->{dimension} = 2;
-    $CHARSET{G96n}->{ ' '.$F }->{chars} = 96;
-    $CHARSET{G96n}->{ ' '.$F }->{ucs} = 0xF0000 + 96*96*($f-0x40);
-    ## U+F0000-U+10F7FF (private) -> ESC 02/04 02/00 <I> (04/00-04/14) (DRCS)
-}
-
-$CHARSET{G94}->{B}->{ucs} = 0x21;	## ASCII
-$CHARSET{G96}->{A}->{ucs} = 0xA0;	## ISO 8859-1
-
-$CHARSET{G94n}->{'B@'}->{dimension} = 2;	## JIS X 0208-1990
-$CHARSET{G94n}->{'B@'}->{chars} = 94;
-$CHARSET{G94n}->{'B@'}->{ucs} = 0xE9F6C0 + 94*94*79;
-
-  ## -- Control character sets
-  $CHARSET{C0}->{'@'}->{ucs} = 0x00;	## ISO/IEC 6429 C0
-  for ("\x40", "\x43", "\x44", "\x45", "\x46", "\x49", "\x4A", "\x4B", "\x4C") {
-    $CHARSET{C0}->{$_}->{C_LS0} = "\x0F";
-    $CHARSET{C0}->{$_}->{C_LS1} = "\x0E";
-    $CHARSET{C0}->{$_}->{r_LS0} = '\x0F';
-    $CHARSET{C0}->{$_}->{r_LS1} = '\x0E';
-  }
-  for ("\x40", "\x44", "\x45", "\x46", "\x48", "\x4C") {
-    $CHARSET{C0}->{$_}->{reset_all} = {"\x0A" => 1, "\x0B" => 1,
-      "\x0C" => 1, "\x0D" => 1};
-  }
-  $CHARSET{C0}->{"\x43"}->{reset_all} = {"\x0A" => 1};
-  $CHARSET{C0}->{"\x44"}->{C_SS2} = "\x1C";
-  $CHARSET{C0}->{"\x44"}->{r_SS2} = '\x1C';
-  for ("\x45", "\x49", "\x4A", "\x4B") {
-    $CHARSET{C0}->{$_}->{C_SS2} = "\x19";
-    $CHARSET{C0}->{$_}->{C_SS3} = "\x1D";
-    $CHARSET{C0}->{$_}->{r_SS2} = '\x19';
-    $CHARSET{C0}->{$_}->{r_SS3} = '\x1D';
-  }
-  $CHARSET{C0}->{"\x4C"}->{C_SS2} = "\x19";
-  $CHARSET{C0}->{"\x4C"}->{r_SS2} = '\x19';
-  
-  $CHARSET{C1}->{'64291991C1'}->{dimension} = 1;	## ISO/IEC 6429:1991 C1
-  $CHARSET{C1}->{'64291991C1'}->{chars} = 32;
-  $CHARSET{C1}->{'64291991C1'}->{ucs} = 0x80;
-  for ("\x43", "\x45", "\x47", '64291991C1') {
-    $CHARSET{C1}->{$_}->{C_SS2} = "\x8E";
-    $CHARSET{C1}->{$_}->{C_SS3} = "\x8F";
-    $CHARSET{C1}->{$_}->{r_SS2} = '\x8E';
-    $CHARSET{C1}->{$_}->{r_SS3} = '\x8F';
-    $CHARSET{C1}->{$_}->{r_SS2_ESC} = '\x1B\x4E';
-    $CHARSET{C1}->{$_}->{r_SS3_ESC} = '\x1B\x4F';
-  }
-  for ("\x43", '64291991C1') {
-    $CHARSET{C1}->{$_}->{r_CSI} = '\x9B';
-    $CHARSET{C1}->{$_}->{r_CSI_ESC} = '\x1B\x5B';
-    $CHARSET{C1}->{$_}->{r_DCS} = '\x90';
-    $CHARSET{C1}->{$_}->{r_ST} = '\x9C';
-    $CHARSET{C1}->{$_}->{r_OSC} = '\x9D';
-    $CHARSET{C1}->{$_}->{r_PM} = '\x9E';
-    $CHARSET{C1}->{$_}->{r_APC} = '\x9F';
-    $CHARSET{C1}->{$_}->{reset_all} = {"\x85"=>1, "\x90"=>1,
-      "\x9C"=>1, "\x9D"=>1, "\x9E"=>1, "\x9F"=>1};
-  }
-  $CHARSET{C1}->{'64291991C1'}->{r_SCI} = '\x9A';
-  
-  $CHARSET{single_control}->{Fs}   ={ucs => 0x70005000, chars => 32, dimension => 1};
-  $CHARSET{single_control}->{'3F'} ={ucs => 0x70005020, chars => 80, dimension => 1};
-  $CHARSET{single_control}->{'3F!'}={ucs => 0x70005070, chars => 80, dimension => 1};
-  $CHARSET{single_control}->{'3F"'}={ucs => 0x700050C0, chars => 80, dimension => 1};
-  $CHARSET{single_control}->{'3F#'}={ucs => 0x70005110, chars => 80, dimension => 1};
-}
-
 
 ### --- Perl Encode module common functions
 
@@ -212,6 +63,7 @@ sub new_object {
   $C{G1} = $CHARSET{G94}->{"\x7E"};	## empty set
   $C{G2} = $CHARSET{G94}->{"\x7E"};	## empty set
   $C{G3} = $CHARSET{G94}->{"\x7E"};	## empty set
+  $C{coding_system} = $CODING_SYSTEM{"\x40"};	## ISO/IEC 2022
   $C{option} = {
   	C1invoke_to_right	=> 0,	## C1 invoked to: (0: ESC Fe, 1: CR)
   	G94n_designate_long	=> 0,	## (1: ESC 02/04 02/08 04/00..02)
@@ -234,6 +86,9 @@ sub new_object {
   		},
   		G96n	=> {
   			default	=> 1,
+  		},
+  		coding_system => {
+  			default => -1,
   		},
   	},
   	Ginvoke_by_single_shift	=> [0,0,0,0],	## Invoked by SS
@@ -261,6 +116,55 @@ sub new_object {
 }
 
 sub iso2022_to_internal ($;\%) {
+  my ($s, $C) = @_;
+  my $t = '';
+  $s =~ s{
+    ^((?:(?!\x1B\x25\x2F?[\x30-\x7E]).)*)
+  }{
+    my $i2 = $1;
+    $t = _iso2022_to_internal ($i2, $C);
+    '';
+  }gesx;
+  $s =~ s{
+     ## ISO/IEC 2022
+      \x1B\x25\x40((?:(?!\x1B\x25\x2F?[\x30-\x7E]).)*)
+     ## UTF-8
+     |\x1B\x25(?:\x47|\x2F[\x47-\x49])((?:(?!\x1B\x25\x2F?[\x30-\x7E]).)*)
+     ## UCS-2, UTF-16
+     |\x1B\x25\x2F[\x40\x43\x45\x4A-\x4C]
+       ((?!\x00\x1B\x00\x25\x00\x2F?\x00[\x30-\x7E].)*)
+     ## UCS-4
+     |\x1B\x25\x2F[\x41\x44\x46]
+       ((?!\x00\x00\x00\x1B\x00\x00\x00\x25\x00\x00\x00\x2F?
+           \x00\x00\x00[\x30-\x7E].)*)
+     ## with standard return
+     |\x1B\x25([\x30-\x7E])((?:(?!\x1B\x25\x2F?[\x30-\x7E]).)*)
+     ## without standard return
+     |\x1B\x25\x2F([\x30-\x7E])(.*)
+  }{
+    my ($i2,$u8,$Fu2,$u2,$u4,$Fsr,$sr,$Fnsr,$nsr) = ($1,$2,$3,$4,$5,$6,$7,$8,$9);
+    my $r = '';
+    if (defined $i2) {
+      $r = _iso2022_to_internal ($i2, $C);
+    } elsif (defined $u8) {
+      $r = Encode::decode ('utf8', $u8);
+    } elsif ($Fu2) {
+      if (ord ($Fu2) > 0x49) {
+        $r = Encode::decode ('utf-16be', $u2);
+      } else {
+        $r = Encode::decode ('ucs-2be', $u2);
+      }
+    } elsif (defined $u4) {
+      $r = Encode::decode ('ucs-4be', $u2);
+    } else {	## temporary
+      $r = '?+';
+    }
+    $r;
+  }gesx;
+  $t . $s;
+}
+
+sub _iso2022_to_internal ($;\%) {
   my ($s, $C) = @_;
   my %_GB_to_GN = (
     "\x28"=>'G0',"\x29"=>'G1',"\x2A"=>'G2',"\x2B"=>'G3',
@@ -570,10 +474,29 @@ sub internal_to_iso2022 ($\%) {
                        ->[ $c / 8836 ]);
     }
     if (defined $t) {
+      $t = _i2o ($t, $C, cs_F => "\x40")
+        if $C->{coding_system} ne $CODING_SYSTEM{"\x40"};
+    } else {
+      my $F;  my @F = qw~G /G /H /I  B  /A /D /F~;
+      push @F, qw~/J /K /L~ if $cc <= 0x10FFFF;
+      push @F, qw~/@ /C /E~ if $cc <= 0xFFFF;
+      for (@F) {
+        if (defined $C->{option}->{designate_to}->{coding_system}->{$_}
+            && $C->{option}->{designate_to}->{coding_system}->{$_} > -1) {
+          $F = $_; last;
+        } elsif ($C->{option}->{designate_to}->{coding_system}->{default} > -1) {
+          $F = $_; last;
+        }
+      }
+      $t = _i2o ($c, $C, cs_F => $F) if $F;
+    }
+    if (defined $t) {
       $r .= $t;
     } else {
-      $r .= _i2g ($C->{option}->{undef_char}->[0], $C,
+      $t = _i2g ($C->{option}->{undef_char}->[0], $C,
                   %{ $C->{option}->{undef_char}->[1] });
+      $r .= $C->{coding_system} eq $CODING_SYSTEM{"\x40"} ?
+            $t : _i2o ($t, $C, cs_F => "\x40");
     }
   }
   $r . _back2ascii ($C);
@@ -729,14 +652,59 @@ sub __invoke (\%$$) {
   }
   '';
 }
-
-sub make_charset (%) {
-## TODO: support private charset ID such as 'X0'
-  my %set = @_;
-  my $setid = qq($set{I}$set{F}$set{revision});
-  my $settype = $set{type} || 'G94';
-  delete $set{type}, $set{I}, $set{F}, $set{revision};
-  $CHARSET{ $settype }->{ $setid } = \%set;
+sub _i2o ($\%%) {
+  my ($s, $C, %O) = @_;
+  my $CS = $CODING_SYSTEM{ $O{cs_F} } || $CODING_SYSTEM{ $O{cs_id} } || return undef;
+  my $r = '';
+  if ($CS ne $C->{coding_system}) {
+    my $e = '';
+    $e .= "\x1B\x25";
+    $e .= $O{cs_F} || $C->{private_set}->{coding_system}->{ $O{cs_id} }
+          || return undef;
+    if ($C->{coding_system} eq $CODING_SYSTEM{"\x2F\x40"}
+     || $C->{coding_system} eq $CODING_SYSTEM{"\x2F\x43"}
+     || $C->{coding_system} eq $CODING_SYSTEM{"\x2F\x45"}
+     || $C->{coding_system} eq $CODING_SYSTEM{"\x2F\x4A"}
+     || $C->{coding_system} eq $CODING_SYSTEM{"\x2F\x4B"}
+     || $C->{coding_system} eq $CODING_SYSTEM{"\x2F\x4C"}) {
+      $e =~ s/(.)/\x00$1/go;
+    } elsif ($C->{coding_system} eq $CODING_SYSTEM{"\x2F\x41"}
+     || $C->{coding_system} eq $CODING_SYSTEM{"\x2F\x44"}
+     || $C->{coding_system} eq $CODING_SYSTEM{"\x2F\x46"}) {
+      $e =~ s/(.)/\x00\x00\x00$1/go;
+    }
+    $r .= $e;
+    $C->{coding_system} = $CS;
+    if ($CS->{reset_state}) {
+      $C->{GL} = undef;  $C->{GR} = undef;
+      $C->{C0} = $CHARSET{C0}->{"\x7E"};
+      $C->{C1} = $CHARSET{C1}->{"\x7E"};
+      $C->{G0} = $CHARSET{G94}->{"\x7E"};
+      $C->{G1} = $CHARSET{G94}->{"\x7E"};
+      $C->{G2} = $CHARSET{G94}->{"\x7E"};
+      $C->{G3} = $CHARSET{G94}->{"\x7E"};
+    }
+  }
+  if ($CS eq $CODING_SYSTEM{"\x40"}) {
+    # 
+  } elsif ($CS eq $CODING_SYSTEM{G} || $CS eq $CODING_SYSTEM{'/G'}
+        || $CS eq $CODING_SYSTEM{'/H'} || $CS eq $CODING_SYSTEM{'/I'}) {
+    Encode::_utf8_off ($s);
+  } elsif ($CS eq $CODING_SYSTEM{'/@'} || $CS eq $CODING_SYSTEM{'/C'}
+        || $CS eq $CODING_SYSTEM{'/E'}) {
+    $s = Encode::encode ('ucs-2be', $s);
+  } elsif ($CS eq $CODING_SYSTEM{'/A'} || $CS eq $CODING_SYSTEM{'/D'}
+        || $CS eq $CODING_SYSTEM{'/F'}) {
+    $s = Encode::encode ('ucs-4be', $s);
+  } elsif ($CS eq $CODING_SYSTEM{'/J'} || $CS eq $CODING_SYSTEM{'/K'}
+        || $CS eq $CODING_SYSTEM{'/L'}) {
+    $s = Encode::encode ('UTF-16BE', $s);
+  } elsif ($CS eq $CODING_SYSTEM{B}) {
+    $s = Encode::encode ('utf-1', $s);
+  } else {
+    return undef;
+  }
+  $r . $s;
 }
 
 1;
@@ -808,14 +776,20 @@ not implemented yet.
 
 =back
 
+=head1 AUTHORS
+
+Nanashi-san
+
+Wakaba <w@suika.fam.cx>
+
 =head1 LICENSE
 
-Copyright 2002 wakaba <w@suika.fam.cx>
+Copyright 2002 AUTHORS
 
 This library is free software; you can redistribute it
 and/or modify it under the same terms as Perl itself.
 
 =cut
 
-# $Date: 2002/09/16 06:35:16 $
+# $Date: 2002/09/20 14:01:45 $
 ### ISO2022.pm ends here

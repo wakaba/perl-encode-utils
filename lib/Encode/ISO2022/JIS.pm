@@ -15,7 +15,7 @@ require 5.7.3;
 use strict;
 package Encode::ISO2022::JIS;
 use vars qw($VERSION);
-$VERSION=do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use base qw(Encode::Encoding);
 require Encode::ISO2022;
 
@@ -499,12 +499,12 @@ in Encode::ISO2022::RFC1345.)
 
 =head1 LICENSE
 
-Copyright 2002 wakaba <w@suika.fam.cx>
+Copyright 2002 Wakaba <w@suika.fam.cx>
 
 This library is free software; you can redistribute it
 and/or modify it under the same terms as Perl itself.
 
 =cut
 
-# $Date: 2002/09/16 11:00:41 $
+# $Date: 2002/09/20 14:01:45 $
 ### JIS.pm ends here

@@ -2,7 +2,7 @@ require 5.7.3;
 package Encode::EUCFixed;
 use strict;
 use vars qw(%DEFAULT $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.1 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 package Encode::EUCFixed::JP;
 use base qw(Encode::Encoding);
@@ -93,13 +93,13 @@ Encode::EUCFixed --- Fixed width (or wide) coding system of EUC
 
 =head1 LICENSE
 
-Copyright 2002 wakaba <w@suika.fam.cx>
+Copyright 2002 Wakaba <w@suika.fam.cx>
 
 This library is free software; you can redistribute it
 and/or modify it under the same terms as Perl itself.
 
 =head1 CHANGE
 
-Last update $Date: 2002/08/04 01:00:02 $
+Last update $Date: 2002/09/20 14:01:45 $
 
 =cut

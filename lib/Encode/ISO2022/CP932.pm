@@ -2,9 +2,9 @@ require 5.7.3;
 package Encode::ISO2022::CP932;
 use strict;
 use vars qw(%DEFAULT $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use base qw(Encode::Encoding);
-__PACKAGE__->Define (qw/x-iso2022jp-cp932/);
+__PACKAGE__->Define (qw/x-iso2022jp-cp932 CP50220/);
 
 sub encode ($$;$) {
   my ($obj, $str, $chk) = @_;
@@ -76,16 +76,31 @@ or 7bit ISO/IEC 2022 CES.
 This module supports two such charsets.  One is
 C<x-iso2022jp-cp932>, 
 
+=head1 ENCODINGS
+
+=over 4
+
+=item x-iso2022jp-cp932
+
+Microsoft Windows CodePage 50220: A transformation format of
+Microsoft Windows CodePage 932 that looks like C<ISO-2022-JP>
+(Alias: C<CP50220> (M$))
+
+Note that this coding system does NOT comform to RFC 1468,
+JIS standards nor ISO/IEC 2022.  This coding system
+SHOULD be used when and ONLY when converting data received
+from Microsoft Windows platforms.
+
+=back
+
 =head1 LICENSE
 
-Copyright 2002 wakaba <w@suika.fam.cx>
+Copyright 2002 Wakaba <w@suika.fam.cx>
 
 This library is free software; you can redistribute it
 and/or modify it under the same terms as Perl itself.
 
-=head1 CHANGE
-
-See F<ChangeLog>.
-$Date: 2002/09/15 04:15:11 $
-
 =cut
+
+# $Date: 2002/09/20 14:01:45 $
+### CP932.pm ends here

@@ -13,7 +13,7 @@ require 5.7.3;
 use strict;
 package Encode::ISO2022::SevenBit;
 use vars qw($VERSION);
-$VERSION=do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.5 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use base qw(Encode::Encoding);
 __PACKAGE__->Define (qw/iso-2022-7bit iso-2022-7 jis junet jis7/);
 require Encode::ISO2022;
@@ -61,14 +61,13 @@ package Encode::ISO2022::SevenBit::JP;
 use vars qw/@ISA/;
 push @ISA, 'Encode::ISO2022::SevenBit';
 __PACKAGE__->Define (qw/iso-2022-jp junet-code japanese-iso-7bit csiso2022jp
- cp50220 iso2022jp/);
+ iso2022jp/);
 
 =item iso-2022-jp
 
 ISO/IEC 2022 based 7-bit encoding for Japanese.
 Defined by Junet no tebiki, RFC 1468 and JIS X 0208:1997 Appendix 2.
-(Alias: junet-code, japanese-iso-7bit (emacsen), csISO2022JP (IANA),
-CP50220 (M$))
+(Alias: junet-code, japanese-iso-7bit (emacsen), csISO2022JP (IANA))
 
 =cut
 
@@ -500,12 +499,12 @@ __END__
 
 =head1 LICENSE
 
-Copyright 2002 wakaba <w@suika.fam.cx>
+Copyright 2002 Wakaba <w@suika.fam.cx>
 
 This library is free software; you can redistribute it
 and/or modify it under the same terms as Perl itself.
 
 =cut
 
-# $Date: 2002/09/16 06:34:35 $
+# $Date: 2002/09/20 14:01:45 $
 ### SevenBit.pm ends here

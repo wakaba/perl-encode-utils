@@ -2,7 +2,7 @@ require 5.7.3;
 package Encode::Unicode::UTF1;
 use strict;
 use vars qw($VERSION);
-$VERSION=do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use base qw(Encode::Encoding);
 __PACKAGE__->Define (qw/ISO-10646-UTF-1 utf-1 utf1 csISO10646UTF1 iso-ir-178/);
 
@@ -92,7 +92,7 @@ Encode::Unicode::UTF1 --- Encode/decode of UTF-1
 
 =head1 LICENSE
 
-Copyright 2002 wakaba E<lt>w@suika.fam.cxE<gt>.
+Copyright 2002 Wakaba E<lt>w@suika.fam.cxE<gt>.
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -109,9 +109,7 @@ along with this program; see the file COPYING.  If not, write to
 the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 Boston, MA 02111-1307, USA.
 
-=head1 CHANGE
-
-See F<ChangeLog>.
-$Date: 2002/08/16 12:09:21 $
-
 =cut
+
+# $Date: 2002/09/20 14:01:45 $
+### UTF1.pm ends here

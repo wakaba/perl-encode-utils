@@ -1,3 +1,28 @@
+2002-09-20  Wakaba <w@suika.fam.cx>
+
+	* ISO2022.pm:
+	- (iso2022_to_internal): New function.
+	- (_iso2022_to_internal): Renamed from iso2022_to_internal.
+	- (iso2022_to_internal): Experimental support of DOCS.
+	- (internal_to_iso2022): Output in UCS coding systems
+	if the character is unable to be encoded in ISO/IEC 2022
+	coded character sets.
+	- (_i2o): New procedure.
+	- ($C->{option}->{designate_to}->{coding_system}): New option
+	property object.
+	- ($C->{coding_system}): New property.
+	- (%CODING_SYSTEM): New hash.  (Alias to Encode::Charset's one.)
+	* Charset.pm (make_initial_coding_system): Set 'reset_state'
+	property with 1 value to coding systems of DOCS with 02/14 I byte.
+
+2002-09-19  Wakaba <w@suika.fam.cx>
+
+	* ISO2022.pm:
+	- (make_initial_charset, make_charset): Removed.
+	- (%CHARSET): Redefined as an alias of Encode::Charset's.
+	* Charset.pm: New module.  Charset definitions are
+	moved from ISO2022.pm.
+
 2002-09-16  Wakaba <w@suika.fam.cx>
 
 	* ISO2022.pm:

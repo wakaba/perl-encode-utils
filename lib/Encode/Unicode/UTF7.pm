@@ -2,7 +2,7 @@ require 5.7.3;
 package Encode::Unicode::UTF7;
 use strict;
 use vars qw(%OPTION $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use base qw(Encode::Encoding);
 require MIME::Base64;
 __PACKAGE__->Define (qw/utf-7 utf7 unicode-2-0-utf-7 unicode-2-0-utf7 x-unicode-2-0-utf7 cp65000 unicode-1-1-utf-7 csunicode11utf7/);
@@ -111,7 +111,7 @@ Encode::Unicode::UTF7 --- Encode/decode of UTF-7 and IMAP4 modified UTF-7
 
 =head1 LICENSE
 
-Copyright 2002 wakaba E<lt>w@suika.fam.cxE<gt>.
+Copyright 2002 Wakaba E<lt>w@suika.fam.cxE<gt>.
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -130,5 +130,5 @@ Boston, MA 02111-1307, USA.
 
 =cut
 
-## $Date: 2002/09/15 04:15:51 $
+# $Date: 2002/09/20 14:01:45 $
 ### UTF7.pm ends here
