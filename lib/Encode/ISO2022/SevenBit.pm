@@ -13,9 +13,10 @@ require 5.7.3;
 use strict;
 package Encode::ISO2022::SevenBit;
 use vars qw($VERSION);
-$VERSION=do{my @r=(q$Revision: 1.6 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.7 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use base qw(Encode::Encoding);
-__PACKAGE__->Define (qw/iso-2022-7bit iso-2022-7 jis junet jis7/);
+__PACKAGE__->Define (qw/iso-2022-7bit iso-2022-7 jis junet jis7
+  7bit-jis/);
 require Encode::ISO2022;
 
 sub encode ($$;$) {
@@ -34,7 +35,7 @@ sub decode ($$;$) {
 =item iso-2022-7bit
 
 ISO/IEC 2022 based 7-bit encoding using only G0
-(Alias: junet, jis, jis7, iso-2022-7)
+(Alias: junet (emacsen), jis, jis7, iso-2022-7 (emacsen), 7bit-jis (perl))
 
 =cut
 
@@ -509,5 +510,5 @@ and/or modify it under the same terms as Perl itself.
 
 =cut
 
-# $Date: 2002/09/22 11:08:23 $
+# $Date: 2002/09/23 10:36:03 $
 ### SevenBit.pm ends here

@@ -13,7 +13,7 @@ require 5.7.3;
 use strict;
 package Encode::ISO2022::ISO646;
 use vars qw($VERSION);
-$VERSION=do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use base qw(Encode::Encoding);
 require Encode::ISO2022;
 
@@ -584,14 +584,20 @@ __END__
 
 =back
 
+=head1 AUTHORS
+
+Nanashi-san
+
+Wakaba <w@suika.fam.cx>
+
 =head1 LICENSE
 
-Copyright 2002 Wakaba <w@suika.fam.cx>
+Copyright 2002 Authors
 
 This library is free software; you can redistribute it
 and/or modify it under the same terms as Perl itself.
 
 =cut
 
-# $Date: 2002/09/23 02:35:37 $
+# $Date: 2002/09/23 10:36:03 $
 ### ISO646.pm ends here
