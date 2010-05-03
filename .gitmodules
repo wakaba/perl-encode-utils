@@ -1,0 +1,3 @@
+[submodule "modules/chartables"]
+	path = modules/chartables
+	url = http://suika.fam.cx/gate/git/bare/chartables.git
