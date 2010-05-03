@@ -1,9 +1,7 @@
 
-PLDIR = tool/
+PLDIR = ../../../bin/
 PERL = perl
 PERLI = $(PERL) -I$(PLDIR)
-TBR2TBL = $(PLDIR)tbr2tbl.pl
-TBL2UCM = $(PLDIR)tbl2ucm.pl
 TBL2PM = $(PLDIR)tbl2pm.pl
 
 TBL_DIR = ../../../modules/chartables/generated/
