@@ -6,6 +6,9 @@ TBR2TBL = $(PLDIR)tbr2tbl.pl
 TBL2UCM = $(PLDIR)tbl2ucm.pl
 TBL2PM = $(PLDIR)tbl2pm.pl
 
+TBL_DIR = ../../../modules/chartables/generated/
+PM_DIR = ./
+
 PM_jis = jisx0208_1978.pm jisx0208_1978_irv.pm \
   jisx0208_1983.pm jisx0208_1983_irv.pm jisx0208_1990.pm \
   jisx0208_1990_open_0201.pm jisx0208_1990_open_ascii.pm \
@@ -31,42 +34,19 @@ PM_iso8859 = isoiec8859_2.pm isoiec8859_3.pm isoiec8859_4.pm \
 
 all: jis gb ks kps iso8859 photograph misc
 
-jis:  $(PM_jis)
-jis-tbl:  $(PM_jis:.pm=.tbl)
-gb:  $(PM_gb)
-gb-tbl:  $(PM_gb:.pm=.tbl)
-ks:  $(PM_ks)
-ks-tbl:  $(PM_ks:.pm=.tbl)
-kps:  $(PM_kps)
-kps-tbl:  $(PM_kps:.pm=.tbl)
-iso8859:  $(PM_iso8859)
-iso8859-tbl:  $(PM_iso8859:.pm=.tbl)
-photograph:  $(PM_photograph)
-photograph-tbl:  $(PM_photograph:.pm=.tbl)
-misc:  $(PM_misc)
-misc-tbl:  $(PM_misc:.pm=.tbl)
+jis:  $(PM_jis:%=$(PM_DIR)%)
+gb:  $(PM_gb:%=$(PM_DIR)%)
+ks:  $(PM_ks:%=$(PM_DIR)%)
+kps:  $(PM_kps:%=$(PM_DIR)%)
+iso8859:  $(PM_iso8859:%=$(PM_DIR)%)
+photograph:  $(PM_photograph:%=$(PM_DIR)%)
+misc:  $(PM_misc:%=$(PM_DIR)%)
 
-%.tbl: %.tbr $(TBR2TBL)
-	$(PERLI) $(TBR2TBL) $< > $@
-
-euc_jp_open_ascii.tbl: euc_jp_open_ascii.tbr $(TBR2TBL) \
-  jisx0208_1990_open_ascii.tbl \
-  jisx0212_1990_open_ascii.tbl
-	$(PERLI) $(TBR2TBL) $< > $@
-
-%.ucm: %.tbl $(TBL2UCM)
-	$(PERLI) $(TBL2UCM) $< > $@
-
-%.pm: %.tbl $(TBL2PM) $(PLDIR)internal.pl
+$(PM_DIR)%.pm: $(TBL_DIR)%.tbl $(TBL2PM) $(PLDIR)internal.pl
 	$(PERLI) $(TBL2PM) $< > $@
 	$(PERLI) -c $@
 
 clean:
 	rm -rfv *.BAK .*.BAK *~ .*~
-	rm -ffv $(PM_jis) $(PM_jis:.pm=.tbl) \
-	  $(PM_gb) $(PM_gb:.pm=.tbl) \
-	  $(PM_ks) $(PM_ks:.pm=.tbl) \
-	  $(PM_kps) $(PM_kps:.pm=.tbl) \
-	  $(PM_iso8859) $(PM_iso8859:.pm=.tbl) \
-	  $(PM_misc) $(PM_misc:.pm=.tbl)
-	  $(PM_photograph) $(PM_photograph:.pm=.tbl)
+
+## License: Public Domain.
