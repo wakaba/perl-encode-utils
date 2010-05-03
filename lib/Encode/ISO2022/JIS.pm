@@ -1,4 +1,4 @@
-## This file is auto-generated (at 2010-05-03T06:14:51Z).
+## This file is auto-generated (at 2010-05-03T06:23:52Z).
 ## Do not edit by hand!
 
 =head1 NAME
@@ -2061,7 +2061,7 @@ sub __code_version ($) {
   require Encode::Charset;
   my $C = &Encode::Charset::new_object;
   $C->{bit} = 8;
-  $C->{G0} = $Encode::Charset::CHARSET{G94n}->{'B ## JIS X 0208-1983'};
+  $C->{G0} = $Encode::Charset::CHARSET{G94n}->{'B'};	## JIS X 0208-1983
   $C;
 }
 

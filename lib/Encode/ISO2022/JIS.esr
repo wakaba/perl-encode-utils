@@ -577,7 +577,7 @@ Name:
 	jisx4001-text-8bit
 Cversion:
 	C:bit=8
-	C:G0=G94n:B ## JIS X 0208-1983
+	C:G0=G94n:B	## JIS X 0208-1983
 Encode:Prepare:
 	C:GR=undef
 	C:C1=C1:~
